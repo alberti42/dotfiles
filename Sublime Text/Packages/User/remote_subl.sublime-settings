@@ -1,0 +1,19 @@
+{
+    /*
+        listen host
+
+        WARNING: it's NOT recommended to change this option,
+        use SSH tunneling instead.
+    */
+    "host": "localhost",
+
+    /*
+        listen port
+    */
+    "port": 52150,
+
+    /*
+        display a dialog when connection is lost
+    */
+    "pop_up_when_connection_lost": true
+}

@@ -1,0 +1,2 @@
+Sublime[[:space:]]Text/Packages/User/Preferences.sublime-settings filter=ignore-dictionary-key
+Sublime[[:space:]]Text/Packages/User/LSP-ltex-ls.sublime-settings filter=ignore-ltex_language-key

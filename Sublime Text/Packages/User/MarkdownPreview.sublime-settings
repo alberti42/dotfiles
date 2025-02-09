@@ -1,0 +1,9 @@
+{
+    "enable_mathjax": true,
+	"js": {
+	        "markdown": [
+	            "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js",
+	            "res://MarkdownPreview/js/math_config.js"
+	        ]
+	    }
+}

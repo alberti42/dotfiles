@@ -1,0 +1,9 @@
+{
+    "environment_directories": [
+        "~/.virtualenvs",
+        "~/.pyenv/versions/3.10.15/envs",
+        "~/.pyenv/versions/3.13.1/envs"
+    ],
+    "log_level": "INFO",
+    "LSP_plugin": "LSP-basedpyright",
+}

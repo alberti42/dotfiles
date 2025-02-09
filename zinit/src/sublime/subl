@@ -1,0 +1,44 @@
+#!/usr/bin/env zsh -fd
+
+# Andrea Alberti, 2024
+
+_subl_main() {
+  emulate -LR zsh
+  
+  # Define the path to the Sublime Text binary
+  local subl_path subl_paths
+  typeset -a subl_paths
+
+  if [[ $OSTYPE =~ 'darwin*' ]]; then
+    subl_paths=("/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl")
+  elif [[ $OSTYPE =~ 'linux*' ]]; then
+    subl_paths=("$HOME/.local/bin/sublime_text")
+  else
+    # TODO: provide some meaningul alternative
+    subl_paths=()
+  fi
+
+  for subl_path in "${subl_paths[@]}"; do
+    if [[ -f "$subl_path" ]]; then
+      break
+    fi
+  done
+
+  # Resolve all positional arguments to their real paths
+  local resolved_args arg
+  typeset -a resolved_args
+  for arg in "$@"; do
+    if [[ -f "$arg" || -d "$arg" ]]; then
+        # If it's a file or directory, resolve the real path
+        resolved_args+=("$(readlink -f "$arg" 2>/dev/null || echo "$arg")")
+    else
+        # Pass through non-file arguments like options (-n, --help, etc.)
+        resolved_args+=("$arg")
+    fi
+  done
+
+  # Execute the Sublime Text binary with resolved arguments
+  "$subl_path" -p "$RSUBL_PORT" "${resolved_args[@]}"
+}
+
+_subl_main "$@"

@@ -1,0 +1,232 @@
+{
+  "dictionary": "Packages/Language - German/German_de_DE.dic",
+  "gutter": true,
+  "ignored_packages":
+  [
+    "LSP-pyright",
+    "SideBarTools",
+    "Vintage",
+  ],
+  "draw_white_space": "selection",
+  "tab_size": 2,
+  "translate_tabs_to_spaces": false,
+  "detect_indentation": false,
+  "line_numbers": true,
+  "open_files_in_new_window": "never",
+  "scroll_past_end": true,
+  
+  "show_minimap": true,
+  "always_show_minimap_viewport": true,
+
+  "show_panel_on_build": true,
+  "theme": "Adaptive.sublime-theme",
+  
+  // Disables horizontal scrolling if enabled.
+  // May be set to true, false, or "auto", where it will be disabled for
+  // source code, and otherwise enabled.
+  "word_wrap": "auto",
+  "auto_indent": true,
+  "wrap_width": "0",
+  "wrap_width_style": "min",
+  
+  // Enables hardware accelerated rendering. This moves rendering to your GPU,
+  // allowing for faster rendering at higher resolutions. Changing this
+  // setting requires an application restart to take effect.
+  // - "none": Performs CPU rendering.
+  // - "opengl": Uses OpenGL for rendering. Minimum required version is 4.1
+  //
+  // On Mac, this value is overridden in the platform specific settings.
+  "hardware_acceleration": "opengl",
+
+  "update_check": true,
+
+  // Characters that are considered to separate words
+  "word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
+
+  // Characters that are considered to separate sub-words
+  "sub_word_separators": "",
+
+  // The indexing engine uses low-priority background processes to load and analyze the files in the project.
+  "index_files": true,
+
+  // Display file encoding in the status bar
+  "show_encoding": true,
+  
+  // Set to true to ensure the last line of the file ends in a newline
+  // character when saving
+  "ensure_newline_at_eof_on_save": false,
+
+  // Color scheme
+  // "color_scheme": "Monokai Pro (Filter Octagon).sublime-color-scheme",
+
+  // Note that the font_face and font_size are overridden in the platform
+  // specific settings file, for example, "Preferences (Linux).sublime-settings".
+  // Because of this, setting them here will have no effect: you must set them
+  // in your User File Preferences.
+  // "font_face": "MesloLGS NF",
+  // "font_size": 20,
+  // "font-options": [],
+
+  "windows":
+	{
+    // "font_size": 14,
+    "ignored_packages":
+	  [
+	    "Terminal",
+	    "Vintage",
+	    "Recent Files Tracker"
+    ],
+	},
+
+  // Ignore version control system-based (VCS-based) packages
+  "ignore_vcs_package": true,
+
+  // Used by the plugin https://github.com/SublimeText/GenerateUUID
+  "uuid_uppercase": false,
+
+  "make_commands_makefile_pattern": "/(Makefile|rules\\.mk)$",
+
+  "added_words":
+  [
+    "nonvanishing",
+    "travelled",
+    "qubit",
+    "brachistochrones",
+    "delocalize",
+    "photonic",
+    "semiclassical",
+    "Schrödinger",
+    "maxima",
+    "Zeeman",
+    "Paraxial",
+    "paraxial",
+    "ansatz",
+    "internet",
+    "Poynting",
+    "Gouy",
+    "permittivity",
+    "dispersionless",
+    "ultracold",
+    "thermalizes",
+    "spectroscopically",
+    "motional",
+    "thermalization",
+    "interferometric",
+    "ellipticity",
+    "waveplate",
+    "interferometry",
+    "interferometrically",
+    "Dephasing",
+    "dephasing",
+    "nonlinearity",
+    "hyperfine",
+    "detuned",
+    "rescaling",
+    "polarizer",
+    "adiabatically",
+    "sideband",
+    "interferometer",
+    "inhomogeneity",
+    "spectrally",
+    "nanometers",
+    "polarizability",
+    "lanthanide",
+    "interferometers",
+    "inhomogeneous",
+    "detuning",
+    "ellipticities",
+    "inhomogenous",
+    "nanometer",
+    "linewidths",
+    "detunings",
+    "systematics",
+    "orthogonalization",
+    "evolutions",
+    "Excitations",
+    "excitations",
+    "precessing",
+    "vibrational",
+    "kurtosis",
+    "delocalization",
+    "brachistochrone",
+    "delocalized",
+    "wavefunction",
+    "tunable",
+    "durations",
+    "Evanescently",
+    "waveguides",
+    "polariton",
+    "waveguide",
+    "evanescently",
+    "testbed",
+    "repositioned",
+    "superfluid",
+    "invariants",
+    "quantized",
+    "indistinguishability",
+    "boson",
+    "projective",
+    "subnanometer",
+    "optimality",
+    "controllability",
+    "splitter",
+    "bosons",
+    "programmability",
+    "sidebands",
+    "unitaries",
+    "photonics",
+    "quadratically",
+    "tomographically",
+    "quadratures",
+    "operatively",
+    "crosstalk",
+    "experimentalists",
+    "dissipative",
+    "delocalizes",
+    "repumper",
+    "collisional",
+    "collimated",
+    "experimentalist",
+    "azimuthal",
+    "collimate",
+    "collimating",
+    "ultranarrow",
+    "qubits",
+    "orthonormal",
+    "defocus",
+    "apodization",
+    "inhomogeneities",
+    "photodiode",
+    "bandpass",
+    "interferogram",
+    "observables",
+    "perturbative",
+    "diagonalization",
+    "benchmarking",
+    "counterintuitive",
+    "fidelities",
+    "metrology",
+    "Ratengleichung",
+    "Schwerebeschleunigung",
+    "discretized",
+    "Elliptizität",
+    "raumfeste",
+  ],
+  "color_scheme": "Catppuccin Frappe.sublime-color-scheme",
+  "auto_complete_triggers":
+  [
+		{
+			"characters": "<",
+			"selector": "text.html, text.xml",
+		},
+		{
+			"rhs_empty": true,
+			"selector": "punctuation.accessor",
+		},
+		{
+			"characters": "\\",
+			"selector": "text.tex.latex",
+		}
+  ],
+  "font_size": 17,
+}

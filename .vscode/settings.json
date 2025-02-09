@@ -1,0 +1,6 @@
+{
+    "files.exclude": {
+        "**/*.sublime-workspace": true,
+        "**/*.zwc": true,
+    }
+}

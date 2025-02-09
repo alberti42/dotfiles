@@ -1,0 +1,3 @@
+#!/bin/sh -f
+
+exec /usr/local/bin/zsh -o NO_GLOBAL_RCS "$@"

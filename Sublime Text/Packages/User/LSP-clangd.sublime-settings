@@ -1,0 +1,23 @@
+// Settings in here override those in "LSP-clangd/LSP-clangd.sublime-settings"
+
+{
+  "clients": {
+    "clangd": {
+      "enabled": true,
+      "command": [
+        "clangd", // you may use an absolute path for this clangd executable
+        "-function-arg-placeholders=0",
+        "-header-insertion-decorators=1",
+        "-index",
+    ],
+      "scopes": ["source.c", "source.c++", "source.objc", "source.objc++"],
+      "syntaxes": [
+        "Packages/C++/C.sublime-syntax",
+        "Packages/C++/C++.sublime-syntax",
+        "Packages/Objective-C/Objective-C.sublime-syntax",
+        "Packages/Objective-C/Objective-C++.sublime-syntax",
+    ],
+      "languageId": "cpp",
+  },
+},
+}

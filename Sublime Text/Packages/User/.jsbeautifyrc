@@ -1,0 +1,12 @@
+{
+    "format_on_save": true,
+    "global_file_rules":
+    {
+        "js":
+        {
+            "allowed_file_extensions": ["js", "jsx", "ts"],
+            "allowed_file_syntaxes": ["javascript", "typescript", "ecma", "react", "babel"],
+            "disallowed_file_patterns": []
+        },
+    }
+}

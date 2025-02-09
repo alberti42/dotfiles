@@ -1,0 +1,28 @@
+{
+    "word_wrap": "true",
+    
+    "wrap_width": 100,
+    "wrap_width_style": "min",
+
+    "spell_check": false,
+
+    // Set to true to insert spaces when tab is pressed
+    "translate_tabs_to_spaces": false,
+
+    // The number of spaces a tab is considered equal to
+    "tab_size": 2,
+
+    // Columns in which to display vertical rulers. Each entry may also be a
+    // list of the column, the ruler style and optionally the ruler width, for
+    // example: [[80, "solid", 2], 78, [90, "dotted"]]
+    "rulers": [[100,"solid",0.5]],
+
+    // Controls how wide ruler lines are drawn
+    "ruler_width": 3.0,
+
+    // Controls how ruler lines are drawn
+    // - "dotted": Drawn as a dotted line
+    // - "stippled": Drawn as a stippled line
+    // - "solid": Drawn as a solid line
+    "ruler_style": "solid",
+}   

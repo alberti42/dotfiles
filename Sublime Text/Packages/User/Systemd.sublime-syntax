@@ -1,0 +1,43 @@
+%YAML 1.2
+# Reference: https://www.sublimetext.com/docs/3/syntax.html
+# A systemd syntax highlight file for Sublime Text 3
+# Fix comment support, fix heading, add boolean, add string, switch source type -- thendrix
+---
+name: Systemd
+file_extensions: [service]
+scope: source.service
+
+contexts:
+  main:
+    - match: '^([A-Za-z]+(?=([\=][\-]?)))'
+      scope: keyword.other.service
+    - match: '^\[[A-Za-z]+\]'
+      scope: entity.name.type.service
+    - match: '(\\\w)?'
+      scope: entity.name.service
+    - match: '\\'
+      scope: constant.character.escape
+    - match: ^(#).*$\n?
+      scope: comment.line.service
+      captures:
+        1: punctuation.definition.comment.service
+    - match: \b(?i:yes|no|0|1|true|false)\b
+      scope: constant.language.boolean.service
+    - match: '"'
+      push: string
+  
+  comments:
+    - match: '#'
+      scope: punctuation.definition.comment.service
+      push:
+       - meta_scope: comment.line.double-slash.service
+       - match: '\n'
+         pop: true
+      
+  string:
+    - meta_scope: string.quoted.double.service
+    - match: \\.
+      scope: constant.character.escape.service
+    - match: '"'
+      pop: true
+      

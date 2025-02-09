@@ -1,0 +1,147 @@
+[
+    {
+        "keys":
+        [
+            "super+ctrl+f"
+        ],
+        "command": "toggle_distraction_free"
+    },
+    // {
+    //     "keys":
+    //     [
+    //         "super+shift+t"
+    //     ],
+    //     "command": "open_terminal"
+    // },
+    // {
+    //     "keys":
+    //     [
+    //         "super+shift+ctrl+t"
+    //     ],
+    //     "command": "open_terminal_project_folder"
+    // },
+    {
+        "keys":
+        [
+            "super+shift+ctrl+n"
+        ],
+        "command": "goto_next_language_problem",
+        "args":
+        {
+            "jumpForward": true
+        }
+    },
+    {
+        "keys":
+        [
+            "super+shift+ctrl+p"
+        ],
+        "command": "goto_next_language_problem",
+        "args":
+        {
+            "jumpForward": false
+        }
+    },
+    {
+        "keys":
+        [
+            "super+shift+ctrl+c"
+        ],
+        "command": "clear_language_problems"
+    },
+    {
+        "keys":
+        [
+            "alt+up"
+        ],
+        "command": "move",
+        "args":
+        {
+            "by": "stops",
+            "empty_line": true,
+            "forward": false
+        }
+    },
+    {
+        "keys":
+        [
+            "alt+down"
+        ],
+        "command": "move",
+        "args":
+        {
+            "by": "stops",
+            "empty_line": true,
+            "forward": true
+        }
+    },
+    {
+        "keys":
+        [
+            "alt+shift+up"
+        ],
+        "command": "move",
+        "args":
+        {
+            "by": "stops",
+            "empty_line": true,
+            "forward": false,
+            "extend": true
+        }
+    },
+    {
+        "keys":
+        [
+            "alt+shift+down"
+        ],
+        "command": "move",
+        "args":
+        {
+            "by": "stops",
+            "empty_line": true,
+            "forward": true,
+            "extend": true
+        }
+    },
+    {
+        "keys":
+        [
+            "super+shift+a"
+        ],
+        "command": "lsp_expand_selection",
+        "args":
+        {}
+    },
+    // >>> TERMINUS >>>
+    { 
+        "keys": ["alt+`"],
+        "command": "toggle_terminus_panel",
+        "args": {
+            "cwd": "${file_path:${folder}}"
+        }
+    },
+    { 
+        "keys": ["super+shift+t"],
+        "command": "terminus_open",
+        "args": {
+        		"config_name": "Zsh",
+            "cwd": "${file_path:${folder}}",
+        }
+    },
+    { 
+        "keys": ["ctrl+alt+t"],
+        "command": "terminus_open",
+        "args": {
+            "cmd": "ipython",
+            "cwd": "${file_path:${folder}}"
+        }
+    },
+    {
+        "keys": ["super+b"],
+        "command": "build_with_terminus",
+        "context": [
+            { "key": "setting.terminus_build", "operator": "equal", "operand": true }
+        ]
+    }
+    // <<< TERMINUS <<<
+]

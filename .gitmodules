@@ -1,0 +1,18 @@
+[submodule "oh-my-zsh/custom/plugins/zsh-misc-completions"]
+	path = oh-my-zsh/custom/plugins/zsh-misc-completions
+	url = git@github.com:alberti42/zsh-misc-completions.git
+	branch = main
+[submodule "oh-my-zsh/custom/plugins/tmux-ssh-syncing"]
+	path = oh-my-zsh/custom/plugins/tmux-ssh-syncing
+	url = git@github.com:alberti42/tmux-ssh-syncing.git
+	branch = main
+[submodule "Sublime Text/Packages/Recent Files Tracker"]
+	path = Sublime Text/Packages/Recent Files Tracker
+	url = https://github.com/alberti42/sublime-recent-files-tracker
+[submodule "Sublime Text/Packages/VirtualenvSelector"]
+	path = Sublime Text/Packages/VirtualenvSelector
+	url = git@github.com:alberti42/sublime-virtualenv-selector.git
+[submodule ".config/yazi/flavors"]
+	path = .config/yazi/flavors
+	url = git@github.com:yazi-rs/flavors.git
+	

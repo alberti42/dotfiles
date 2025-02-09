@@ -1,0 +1,156 @@
+#!/usr/bin/env zsh
+
+# (c) Andrea Alberti, 2024
+
+# convert_to_png.plugin.zsh
+
+# This plugin provides a `convert_to_png` function to resize and compress PNG images using `zopflipng`. 
+# Usage:
+# convert_to_png [-o] -r <reduction_factor> -- <input_file1> <input_file2> ...
+
+# Function to handle cleanup of temporary files
+cleanup() {
+  if [[ -n "$temp_file" && -f "$temp_file" ]]; then
+    rm "$temp_file"
+    if [[ $? -ne 0 ]]; then
+      echo "Warning: Failed to remove temporary file $temp_file"
+    fi
+  fi
+}
+
+# Trap to ensure cleanup happens on script exit or error
+trap cleanup EXIT
+
+# Usage message
+usage() {
+  echo "Usage: convert_to_png [-o] -r <reduction_factor> -- <input_files>"
+  echo "Options:"
+  echo "  -o    Overwrite the original file(s)"
+  echo "  -y    Overwrite the output file(s) without asking permission"
+  echo "  -r    Reduction factor (required, must be a number between 1 and 100)"
+  exit 1
+}
+
+# Initialize variables
+overwrite=0
+reduction_factor=""
+force=0
+
+# Parse options using getopts
+while getopts ":oyr:" opt; do
+  case "${opt}" in
+    o)
+      overwrite=1
+      ;;
+    y)
+      force=1
+      ;;
+    r)
+      reduction_factor="${OPTARG}"
+      if ! [[ "$reduction_factor" =~ ^[0-9]+$ ]] || (( reduction_factor <= 0 || reduction_factor > 100 )); then
+        echo "Error: Reduction factor must be a number between 1 and 100."
+        usage
+      fi
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+# Adjust argument positions
+shift $((OPTIND - 2))
+
+# Ensure `--` is present and shift past it
+if [[ "$1" == "--" ]]; then
+  shift
+else
+  echo "Error: Missing '--' separator before input files."
+  usage
+fi
+
+# Collect input files
+if [[ $# -eq 0 ]]; then
+  echo "Error: No input files provided."
+  usage
+fi
+input_files=("$@")
+
+# Process each input file
+for input_file in "${input_files[@]}"; do
+  if [[ ! -f "$input_file" ]]; then
+    echo "Error: File $input_file does not exist. Skipping."
+    continue
+  fi
+
+  temp_resized_file="$(mktemp).png"
+  temp_output_file="$(mktemp).png"
+
+  # Determine output file name
+  if [[ $overwrite -eq 1 ]]; then
+    output_file="${input_file%.*}.png"
+    force=1  # automatically force overwriting
+  else
+    output_file="${input_file%.*}_compressed.png"
+  fi
+
+  # Step 1: Resize the image using ImageMagick
+  magick "$input_file" -resize "${reduction_factor}%" "$temp_resized_file"
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Image resizing failed for $input_file."
+    rm "$temp_resized_file"
+    continue
+  fi
+
+  # The following command uses `zopflipng` to compress the PNG image. Since `zopflipng` outputs progress and results to the terminal,
+  # we want to display this output in real-time and replace the temporary filename with the original input file name in the displayed text.
+  # 
+  # - `stdbuf -oL`: Ensures the output from `zopflipng` is line-buffered, allowing real-time display of each line of progress.
+  # - `zopflipng`: The main command performing PNG optimization.
+  # - `--lossy_transparent --iterations=15`: Options to enable lossy compression of transparent pixels and set the number of iterations for compression.
+  # - `$temp_resized`: The resized temporary image file, used as the input to `zopflipng`.
+  # - `$output_file`: The output file where the optimized PNG will be saved.
+  # - `| sed "s|$temp_resized|$input_file|g"`: Replaces all occurrences of the temporary file's path with the original input file's path in `zopflipng`'s output.
+  # 
+  # This combination ensures that:
+  # 1. You see `zopflipng`'s progress and results immediately in the terminal (real-time output).
+  # 2. The displayed messages reference the actual input file instead of the temporary resized file, making the output easier to understand.
+
+  # Step 2: Compress the resized image with zopflipng
+  stdbuf -oL zopflipng --lossy_transparent --iterations=15 "$temp_resized_file" "$temp_output_file" | sed "s|$temp_resized_file|$input_file|g"
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Image compression failed for $input_file."
+    rm "$temp_resized_file" "$temp_output_file"
+    continue
+  fi
+
+  # Step 3: Handle overwriting logic
+  if [[ -f "$output_file" && $force -eq 0 ]]; then
+    echo "$output_file already exists. Do you want to overwrite it? (y/n): "
+    read response
+    if [[ "$response" != "y" ]]; then
+      rm "$temp_resized_file" "$temp_output_file"
+      continue
+    fi
+  fi
+
+  # Step 4: Write the output file
+  mv "$temp_output_file" "$output_file"
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to overwrite $output_file."
+    rm "$temp_resized_file"
+    continue
+  fi
+
+  rm "$temp_resized_file"  # Clean up resized temporary file
+
+  # Step 5: Final check
+  if [[ -f "$output_file" ]]; then
+    if [[ "$input_file" == "$output_file" ]]; then
+      echo "Successfully converted $input_file"
+    else
+      echo "Successfully converted $input_file -> $output_file"
+    fi
+  else
+    echo "Failed to create $output_file"
+  fi
+done

@@ -1,0 +1,10 @@
+[terminal.shell]
+program = "/Users/andrea/.local/share/zinit/polaris/bin/tmux"
+args = ["-l", "new-session", "-A", "-s", "main"]
+
+[window]
+position = { x = 800, y = 280 }
+dimensions = { columns = 180, lines = 55}
+
+[font]
+size = 17

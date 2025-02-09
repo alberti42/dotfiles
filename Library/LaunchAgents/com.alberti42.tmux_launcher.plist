@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<false/>
+	<key>EnvironmentVariables</key>
+	<dict/>
+	<key>Label</key>
+	<string>Tmux launcher</string>
+	<key>LowPriorityIO</key>
+	<false/>
+	<key>Nice</key>
+	<integer>0</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>if [ -x /usr/libexec/path_helper ]; then eval $(/usr/libexec/path_helper -s); fi; tmux has-session -t main 2&gt; /dev/null || ( cd $HOME; tmux new-session -d -s main )</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>

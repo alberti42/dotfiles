@@ -1,0 +1,12 @@
+{
+    "rules": [
+        {
+            "scope": "constant.language.failure.sftp",
+            "foreground": "#dd7878"
+        },
+        {
+            "scope": "constant.language.success.sftp",
+            "foreground": "#40a02b"
+        }
+    ]
+}

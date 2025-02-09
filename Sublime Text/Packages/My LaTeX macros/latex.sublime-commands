@@ -1,0 +1,4 @@
+[
+  { "caption": "LaTeX macros: Comment out Latex block", "command": "encapsulate_in_environment", "args": { "env_name": "comment" }},
+  { "caption": "LaTeX macros: Split Latex sentences", "command": "split_latex_lines"},
+]

@@ -1,0 +1,5 @@
+#!/bin/sh -f
+
+PATH="/Users/andrea/.local/share/zinit/polaris/bin:/usr/bin:/bin"
+
+exec tmux "$@"

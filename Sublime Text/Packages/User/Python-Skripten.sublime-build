@@ -1,0 +1,9 @@
+{
+  "cmd": ["/Users/andrea/miniforge3/envs/E1/bin/python3", "-u", "$file"],
+  "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+  "selector": "source.python",
+  "env": {
+      "PATH": "~/miniforge3/envs/E1/bin:$PATH"
+  },
+  "shell": true
+}

@@ -1,0 +1,8 @@
+// Settings in here override those in "LSP-eslint/LSP-eslint.sublime-settings"
+
+{
+    "options": {
+        "eslint.options": { "configFile": "~/.eslint/eslint.config.js" },
+        "eslint.nodePath": "/usr/local/lib/node_modules"
+    },    
+}

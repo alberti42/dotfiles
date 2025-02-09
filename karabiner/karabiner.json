@@ -1,0 +1,179 @@
+{
+    "global":
+    {
+        "show_in_menu_bar": false
+    },
+    "profiles":
+    [
+        {
+            "devices":
+            [
+                {
+                    "identifiers":
+                    {
+                        "is_keyboard": true
+                    },
+                    "ignore": true
+                },
+                {
+                    "identifiers":
+                    {
+                        "is_keyboard": true,
+                        "is_pointing_device": true,
+                        "product_id": 46339,
+                        "vendor_id": 1133
+                    },
+                    "ignore": false,
+                    "manipulate_caps_lock_led": false,
+                    "simple_modifications":
+                    [
+                        {
+                            "from":
+                            {
+                                "key_code": "left_arrow"
+                            },
+                            "to":
+                            [
+                                {
+                                    "key_code": "open_bracket"
+                                }
+                            ]
+                        },
+                        {
+                            "from":
+                            {
+                                "key_code": "right_arrow"
+                            },
+                            "to":
+                            [
+                                {
+                                    "key_code": "close_bracket"
+                                }
+                            ]
+                        },
+                        {
+                            "from":
+                            {
+                                "pointing_button": "button1"
+                            },
+                            "to":
+                            [
+                                {
+                                    "key_code": "right_arrow"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "identifiers":
+                    {
+                        "is_keyboard": true,
+                        "product_id": 50477,
+                        "vendor_id": 1133
+                    },
+                    "simple_modifications":
+                    [
+                        {
+                            "from":
+                            {
+                                "key_code": "left_arrow"
+                            },
+                            "to":
+                            [
+                                {
+                                    "key_code": "open_bracket"
+                                }
+                            ]
+                        },
+                        {
+                            "from":
+                            {
+                                "key_code": "page_up"
+                            },
+                            "to":
+                            [
+                                {
+                                    "key_code": "open_bracket"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "complex_modifications":
+            {
+                "rules":
+                [
+                    {
+                        "description": "Option+F moves forward by word",
+                        "manipulators":
+                        [
+                            {
+                                "from":
+                                {
+                                    "key_code": "f",
+                                    "modifiers":
+                                    {
+                                        "mandatory":
+                                        [
+                                            "option"
+                                        ]
+                                    }
+                                },
+                                "to":
+                                [
+                                    {
+                                        "key_code": "right_arrow",
+                                        "modifiers":
+                                        [
+                                            "option"
+                                        ]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Option+B moves backward by word",
+                        "manipulators":
+                        [
+                            {
+                                "from":
+                                {
+                                    "key_code": "b",
+                                    "modifiers":
+                                    {
+                                        "mandatory":
+                                        [
+                                            "option"
+                                        ]
+                                    }
+                                },
+                                "to":
+                                [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers":
+                                        [
+                                            "option"
+                                        ]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "name": "Default profile",
+            "selected": true,
+            "virtual_hid_keyboard":
+            {
+                "country_code": 0,
+                "keyboard_type_v2": "ansi"
+            }
+        }
+    ]
+}

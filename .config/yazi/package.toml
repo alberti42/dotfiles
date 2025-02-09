@@ -1,0 +1,7 @@
+[[plugin.deps]]
+use = "yazi-rs/plugins:max-preview"
+rev = "f202fa8"
+hash = "9bc26d10d2f6e2aa93b10905b1b76979"
+
+[flavor]
+deps = []

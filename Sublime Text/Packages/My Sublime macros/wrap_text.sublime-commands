@@ -1,0 +1,10 @@
+[
+    {
+        "caption": "Wrap Text",
+        "command": "wrap_text"
+    },
+    {
+        "caption": "Unwrap Text",
+        "command": "unwrap_text"
+    }
+]

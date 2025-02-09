@@ -1,0 +1,20 @@
+{
+	"cancel":
+	{
+		"kill": true,
+	},
+	"file_regex": "^(..[^:\n]*):([0-9]+):?([0-9]+)?:? (.*)",
+	"keyfiles":
+	[
+		"Makefile",
+		"makefile"
+	],
+	"makefile": "/Users/andrea/LS_COLORS/Makefile",
+	"selector": "source.makefile",
+	"syntax": "Packages/Makefile/Make Output.sublime-syntax",
+	"target": "make_targets",
+	"variants":
+	[
+	],
+	"working_dir": "${folder:${project_path:${file_path}}}",
+}

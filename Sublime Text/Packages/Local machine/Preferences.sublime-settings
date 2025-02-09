@@ -1,0 +1,10 @@
+// Do not link this file -- just copy it to keep it local to your machine
+{
+ // Note that the font_face and font_size are overridden in the platform
+  // specific settings file, for example, "Preferences (Linux).sublime-settings".
+  // Because of this, setting them here will have no effect: you must set them
+  // in your User File Preferences.
+  "font_face": "MesloLGS NF",
+  "font_size": 18,
+  "font-options": [],
+}

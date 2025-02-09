@@ -1,0 +1,55 @@
+{
+    "theme": "adaptive",
+    "brighten_bold_text": false,
+    "shell_configs": [
+        {
+            "name": "Tmux",
+            "cmd": ["tmux", "-l", "new-session", "-A", "-s", "terminus"],
+            "env": {},
+            "enable": true,
+            "platforms": ["linux", "osx"],
+        },
+        {
+            "name": "Zsh",
+            "cmd": ["zsh", "-i", "-l"],
+            "env": {},
+            "enable": true,
+            "platforms": ["linux", "osx"],
+        },
+        {
+            "name": "Command Prompt",
+            "cmd": "cmd.exe",
+            "env": {},
+            "enable": true,
+            "platforms": ["windows"],
+        },
+        {
+            "name": "PowerShell Core",
+            "cmd": "pwsh.exe",
+            "env": {},
+            "enable": true,
+            "platforms": ["windows"],
+        },
+        {
+            "name": "PowerShell",
+            "cmd": "powershell.exe",
+            "env": {},
+            "enable": true,
+            "platforms": ["windows"],
+        },
+        {
+            "name": "Cmder",
+            "cmd": ["cmd.exe", "/k", "%CMDER_ROOT%\\vendor\\init.bat"],
+            "env": {},
+            "enable": false,
+            "platforms": ["windows"],
+        },
+        {
+            "name": "WSL Login Shell",
+            "cmd": "wsl.exe",
+            "env": {},
+            "enable": true,
+            "platforms": ["windows"],
+        }
+    ],
+}

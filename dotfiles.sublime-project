@@ -1,0 +1,41 @@
+{
+  "folders":
+  [
+    {
+      "path": ".",
+      /*"folder_exclude_patterns": [],*/
+      /*"file_exclude_patterns": ["*"],*/
+      /*"folder_exclude_patterns": [
+      ],*/
+      "file_exclude_patterns": ["*.zwc"]
+    }
+  ],
+  "build_systems":
+  [
+  ],
+  "syntax_override": {
+  },
+  "settings":
+  {
+        "project_environment":
+        {
+        },
+        "SublimeLinter.linters.eslint.disable": true, // disable eslint
+        "tab_size": 2,
+        "translate_tabs_to_spaces": true,
+        "default_encoding": "UTF-8",
+        "ensure_newline_at_eof_on_save": true,
+      },
+      "syntax_specific":
+      {
+        "text.html": {
+          "tab_size": 2,
+          "translate_tabs_to_spaces": true,
+        },
+        "text.html.markdown": {
+          "tab_size": 2,
+          "translate_tabs_to_spaces": true,
+          "extensions": ["md", "markdown"],
+        },
+      },
+    }

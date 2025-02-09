@@ -1,0 +1,6 @@
+// These settings override both User and Default settings for the Terminus View syntax
+{
+    "font_face": "MesloLGS NF",
+    "font_size": 16,
+    "show_minimap": false,
+}

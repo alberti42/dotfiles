@@ -1,0 +1,161 @@
+[
+    {
+        "keys":
+        [
+            "super+shift+c"
+        ],
+        "command": "encapsulate_in_environment",
+        "args": { "env_name": "comment" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys":
+        [
+            "super+shift+s"
+        ],
+        "command": "encapsulate_in_environment",
+        "args": { "env_name": "solution" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys": ["super+l","q"],
+        "command": "insert_snippet",
+        "args": { "contents": "\\quotedblock{${1:name_of_the_block}}{${2:$SELECTION}}$0" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys": ["super+l","r"],
+        "command": "insert_snippet",
+        "args": { "contents": "\\changeReferees{${1:$SELECTION}}{${2:$SELECTION}}$0" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys": ["super+l","a"],
+        "command": "insert_snippet",
+        "args": { "contents": "\\changeAA{${1:$SELECTION}}{${2:$SELECTION}}$0" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys": ["super+l","i"],
+        "command": "insert_snippet",
+        "args": { "name": "Packages/My LaTeX macros/Snippets/emphasize.sublime-snippet" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys": ["super+l","b"],
+        "command": "insert_snippet",
+        "args": { "contents": "\\textbf{${1:$SELECTION}}$0" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys": ["super+l","m","r"],
+        "command": "insert_snippet",
+        "args": { "contents": "\\mathrm{${1:$SELECTION}}$0" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys":
+        [
+            "shift+enter"
+        ],
+        "command": "new_latex_line",
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys":
+        [
+            "ctrl+alt+s"
+        ],
+        "command": "split_latex_lines",
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
+        "keys":
+        [
+            "super+shift+enter"
+        ],
+        "command": "insert",
+        "args":
+        {
+            "characters": "\n%\n"
+        },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    }
+]

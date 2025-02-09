@@ -1,0 +1,59 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    {
+        "key": "i i",
+        "command": "notebook.cancelExecution",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "delete delete",
+        "command": "notebook.cell.clearOutputs",
+        "when": "notebookCellEditable && notebookCellHasOutputs && notebookEditable && notebookEditorFocused && !inputFocus"
+    },
+    {
+        "key": "backspace backspace",
+        "command": "notebook.cell.delete",
+        "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
+    },
+    {
+        "key": "ctrl+up",
+        "command": "notebook.cell.moveUp",
+        "when": "notebookEditorFocused && !inputFocus"
+    },
+    {
+        "key": "ctrl+down",
+        "command": "notebook.cell.moveDown",
+        "when": "notebookEditorFocused && !inputFocus"
+    },
+    {
+        "key": "cmd+shift+t",
+        "command": "workbench.action.terminal.newWithCwd",
+        "args": {
+          "cwd": "${fileDirname}"
+        }
+    },
+    {
+        "key": "cmd+shift+r",
+        "when": "editorLangId == latex && editorHasSelection",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "snippet": "\\changeReferees{${1:$TM_SELECTED_TEXT}}{$TM_SELECTED_TEXT}"
+        }
+    },
+    {
+        "key": "cmd+shift+b",
+        "when": "editorLangId == latex && editorHasSelection",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "snippet": "\\quotedblock{${1:block_label}}{$TM_SELECTED_TEXT}"
+        }
+    },
+    {
+        "key": "cmd+alt+r",
+        "when": "editorLangId == latex && editorHasSelection",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "snippet": "\\begin{referee}\n$TM_SELECTED_TEXT\n\\end{referee}"
+        }
+    },
+]

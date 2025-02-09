@@ -1,0 +1,15 @@
+// Settings in here override those in "/ProjectEnvironment/ProjectEnvironment.sublime-settings",
+{
+	// This is only for windows, since Mac and Linux can use shebang:
+    "settings": {
+        "project_environment": {
+            "env": {},
+            "env_file": "",
+            "windows": {},
+            "osx": {
+                "env_file": "~/.zshenv"
+            },
+            "linux": {}
+        }
+    }	
+}

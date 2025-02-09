@@ -1,0 +1,12 @@
+[
+    {
+        "caption": "Sublime Text: Enable Logging",
+        "command": "toggle_logging",
+        "args": { "enable": true }
+    },
+    {
+        "caption": "Sublime Text: Disable Logging",
+        "command": "toggle_logging",
+        "args": { "enable": false }
+    }
+]

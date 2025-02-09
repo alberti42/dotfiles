@@ -1,0 +1,43 @@
+# (c) Andrea Alberti, 2024
+
+# Activate venv by passing the name of the venv
+function conda_init() {
+  # >>> conda initialize >>>
+  # !! Contents within this block are managed by 'conda init' !!
+  cache_file="$HOME/.cache/conda.zsh"
+
+  # Get the current time in seconds
+  current_time=$(date +%s)
+
+  # Get the modification time of the cache file using the unaliased 'stat'
+  if [ -f "$cache_file" ]; then
+    cache_mtime=$(\stat -f "%m" "$cache_file")
+  else
+    cache_mtime=0
+  fi
+
+  # Check if the cache file is older than 7 days (604800 seconds)
+  if [ $((current_time - cache_mtime)) -lt 604800 ]; then
+      # Source the cache file if it's less than a week old
+      source "$cache_file"
+    else
+      # Generate new conda setup and save it to the cache file
+      '/Users/andrea/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null 1> "$cache_file"
+      if [ $? -eq 0 ]; then
+        source "$cache_file"
+      else
+        if [ -f "/Users/andrea/miniforge3/etc/profile.d/conda.sh" ]; then
+          . "/Users/andrea/miniforge3/etc/profile.d/conda.sh"
+        else
+          export PATH="/Users/andrea/miniforge3/bin:$PATH"
+        fi
+      fi
+    fi
+
+    if [ -f "/Users/andrea/miniforge3/etc/profile.d/mamba.sh" ]; then
+      . "/Users/andrea/miniforge3/etc/profile.d/mamba.sh"
+    fi
+
+    unset __conda_setup
+  # <<< conda initialize <<<
+}

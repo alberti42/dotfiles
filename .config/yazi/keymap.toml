@@ -1,0 +1,16 @@
+[manager]
+prepend_keymap = [
+  # { on = "z",         run = "plugin zoxide",              			 desc = "Jump to a directory via zoxide" },
+	{ on = "F",         run = 'plugin fzf',                 			 desc = "Jump to a file/directory via fzf" },
+	{ on = "<A-Up>", 	run = 'seek -1',								 desc = "Scroll up"},
+	{ on = "<A-Down>",	run = 'seek +1',								 desc = "Scroll down"},
+	{ on = "!",         run = 'shell "$SHELL" --block',     			 desc = "Open shell in current directory"},
+	{ on = "#", 	    run = 'plugin max-preview',         			 desc = "Maximize or restore preview"},
+  	{ on = "s",			run = 'search fd --args="--no-ignore"', 		 desc = "Search files by name using fd" },
+  	{ on = "S",         run = 'search rg --args "--no-ignore"',   		 desc = "Search files by content using ripgrep" },
+]
+
+[input]
+prepend_keymap = [
+	{ on = "<Esc>",     run  = "close", desc = "Cancel input" }
+]

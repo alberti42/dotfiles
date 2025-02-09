@@ -1,0 +1,137 @@
+{
+    // window
+    "window.newWindowDimensions": "inherit",
+
+    // workbench
+    "workbench.editor.empty.hint": "hidden",
+    "workbench.startupEditor": "none",
+    "workbench.localHistory.maxFileEntries": 500,
+    "workbench.colorTheme": "Catppuccin Frappé",
+    "workbench.colorCustomizations": {
+        "editorStickyScroll.border": "#6a798d",
+        "editorStickyScroll.background": "#292f36"
+    },
+
+    "jupyter.widgetScriptSources": [
+        "jsdelivr.com",
+        "unpkg.com"
+    ],
+
+    "cSpell.customDictionaries": {
+        "custom-dictionary-user": {
+            "name": "custom-dictionary-user",
+            "path": "~/.cspell/custom-dictionary-user.txt",
+            "addWords": true,
+            "scope": "user"
+        }
+    },
+    "cSpell.languageSettings": [
+        // This one works with Python
+        {
+            "languageId": "python",
+            "includeRegExpList": [
+                "/#.*/",
+                "/('''|\"\"\")[^\\1]+?\\1/g",
+                "strings"
+            ]
+        },
+        // This one works with JavaScript, Typescript, etc
+        {
+            "languageId": "javascript,typescript",
+            "includeRegExpList": [
+                "CStyleComment",
+                "strings"
+            ]
+        },
+        // Use with cpp or c files
+        {
+            "languageId": "cpp,c",
+            // Turn off compound words, because it is only checking strings.
+            "allowCompoundWords": false,
+            // Only check comments and strings
+            "includeRegExpList": [
+                "CStyleComment",
+                "string"
+            ],
+            // Exclude includes, because they are also strings.
+            "ignoreRegExpList": [
+                "/#include.*/"
+            ]
+        }
+    ],
+    
+    // Security
+    "security.workspace.trust.enabled": false,
+    "security.workspace.trust.startupPrompt": "never",
+    "security.workspace.trust.untrustedFiles": "open",
+    "security.workspace.trust.emptyWindow": true,
+    "security.workspace.trust.banner": "never",
+    "security.promptForLocalFileProtocolHandling": false,
+    
+    // Editor
+    "editor.fontSize": 16,
+    "editor.fontFamily": "MesloLGS NF",
+    "editor.accessibilitySupport": "off",
+    "editor.insertSpaces": true,
+    
+    // cSpell
+    "cSpell.enabled": false,
+    "cSpell.enabledFileTypes": {
+        "*": true
+    },
+
+    // Terminal
+    "terminal.integrated.macOptionIsMeta": true,
+    "terminal.integrated.commandsToSkipShell": [
+        "matlab.interrupt",
+        "language-julia.interrupt"
+    ],
+    "terminal.integrated.fontSize": 16,
+
+    // directly open settings as JSON
+    "workbench.settings.editor": "json",
+
+    // LTeX
+    "ltex.languageToolOrg.username": "secret@gmail.com",
+    "ltex.languageToolOrg.apiKey": "secret",
+    "ltex.language": "auto",
+    
+    // git
+    "git.confirmSync": false,
+    "git.openRepositoryInParentFolders": "always",
+    "git.autofetch": true,
+    
+    // Python
+    "python.venvPath": "~/.virtualenvs",
+    "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/3.13.0/bin/python",
+
+    // Julia
+    "julia.symbolCacheDownload": true,
+    "julia.enableTelemetry": true,
+    
+    // MATLAB
+    "MATLAB.installPath": "/Applications/MATLAB.app",
+    
+    // Explorer
+    "explorer.confirmDelete": false,
+    
+    // Latex Workshop
+    "latex-workshop.latex.outDir": "%DIR%/._aux",
+    "latex-workshop.latex.autoBuild.run": "never",
+
+    // Sublime Merge
+    "vscsm.smergeExecutablePath": "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge",
+    "editor.detectIndentation": false,
+    "latex-workshop.latex.recipe.default": "lastUsed",
+    "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
+
+    // Latex files
+    "[latex]": {
+        "editor.wordWrap": "on"
+    },
+    // Latex files
+    "[shellscript]": {
+        "editor.tabSize": 2
+    }
+
+}

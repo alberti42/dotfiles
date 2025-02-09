@@ -1,0 +1,54 @@
+[user]
+	name = Andrea Alberti
+	email = email@gmail.com
+[core]
+	attributesfile = ~/.config/git/attributes
+[push]
+	default = simple
+[filter "media"]
+	required = true
+	clean = git media clean %f
+	smudge = git media smudge %f
+[filter "hawser"]
+	clean = git hawser clean %f
+	smudge = git hawser smudge %f
+	required = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
+	process = git-lfs filter-process
+[http]
+	postBuffer = 524288000
+[pull]
+	rebase = false
+[alias]
+  lastcommit = rev-parse HEAD
+	showfiles = diff-tree --no-commit-id --name-status -r
+[log]
+  follow = true
+[man]
+	viewer = catman
+[man "catman"]
+	cmd = man -P \"col -b\"
+[color]
+	ui = true
+[diff]
+	colorMoved = zebra
+[color "status"]
+  header = "#999999"
+  added = "#99cc99"
+  changed = "#f2777a"
+  untracked = "#ffcc66"
+  branch = "#2d2d2d" "#6699cc"
+  # Because the phrase "Detached HEAD" isn't unnerving enough
+  nobranch = bold ul blink "#f99157"
+[color "diff"]
+  meta = "#515151"
+  func = "#cc99cc"
+  frag = "#66cccc"
+  context = "#999999"
+  old = "#f2777a" "#393939"
+  new = "#bef2be" "#515151"
+[diff "plist"]
+	textconv = plutil -convert xml1 -o - --

@@ -1,0 +1,18 @@
+[
+    {
+        "caption": "Switch to German Dictionary",
+        "command": "switch_dictionary",
+        "args": {
+        	"language": "Packages/Language - German/German_de_DE.dic",
+        	"ltex.language": "de-DE"
+        }
+    },
+    {
+        "caption": "Switch to English Dictionary",
+        "command": "switch_dictionary",
+        "args": {
+        	"language": "Packages/Language - English/en_US.dic",
+        	"ltex.language": "en-US"
+        }
+    }
+]

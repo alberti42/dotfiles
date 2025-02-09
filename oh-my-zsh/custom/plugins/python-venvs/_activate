@@ -1,0 +1,38 @@
+#compdef activate
+
+# Copyright Andrea, 2024
+
+# Autocompletion function for the `activate` command
+_activate() {
+  # Only provide suggestions for the first argument
+  if (( CURRENT != 2 )); then
+    return 1
+  fi
+
+  # Use local variables for clarity
+  local dir pattern matches options local_envs
+
+  # Base directory for virtual environments
+  dir="$HOME/.virtualenvs"
+  pattern="*"
+
+  # Collect all matching directories in ~/.virtualenvs
+  matches=(${~dir}/${~pattern})
+
+  # Extract only the directory names
+  options=("${matches[@]##*/}")
+
+  # Check for `.venv` and `venv` in the current directory
+  local_envs=()
+  [[ -d "./.venv" ]] && local_envs+=(".venv")
+  [[ -d "./venv" ]] && local_envs+=("venv")
+
+  # Add local environments to the options
+  options+=("${local_envs[@]}")
+
+  # Provide completion suggestions
+  _describe 'virtual environments' options
+}
+
+# Register the function for the `activate` command
+compdef _activate activate

@@ -1,0 +1,130 @@
+#!/usr/bin/env zsh
+
+# (c) Andrea Alberti, 2024
+
+# convert_to_jpeg.plugin.zsh
+
+# This plugin provides a `convert_to_jpeg` function to resize and convert images to JPEG format with a reduction factor. 
+# Usage:
+# convert_to_jpeg [-o] -r <reduction_factor> -- <input_file1> <input_file2> ...
+
+# Function to handle cleanup of temporary files
+cleanup() {
+  if [[ -n "$temp_file" && -f "$temp_file" ]]; then
+    rm "$temp_file"
+    if [ $? -ne 0 ]; then
+      echo "Warning: Failed to remove temporary file $temp_file"
+    fi
+  fi
+}
+
+# Trap to ensure cleanup happens on script exit or error
+trap cleanup EXIT
+
+# Usage message
+usage() {
+  echo "Usage: convert_to_jpeg [-o] -r <reduction_factor> -- <input_files>"
+  echo "Options:"
+  echo "  -o    Overwrite the original file(s)"
+  echo "  -y    Overwrite the output file(s) without asking permission"
+  echo "  -r    Reduction factor (required, must be a number between 1 and 100)"
+  exit 1
+}
+
+# Initialize variables
+overwrite=0
+reduction_factor=""
+force=0
+
+# Parse options using getopts
+while getopts ":oyr:" opt; do
+  case "${opt}" in
+    o)
+      overwrite=1
+      ;;
+    y)
+      force=1
+      ;;
+    r)
+      reduction_factor="${OPTARG}"
+      if ! [[ "$reduction_factor" =~ ^[0-9]+$ ]] || (( reduction_factor <= 0 || reduction_factor > 100 )); then
+        echo "Error: Reduction factor must be a number between 1 and 100."
+        usage
+      fi
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+# It has already consumed `--` and it points past to it; thus we remove 2 positions
+shift $((OPTIND-2))
+
+# Ensure `--` is present and shift past it
+if [[ "$1" == "--" ]]; then
+  shift
+else
+  echo "Error: Missing '--' separator before input files."
+  usage
+fi
+
+# Collect input files
+if [[ $# -eq 0 ]]; then
+  echo "Error: No input files provided."
+  usage
+fi
+input_files=("$@")
+
+# Process each input file
+for input_file in "${input_files[@]}"; do
+  if [[ ! -f "$input_file" ]]; then
+    echo "Error: File $input_file does not exist. Skipping."
+    continue
+  fi
+
+  temp_output_file="$(mktemp).jpg"
+
+  # Determine output file name
+  if [[ $overwrite -eq 1 ]]; then
+    output_file="${input_file%.*}.jpg"
+    force=1  # automatically force overwriting
+  else
+    output_file="${input_file%.*}_compressed.jpg"
+  fi
+
+  # Convert and compress the image
+  magick "$input_file" -resize "${reduction_factor}%" pnm:- | cjpeg -quality 75 -optimize -progressive > "$temp_output_file"
+  if [ $? -ne 0 ]; then
+    echo "Error: Image conversion failed for $input_file."
+    rm "$temp_output_file"
+    continue
+  fi
+
+  # If the output file exists, prompt the user for confirmation before overwriting
+  if [[ -f "$output_file" && $force -eq 0 ]]; then
+    echo "$output_file already exists. Do you want to overwrite it? (y/n): "
+    read response
+    if [[ "$response" != "y" ]]; then
+      rm "$temp_output_file"
+      continue
+    fi
+  fi
+
+  mv "$temp_output_file" "$output_file"
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to overwrite $output_file."
+    rm "$temp_output_file"
+    continue
+  fi
+
+  # Final check if the output file was created successfully
+  if [[ -f "$output_file" ]]; then
+    if [[ "$input_file" == "$output_file" ]]; then
+      echo "Successfully converted $input_file"
+    else
+      echo "Successfully converted $input_file -> $output_file"
+    fi
+  else
+    echo "Failed to create $output_file"
+  fi
+done

@@ -1,0 +1,7 @@
+{
+  "settings": {
+    // Defines the default rule set for type checking.
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.reportOptionalSubscript": "off",
+  }
+}

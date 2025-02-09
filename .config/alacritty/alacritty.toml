@@ -1,0 +1,134 @@
+# ~/.config/alacritty/alacritty.toml
+
+# Visit https://alacritty.org/config-alacritty.html for an explanation of the parameters
+
+[general]
+live_config_reload = true
+import = ["~/.config/alacritty/alacritty_local.toml"]
+
+[colors]
+draw_bold_text_with_bright_colors = false
+
+[colors.normal]
+  black   = "0x000000"  # ANSI 0
+  red     = "0xc91b00"   # ANSI 1
+  green   = "0x00c300"   # ANSI 2
+  yellow  = "0xc7c400"  # ANSI 3
+  blue    = "0x0226c8"  # ANSI 4
+  magenta = "0xca30c7"  # ANSI 5
+  cyan    = "0x00c5c8"  # ANSI 6
+  white   = "0xc7c7c7"  # ANSI 7
+
+[colors.bright]
+  black   = "0x686868"  # ANSI 0
+  red     = "0xff6e68"   # ANSI 1
+  green   = "0x60fa67"   # ANSI 2
+  yellow  = "0xfffc67"  # ANSI 3
+  blue    = "0x6872ff"  # ANSI 4
+  magenta = "0xff77ff"  # ANSI 5
+  cyan    = "0x5ffdff"  # ANSI 6
+  white   = "0xffffff"  # ANSI 7
+  
+[colors.primary]
+  background = "0x282935"
+  foreground = "0xffffff"
+
+[cursor]
+  unfocused_hollow = true
+  blink_interval = 600
+  thickness = 0.150
+  blink_timeout = 0
+
+# Cursor style
+[cursor.style]
+  shape = "Beam"
+  blinking = "Off"
+
+[env]
+  TERM = "xterm-256color"
+  # alacritty-direct explained https://superuser.com/a/1772039
+  # TERM = "alacritty-direct"
+  TERM_PROGRAM = "alacritty"
+
+[font.normal]
+  family = "MesloLGS NF"
+  style = "Regular"
+  
+# See https://alacritty.org/config-alacritty-bindings.html
+[keyboard]
+  bindings = [
+    { key = "Left", mods = "Alt", chars = "\u001BB" },               # Alt + Left arrow (Move backward one word)
+    { key = "Right", mods = "Alt", chars = "\u001BF" },              # Alt + Right arrow (Move forward one word)
+    
+    # { key = "U", mods = "Alt", chars = "\u001BU" },                # Alt + U (Uppercase from cursor to end of word)
+    # { key = "L", mods = "Alt", chars = "\u001BL" },                # Alt + L (Lowercase from cursor to end of word)
+    # { key = "C", mods = "Alt", chars = "\u001BC" },                # Alt + C (Capitalize the current word)
+    
+    # { key = ".", mods = "Alt", chars = "\u001B." },                # Alt + . (Insert the last argument of previous command)
+    # { key = "Y", mods = "Alt", chars = "\u001BY" },                # Alt + Y (Yank the top of the kill-ring)
+    # { key = "/", mods = "Alt", chars = "\u001B/" },                # Alt + / (Attempt completion)
+    # { key = "T", mods = "Alt", chars = "\u001BT" },                # Alt + T (Transpose the words around cursor)
+    
+    # { key = "R", mods = "Alt", chars = "\u001BR" },                # Alt + R (Recall the last command that matches input)
+    # { key = "N", mods = "Alt", chars = "\u001BN" },                # Alt + N (Search forward through history)
+    # { key = "P", mods = "Alt", chars = "\u001BP" },                # Alt + P (Search backward through history)
+
+    # { key = "Q", mods = "Alt", chars = "\u001BQ" },                # Alt + Q (Not a standard bash shortcut, customizable)
+
+    { key = "t", mods = "Command", chars = "\u0002c" },              # Cmd + t -> `Ctrl-B C` to open a new window in Tmux
+    { key = "n", mods = "Command", action = "None" },                 # Disable new window
+    
+    # { key = "L", mods = "Control|Shift", chars = "l" },  
+    
+    # { key = "PageUp",  action = "ScrollPageUp" },
+    # { key = "PageDown", action = "ScrollPageDown" },
+    # { key = "PageUp", mods = "Alt", action = "ScrollHalfPageUp" },
+    # { key = "PageDown", mods = "Alt", action = "ScrollHalfPageDown" },
+    # { key = "Up", mods = "Alt", action = "ScrollLineUp" },
+    # { key = "Down", mods = "Alt", action = "ScrollLineDown" },
+  ]
+
+[scrolling]
+  history = 10000
+  multiplier = 3
+
+[mouse]
+  hide_when_typing = false
+  bindings = [
+    {action = "Paste", mouse = "Middle"}
+  ]
+
+[selection]
+  save_to_clipboard = true
+  semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+
+[window]
+  dynamic_padding = false
+  opacity = 1
+  decorations = "Buttonless"
+  padding = { x = 12, y = 10 }
+  option_as_alt = "OnlyLeft"
+
+# Links
+[[hints.enabled]]
+  command = "open" # On macOS
+  # command = "xdg-open" # On Linux/BSD
+  # command = { program = "cmd", args = [ "/c", "start", "" ] } # On Windows
+  hyperlinks = true
+  post_processing = false
+  persist = false
+  mouse = {enabled = true, mods = "Command"}
+  binding = { key = "O", mods = "Control|Shift" }
+  regex = "(mailto:|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
+
+# Files with extension
+# [[hints.enabled]]
+# command = { program = "pbcopy", args = [""] }
+# # command = "xdg-open" # On Linux/BSD
+# # command = { program = "cmd", args = [ "/c", "start", "" ] } # On Windows
+# hyperlinks = true
+# post_processing = false
+# persist = false
+# mouse = {enabled = true}
+# regex = "[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+\\.[[:alnum:]]+"
+
