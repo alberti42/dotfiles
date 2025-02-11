@@ -202,7 +202,13 @@ function __my_completions_atinit_hook() {
   zstyle ':completion:*:*:rm:*:*' file-patterns '*:all-files'
   
   # Kill
-  zstyle ':completion:*:*:*:*:processes' command 'ps -u $LOGNAME -o pid,user,command -w'
+  zstyle ':completion:*:*:*:*:processes' command "
+    if [[ $OSTYPE = darwin* ]]; then
+      ps -U "$USER" -o pid,user,comm
+    else
+      ps -u $USER -o pid,user,comm -w -w
+    fi
+  "  
   zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;36=0=01'
   zstyle ':completion:*:*:kill:*' menu yes select
   zstyle ':completion:*:*:kill:*' force-list always

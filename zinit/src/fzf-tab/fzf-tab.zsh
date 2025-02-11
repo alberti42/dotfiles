@@ -14,9 +14,31 @@ __fzf_tab_init_hook() {
   # disable sort when completing `git checkout`
   zstyle ':completion:*:git-checkout:*' sort false
 
+  # NOTE: Check https://github.com/Aloxaf/fzf-tab/wiki/Configuration#zstyle for customization of zstyle
+  
   # switch group using `<` and `>`
   zstyle ':fzf-tab:*' switch-group '<' '>'
+
+  # give a preview of commandline arguments when completing `kill`
+  zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-flags '--preview-window=down:3:wrap'
+  zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-preview '
+    if [[ $group == "[process ID]" ]]; then
+      echo -n "Command: "
+      if [[ $OSTYPE = darwin* ]]; then
+        ps -p "$word" -o command=
+      else
+        ps --pid=$word -o cmd --no-headers -w -w && false
+      fi
+    fi
+  '
   
+  # no prview for options
+  zstyle ':fzf-tab:complete:*:options' fzf-preview ''
+
+  # no preview for subcommands
+  # zstyle ':fzf-tab:complete:*:argument-1' fzf-preview ''
+  
+  # preview for files
   zstyle ":fzf-tab:complete:*:*" fzf-preview '
     if [[ -d "$realpath" ]]; then
       tree -C -L 3 "$realpath"
@@ -26,30 +48,28 @@ __fzf_tab_init_hook() {
       else
         echo "Realpath: $realpath"
         # Use gstat for Linux; fallback to stat for macOS or BSD
-        local stat_cmd
+        local gprefix
         local -a stat_opts
         local arch=$(uname -s)
         if [[ $OSTYPE = darwin* ]]; then
           # Darwin / FreeBSD version
-          local gprefix
           command -v gstat &>/dev/null && gprefix=g
-          echo "Yes"
           if [[ -z $gprefix ]]; then
-              stat_cmd="stat"
               stat_opts=(
-              "-f"
-              "File: %N\nLocation: %d:%i\nMode: %Sp (%Mp%Lp)\nLinks: %l\nOwner: %Su/%Sg\nSize: %z (%b blocks)\nChanged: %Sc\nModified: %Sm\nAccessed: %Sa"
+                "-f"
+                "File: %N\nLocation: %d:%i\nMode: %Sp (%Mp%Lp)\nLinks: %l\nOwner: %Su/%Sg\nSize: %z (%b blocks)\nChanged: %Sc\nModified: %Sm\nAccessed: %Sa"
               )
           fi
-        else
-          # Linux or Darwin with GNU support
-          stat_cmd="${gprefix}stat"
+        fi
+        # Linux or Darwin with GNU support
+        if [[ -z $stat_opts ]]; then
           stat_opts=(
             "-c"
             "File: %N\nType: %F\nLocation: %d:%i\nMode: %A (%a)\nLinks: %h\nOwner: %U/%G\nSize: %s (%b blocks)\nChanged: %z\nModified: %y\nAccessed: %x"
           )
         fi
 
+        local stat_cmd="${gprefix}stat"
         echo $($stat_cmd "$stat_opts[@]" "$realpath")
       fi
     fi'
@@ -65,6 +85,9 @@ __fzf_tab_init_hook() {
     "--color=hl:#ffffff" \
     "--color=hl+:#ffffff"
 }
+
+# Enable preview only for files and directories
+# zstyle ':fzf-tab:complete:*:(files|directories)' fzf-preview 'ls --color=auto -l $realpath'
 
 # Add fzf support to zsh; check https://thevaluable.dev/practical-guide-fzf-example/
 # It requires zicompinit; zicompinit; so it must be called after fast-syntax-highlighting

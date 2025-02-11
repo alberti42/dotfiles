@@ -1,6 +1,7 @@
 {
     // window
     "window.newWindowDimensions": "inherit",
+    "window.autoDetectColorScheme": true,
 
     // workbench
     "workbench.editor.empty.hint": "hidden",
@@ -118,20 +119,25 @@
     // Latex Workshop
     "latex-workshop.latex.outDir": "%DIR%/._aux",
     "latex-workshop.latex.autoBuild.run": "never",
+    "latex-workshop.latex.recipe.default": "lastUsed",
+    "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
 
     // Sublime Merge
     "vscsm.smergeExecutablePath": "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge",
     "editor.detectIndentation": false,
-    "latex-workshop.latex.recipe.default": "lastUsed",
-    "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
-
+    
     // Latex files
     "[latex]": {
-        "editor.wordWrap": "on"
+        "editor.wordWrap": "on",
+        "editor.tabSize": 2
+    },
+    "[tex]": {
+        "editor.tabSize": 2
     },
     // Latex files
     "[shellscript]": {
         "editor.tabSize": 2
-    }
+    },
+    "workbench.preferredDarkColorTheme": "Catppuccin Frappé"
 
 }

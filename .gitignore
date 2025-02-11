@@ -2,3 +2,4 @@
 **/*.sublime-workspace
 Sublime Text/Packages/User/OverrideAudit.status
 **/*.zwc
+.local/share/tmux/resurrect/*

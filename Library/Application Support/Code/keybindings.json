@@ -56,4 +56,12 @@
             "snippet": "\\begin{referee}\n$TM_SELECTED_TEXT\n\\end{referee}"
         }
     },
+    {
+        "key": "shift+cmd+f",
+        "command": "-workbench.action.findInFiles"
+    },
+    {
+        "key": "shift+cmd+f",
+        "command": "search.action.openEditor"
+    },
 ]
