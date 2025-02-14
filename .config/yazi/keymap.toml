@@ -1,6 +1,6 @@
 [manager]
 prepend_keymap = [
-  # { on = "z",         run = "plugin zoxide",              			 desc = "Jump to a directory via zoxide" },
+    { on = "z",         run = "noop",                        			 desc = "Jump to a directory via zoxide" },
 	{ on = "F",         run = 'plugin fzf',                 			 desc = "Jump to a file/directory via fzf" },
 	{ on = "<A-Up>", 	run = 'seek -1',								 desc = "Scroll up"},
 	{ on = "<A-Down>",	run = 'seek +1',								 desc = "Scroll down"},

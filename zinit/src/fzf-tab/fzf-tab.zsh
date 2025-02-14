@@ -68,7 +68,6 @@ __fzf_tab_init_hook() {
             "File: %N\nType: %F\nLocation: %d:%i\nMode: %A (%a)\nLinks: %h\nOwner: %U/%G\nSize: %s (%b blocks)\nChanged: %z\nModified: %y\nAccessed: %x"
           )
         fi
-
         local stat_cmd="${gprefix}stat"
         echo $($stat_cmd "$stat_opts[@]" "$realpath")
       fi

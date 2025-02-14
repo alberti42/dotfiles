@@ -7,10 +7,18 @@
     "workbench.editor.empty.hint": "hidden",
     "workbench.startupEditor": "none",
     "workbench.localHistory.maxFileEntries": 500,
-    "workbench.colorTheme": "Catppuccin Frappé",
+    "workbench.preferredLightColorTheme": "Catppuccin Latte",
+    "workbench.preferredDarkColorTheme": "Catppuccin Frappé",
+    "workbench.tree.indent": 25,
     "workbench.colorCustomizations": {
-        "editorStickyScroll.border": "#6a798d",
-        "editorStickyScroll.background": "#292f36"
+        "[Catppuccin Frappé]": {
+            "editorStickyScroll.border": "#6a798d",
+            "editorStickyScroll.background": "#292f36"
+        },
+        "[Catppuccin Latte]": {
+            "editorStickyScroll.border": "#adadad",
+            "editorStickyScroll.background": "#e4e6eb"
+        }
     },
 
     "jupyter.widgetScriptSources": [
@@ -69,6 +77,9 @@
     "security.workspace.trust.banner": "never",
     "security.promptForLocalFileProtocolHandling": false,
     
+    // Files
+    "files.autoGuessEncoding":true,
+
     // Editor
     "editor.fontSize": 16,
     "editor.fontFamily": "MesloLGS NF",
@@ -138,6 +149,4 @@
     "[shellscript]": {
         "editor.tabSize": 2
     },
-    "workbench.preferredDarkColorTheme": "Catppuccin Frappé"
-
 }

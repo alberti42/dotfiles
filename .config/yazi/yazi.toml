@@ -91,13 +91,15 @@ suppress_preload = false
 
 fetchers = [
 	# Mimetype
+    # { id = "git", name = "*", run  = "git"},
+    # { id = "git", name = "*/", run  = "git"},
 	{ id = "mime", name = "*", run = "mime", if = "!mime", prio = "high" },
 ]
 spotters = [
 	{ name = "*/", run = "folder" },
 	# Code
-	{ mime = "text/*", run = "code" },
-	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "code" },
+	{ mime = "text/*", run = "bat" },
+	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "bat" },
 	# Image
 	{ mime = "image/{avif,hei?,jxl,svg+xml}", run = "magick" },
 	{ mime = "image/*", run = "image" },
@@ -118,11 +120,16 @@ preloaders = [
 	{ mime = "font/*", run = "font" },
 	{ mime = "application/ms-opentype", run = "font" },
 ]
+
+prepend_previewers = [
+    { name = "*.csv", run = "bat" },
+    { name = "*.md", run = "bat" },
+]
 previewers = [
 	{ name = "*/", run = "folder", sync = true },
 	# Code
-	{ mime = "text/*", run = "code" },
-	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "code" },
+	{ mime = "text/*", run = "bat" },
+	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "bat" },
 	# JSON
 	{ mime = "application/{json,ndjson}", run = "json" },
 	# Image

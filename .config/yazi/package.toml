@@ -1,7 +1,12 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:max-preview"
-rev = "f202fa8"
-hash = "9bc26d10d2f6e2aa93b10905b1b76979"
+rev = "8945e54"
+hash = "15b2ff7f6563c14d5b2e93b3e9da35de"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "8945e54"
+hash = "771f18427fb75fb19990ce602bb322f4"
 
 [flavor]
 deps = []

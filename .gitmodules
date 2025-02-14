@@ -15,4 +15,6 @@
 [submodule ".config/yazi/flavors"]
 	path = .config/yazi/flavors
 	url = git@github.com:yazi-rs/flavors.git
-	
+[submodule ".config/yazi/plugins/bat.yazi"]
+	path = .config/yazi/plugins/bat.yazi
+	url = git@github.com:mgumz/yazi-plugin-bat.git

@@ -129,7 +129,7 @@ zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for \
   @tmux-plugins/tmux-battery \
   id-as'tmux-plugins/tmux-catppuccin' @catppuccin/tmux \
   @tmux-plugins/tmux-yank \
-  @tmux-plugins/tmux-resurrect \
+  id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect \
   id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus \
   depth='' id-as'tmux-plugins/tmux-fzf-links' @alberti42/tmux-fzf-links
 
@@ -137,7 +137,7 @@ zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for \
 zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
 
 # Import 7z
-zinit binary lucid wait light-mode depth=1 from'gh-r' for @ip7z/7zip  
+zinit binary lucid wait light-mode depth=1 from'gh-r' lbin'7zz -> 7zz' for @ip7z/7zip  
 
 # Import just command launcher
 # zinit binary lucid wait light-mode depth=1 from'gh-r' for @casey/just
