@@ -4,16 +4,24 @@
     "window.autoDetectColorScheme": true,
 
     // workbench
+    "workbench.fontAliasing": "auto",
     "workbench.editor.empty.hint": "hidden",
     "workbench.startupEditor": "none",
     "workbench.localHistory.maxFileEntries": 500,
     "workbench.preferredLightColorTheme": "Catppuccin Latte",
     "workbench.preferredDarkColorTheme": "Catppuccin Frappé",
     "workbench.tree.indent": 25,
+    "workbench.settings.editor": "json",
     "workbench.colorCustomizations": {
         "[Catppuccin Frappé]": {
             "editorStickyScroll.border": "#6a798d",
-            "editorStickyScroll.background": "#292f36"
+            "editorStickyScroll.background": "#292f36",
+            // selections
+            "editor.selectionHighlightBackground": "#00000000",
+            "editor.selectionHighlightBorder": "#838ba7",
+            // symbol under cursor
+            "editor.wordHighlightBackground": "#00000000",
+            "editor.wordHighlightBorder": "#00000000",
         },
         "[Catppuccin Latte]": {
             "editorStickyScroll.border": "#adadad",
@@ -85,6 +93,15 @@
     "editor.fontFamily": "MesloLGS NF",
     "editor.accessibilitySupport": "off",
     "editor.insertSpaces": true,
+    "editor.minimap.showSlider": "always",
+    "editor.minimap.enabled": false,
+    "editor.semanticTokenColorCustomizations": {
+        // "[Catppuccin Frappé]": {
+        //     "rules": {
+        //     "variable": "#f2d5cf"
+        //     }
+        // }
+    },
     
     // cSpell
     "cSpell.enabled": false,
@@ -100,9 +117,6 @@
     ],
     "terminal.integrated.fontSize": 16,
 
-    // directly open settings as JSON
-    "workbench.settings.editor": "json",
-
     // LTeX
     "ltex.languageToolOrg.username": "secret@gmail.com",
     "ltex.languageToolOrg.apiKey": "secret",
@@ -116,6 +130,8 @@
     // Python
     "python.venvPath": "~/.virtualenvs",
     "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/3.13.0/bin/python",
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
 
     // Julia
     "julia.symbolCacheDownload": true,
@@ -149,4 +165,5 @@
     "[shellscript]": {
         "editor.tabSize": 2
     },
+    "latex-workshop.synctex.afterBuild.enabled": true
 }

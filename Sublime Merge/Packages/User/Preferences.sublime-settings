@@ -1,5 +1,5 @@
 {
-        "ignore_diff_white_space": true,
+        "ignore_diff_white_space": false,
         "trim_trailing_white_space_on_save": false,
         "side_bar_layout": "locations_as_column",
         "theme": "auto",

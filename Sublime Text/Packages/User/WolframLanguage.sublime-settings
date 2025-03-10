@@ -1,3 +1,10 @@
 {
-	"kernel": "/Applications/Wolfram.app/Contents/MacOS/WolframKernel"
+	"kernel": "/Applications/Wolfram.app/Contents/MacOS/WolframKernel",
+	"extensions":
+	[
+		"wl",
+		"wls",
+		"wlt",
+		"mt"
+	],
 }

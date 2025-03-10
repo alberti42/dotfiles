@@ -1,0 +1,41 @@
+{
+    // sftp, ftp or ftps
+    "type": "sftp",
+
+    "sync_down_on_open": true,
+    "sync_same_age": true,
+    
+    "host": "130.183.96.88",
+    "user": "andrea",
+    //"password": "password",
+    "port": "22",
+    "remote_path": "/home/andrea",
+
+    "hide_output_panel": true,
+    
+    "ssh_key_file": "/Users/andrea/.ssh/id_m1-gateway",
+    "sftp_flags": ["-o IdentitiesOnly=yes"],
+
+    "preserve_modification_times": true,
+    "upload_on_save": true,
+
+    //"file_permissions": "664",
+    //"dir_permissions": "775",
+    
+    //"extra_list_connections": 0,
+
+    "connect_timeout": 30,
+    //"keepalive": 120,
+    //"ftp_passive_mode": true,
+    //"ftp_obey_passive_host": false,
+    //"ssh_key_file": "~/.ssh/id_rsa",
+    //"sftp_sudo": false,
+    //"sftp_debug": false,
+    //"sftp_flags": ["-F", "/path/to/ssh_config"],
+    
+    //"preserve_modification_times": false,
+    //"remote_time_offset_in_hours": 0,
+    //"remote_encoding": "utf-8",
+    //"remote_locale": "C",
+    //"allow_config_upload": false,
+}

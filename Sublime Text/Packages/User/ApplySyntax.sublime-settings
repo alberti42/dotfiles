@@ -32,5 +32,11 @@
                 {"file_path": ".*/.duplicacy/preferences(~|$)"},
             ],
         },
+        {
+            "syntax": "Git Formats/Git Config",
+            "rules": [
+                {"file_path": ".*/git/config(~|$)"},
+            ],
+        }
     ]
 }

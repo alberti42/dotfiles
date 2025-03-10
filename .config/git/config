@@ -1,8 +1,9 @@
 [user]
 	name = Andrea Alberti
-	email = email@gmail.com
+	email = a.alberti82@gmail.com
 [core]
 	attributesfile = ~/.config/git/attributes
+	editor = ~/.config/dotfiles/.local/bin/git_editor_launcher
 [push]
 	default = simple
 [filter "media"]
@@ -24,6 +25,7 @@
 	rebase = false
 [alias]
   lastcommit = rev-parse HEAD
+  reflogp = reflog --pretty=reflog
 	showfiles = diff-tree --no-commit-id --name-status -r
 [log]
   follow = true
@@ -52,3 +54,5 @@
   new = "#bef2be" "#515151"
 [diff "plist"]
 	textconv = plutil -convert xml1 -o - --
+[pretty]
+    reflog = %C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)

@@ -1,0 +1,7 @@
+#!/bin/sh -f
+
+if [ -n "$SSH_CONNECTION" ]; then
+  exec rsubl -w "$@"
+else
+  exec subl -n -w "$@"
+fi

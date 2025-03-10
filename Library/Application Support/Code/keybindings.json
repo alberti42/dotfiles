@@ -33,6 +33,11 @@
         }
     },
     {
+        "key": "shift+cmd+c",
+        "command": "-workbench.action.terminal.openNativeConsole",
+        "when": "!terminalFocus"
+    },
+    {
         "key": "cmd+shift+r",
         "when": "editorLangId == latex && editorHasSelection",
         "command": "editor.action.insertSnippet",
@@ -63,5 +68,65 @@
     {
         "key": "shift+cmd+f",
         "command": "search.action.openEditor"
+    },
+    {
+        "key": "alt+cmd+n",
+        "command": "workbench.files.action.showActiveFileInExplorer"
+    },
+    {
+        "key": "alt+cmd+e",
+        "command": "revealFileInOS"
+    },
+    {
+        "key": "alt+cmd+r",
+        "command": "-revealFileInOS",
+        "when": "!editorFocus"
+    },
+    {
+        "key": "alt+up",
+        "command": "-editor.action.moveLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "alt+down",
+        "command": "-editor.action.moveLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "-editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+up",
+        "command": "-editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl+shift+[",    // whatever keybinding you want
+        "command": "cursorMove",
+        "args": {
+            "to": "prevBlankLine",
+            "select": true         // false is the default if omitted
+        },
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+up",
+        "command": "cursorMove",
+        "args": {
+            "to": "prevBlankLine",
+            "select": false
+        },
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+down",
+        "command": "cursorMove",
+        "args": {
+            "to": "nextBlankLine",
+            "select": false
+        },
+        "when": "editorTextFocus"
     },
 ]

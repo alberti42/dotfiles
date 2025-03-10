@@ -1,7 +1,5 @@
-#!/bin/bash -f
+#!/bin/sh -f
 # Script: rsubl
 # Description: A wrapper for `rmate` that passes all arguments and specifies port 52150.
 
-export RSUBL_PORT=52150
-
-rmate "$@" --port "$RSUBL_PORT"
+exec rmate "$@" --port 52150

@@ -14,6 +14,5 @@ zinit ice light-mode \
   lucid \
   nocompile \
   blockf \
-  lbin'rmate -> rmate; rmate -> rsubl; subl -> subl' \
-  pick'$ZPFX/bin/rmate; $ZPFX/bin/rsubl; $ZPFX/bin/subl'
+  lbin'rmate -> rmate; rsubl -> rsubl'
 zinit light @spamwax/rmate-rs

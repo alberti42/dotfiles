@@ -1201,7 +1201,7 @@ Open Quickly</string>
 			<key>Close Sessions On End</key>
 			<true/>
 			<key>Columns</key>
-			<integer>150</integer>
+			<integer>170</integer>
 			<key>Command</key>
 			<string>/Users/andrea/.config/dotfiles/.local/bin/tmux_launcher -l new-session -A -s"main"'</string>
 			<key>Cursor Color</key>
@@ -1377,7 +1377,7 @@ Open Quickly</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>MesloLGS-NF-Regular 17</string>
+			<string>MesloLGS-NF-Regular 15</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Password Manager Automatically</key>
@@ -1389,7 +1389,7 @@ Open Quickly</string>
 			<key>Right Option Key Sends</key>
 			<integer>0</integer>
 			<key>Rows</key>
-			<integer>48</integer>
+			<integer>55</integer>
 			<key>Screen</key>
 			<integer>-1</integer>
 			<key>Scrollback Lines</key>
@@ -1755,7 +1755,7 @@ Open Quickly</string>
 			<key>Close Sessions On End</key>
 			<true/>
 			<key>Columns</key>
-			<integer>150</integer>
+			<integer>170</integer>
 			<key>Command</key>
 			<string></string>
 			<key>Cursor Color</key>
@@ -1905,7 +1905,7 @@ Open Quickly</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>MesloLGS-NF-Regular 17</string>
+			<string>MesloLGS-NF-Regular 15</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Open Password Manager Automatically</key>
@@ -1917,7 +1917,7 @@ Open Quickly</string>
 			<key>Right Option Key Sends</key>
 			<integer>0</integer>
 			<key>Rows</key>
-			<integer>48</integer>
+			<integer>55</integer>
 			<key>Screen</key>
 			<integer>-1</integer>
 			<key>Scrollback Lines</key>

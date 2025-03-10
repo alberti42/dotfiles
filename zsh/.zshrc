@@ -25,8 +25,8 @@ fi
 zinit light-mode lucid depth=1 for \
   @zdharma-continuum/zinit-annex-as-monitor \
   @zdharma-continuum/zinit-annex-binary-symlink \
-  @alberti42/zinit-annex-patch-dl \
-  @alberti42/fork-zinit-annex-bin-gem-node
+  @zdharma-continuum/zinit-annex-patch-dl \
+  @zdharma-continuum/zinit-annex-bin-gem-node
 # Note that we use my fork of zinit-annex-patch-dl to fix a bug
 
 # Load annex (i.e. extension) to import meta plugins (i.e. sets of plugins)
@@ -130,8 +130,12 @@ zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for \
   id-as'tmux-plugins/tmux-catppuccin' @catppuccin/tmux \
   @tmux-plugins/tmux-yank \
   id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect \
+  id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend \
   id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus \
   depth='' id-as'tmux-plugins/tmux-fzf-links' @alberti42/tmux-fzf-links
+
+# Import tig
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tig/tig.zsh"
 
 # Import plugin to synchronize tmux window with ssh sessions 
 zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
@@ -140,7 +144,7 @@ zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
 zinit binary lucid wait light-mode depth=1 from'gh-r' lbin'7zz -> 7zz' for @ip7z/7zip  
 
 # Import just command launcher
-# zinit binary lucid wait light-mode depth=1 from'gh-r' for @casey/just
+zinit binary lucid wait light-mode depth=1 from'gh-r' cp"just.1 -> $ZINIT[MAN_DIR]/man1" lbin'just -> just' for @casey/just
 
 # Import eza
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/eza/eza.zsh"
@@ -278,14 +282,15 @@ local editor_app
 if [[ -n $SSH_CONNECTION ]]; then
   editor_app="rsubl"  # Remote Sublime Text
 else
-  editor_app="code"  # Local Sublime Text
+  # editor_app="emacsclient -a= -nw -c"  # Local emacs
+  editor_app="subl"
 fi
 
 # Check whether the editor is found in the path
 if command -v "$editor_app" >/dev/null 2>&1; then
-  export EDITOR="$editor_app -w"
+  export EDITOR="$editor_app"
 else
-  echo "Warning: '$editor_app' not found in the path. Using 'nano' as a fallback."
+  # echo "Warning: '$editor_app' not found in the path. Using 'nano' as a fallback."
   export EDITOR="nano"
 fi
 
@@ -324,6 +329,8 @@ alias 6='cd -6'
 alias 7='cd -7'
 alias 8='cd -8'
 alias 9='cd -9'
+
+alias e='emacsclient -a= -nw -c'
 
 alias diff='diff --color=auto'
 alias ls='ls --color=auto'

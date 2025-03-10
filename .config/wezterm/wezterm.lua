@@ -7,7 +7,7 @@ wezterm.on("gui-startup", function(cmd)
   local ratio_y = 0.82
   local width, height = screen.width * ratio_x, screen.height * ratio_y
   -- Decide how to center the window based on architecture
-  local divisor = 2
+  local divisor = 1
   if wezterm.target_triple == 'aarch64-apple-darwin' then
     divisor = 1  -- Apple Silicon: no extra halving
   end
@@ -28,7 +28,7 @@ return {
 
   -- Font configuration
   font = wezterm.font('MesloLGS NF', { weight = 'Regular' }),
-  font_size = 17.0,
+  font_size = 15.0,
 
   -- Colors
   colors = {
@@ -82,7 +82,7 @@ return {
 
   -- macOS Left and Right Option Key
   send_composed_key_when_left_alt_is_pressed = false,
-	send_composed_key_when_right_alt_is_pressed = true,
+  send_composed_key_when_right_alt_is_pressed = true,
 
   -- Key bindings
   disable_default_key_bindings = true,

@@ -1,5 +1,5 @@
-#!/bin/sh -f
+#!/bin/bash -f
 
-PATH="/Users/andrea/.local/share/zinit/polaris/bin:/usr/bin:/bin"
-
+PATH="$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin"
+export OSTYPE
 exec tmux "$@"
