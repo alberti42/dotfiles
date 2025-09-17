@@ -74,6 +74,10 @@ autoload -Uz _zinit
 # This avoids errors if `_comps` isn't initialized yet (e.g., `compinit` hasn't run).
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
+# Ensure ZPFX/bin is first in PATH
+path=($ZPFX/bin $path)
+typeset -U path
+
 # Notes:
 # - `compinit` is not invoked here to adhere to Zinit's philosophy of running it only once,
 #   typically at the end of `.zshrc`, to ensure optimal performance and avoid conflicts.

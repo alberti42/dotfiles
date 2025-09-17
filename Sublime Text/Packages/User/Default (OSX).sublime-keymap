@@ -23,35 +23,6 @@
     {
         "keys":
         [
-            "super+shift+ctrl+n"
-        ],
-        "command": "goto_next_language_problem",
-        "args":
-        {
-            "jumpForward": true
-        }
-    },
-    {
-        "keys":
-        [
-            "super+shift+ctrl+p"
-        ],
-        "command": "goto_next_language_problem",
-        "args":
-        {
-            "jumpForward": false
-        }
-    },
-    {
-        "keys":
-        [
-            "super+shift+ctrl+c"
-        ],
-        "command": "clear_language_problems"
-    },
-    {
-        "keys":
-        [
             "alt+up"
         ],
         "command": "move",
@@ -112,6 +83,15 @@
         "args":
         {}
     },
+    {
+        "keys":
+        [
+            "super+shift+m"
+        ],
+        "command": "toggle_minimap",
+        "args":
+        {}
+    },
     // >>> TERMINUS >>>
     { 
         "keys": ["alt+`"],
@@ -132,7 +112,7 @@
         "keys": ["ctrl+alt+t"],
         "command": "terminus_open",
         "args": {
-            "cmd": "ipython",
+            "cmd": "ipython3",
             "cwd": "${file_path:${folder}}"
         }
     },
@@ -142,6 +122,28 @@
         "context": [
             { "key": "setting.terminus_build", "operator": "equal", "operand": true }
         ]
-    }
-    // <<< TERMINUS <<<
+    },
+    // >>> ORIGAMI >>>
+    // 
+	  // --- Move focus between panes: Ctrl-b + arrow (like tmux) ---
+	  { "keys": ["ctrl+b", "up"],    "command": "travel_to_pane", "args": {"direction": "up"} },
+	  { "keys": ["ctrl+b", "right"], "command": "travel_to_pane", "args": {"direction": "right"} },
+	  { "keys": ["ctrl+b", "down"],  "command": "travel_to_pane", "args": {"direction": "down"} },
+	  { "keys": ["ctrl+b", "left"],  "command": "travel_to_pane", "args": {"direction": "left"} },
+
+	  // --- Create/split panes (tmux semantics) ---
+	  // Ctrl-b %  -> split vertically -> new pane on the RIGHT
+	  { "keys": ["ctrl+b", "%"],   "command": "create_pane", "args": {"direction": "right", "give_focus": true} },
+
+	  // Ctrl-b "  -> split horizontally -> new pane BELOW
+	  // (On US keyboards, this is Shift + '  )
+	  { "keys": ["ctrl+b", "\""],   "command": "create_pane", "args": {"direction": "down", "give_focus": true} },
+
+	  // --- Kill current pane (tmux: Ctrl-b x). This avoids clobbering plain Ctrl-x "Cut" ---
+	  { "keys": ["ctrl+b", "x"], "command": "destroy_pane", "args": {"direction": "self"} },
+
+	  // --- New Sublime window (tmux: Ctrl-b c) ---
+	  { "keys": ["ctrl+b", "c"], "command": "new_file" }
+		// <<< ORIGAMI <<<
+
 ]

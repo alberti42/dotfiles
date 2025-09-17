@@ -12,9 +12,12 @@
 [submodule "Sublime Text/Packages/VirtualenvSelector"]
 	path = Sublime Text/Packages/VirtualenvSelector
 	url = git@github.com:alberti42/sublime-virtualenv-selector.git
-[submodule ".config/yazi/flavors"]
-	path = .config/yazi/flavors
-	url = git@github.com:yazi-rs/flavors.git
 [submodule ".config/yazi/plugins/bat.yazi"]
 	path = .config/yazi/plugins/bat.yazi
-	url = git@github.com:mgumz/yazi-plugin-bat.git
+	url = https://github.com/mgumz/yazi-plugin-bat.git
+[submodule ".config/yazi/flavors"]
+	path = .config/yazi/flavors
+	url = https://github.com/yazi-rs/flavors
+[submodule "Sublime Text/Packages/Dictionaries"]
+	path = Sublime Text/Packages/Dictionaries
+	url = https://github.com/titoBouzout/Dictionaries.git

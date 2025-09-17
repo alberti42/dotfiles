@@ -73,6 +73,9 @@ __fzf_tab_init_hook() {
       fi
     fi'
 
+  # Force fzf-tab to use FZF_DEFAULT_OPTS
+  # zstyle ':fzf-tab:*' use-fzf-default-opts yes fzf-flags
+  
   # Custom fzf flags. Note: fzf-tab does not follow FZF_DEFAULT_OPTS by default
   zstyle ":fzf-tab:*" fzf-flags \
     "--bind=tab:accept" \
@@ -92,5 +95,7 @@ __fzf_tab_init_hook() {
 # It requires zicompinit; zicompinit; so it must be called after fast-syntax-highlighting
 zinit ice depth=1 wait light-mode lucid \
   atclone"source '${${(%):-%x}:h}/__fzf_tab_atclone_hook.zsh'" \
-  atinit'_safe_one_off_load __fzf_tab_init_hook'
-zinit light Aloxaf/fzf-tab
+  atinit'_safe_one_off_load __fzf_tab_init_hook' \
+  id-as'Aloxaf/fzf-tab'
+zinit light alberti42/fzf-tab-fork
+# zinit light Aloxaf/fzf-tab

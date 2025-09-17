@@ -7,7 +7,7 @@ typeset -g ls_colors_file="$ZSH_CACHE_DIR/ls_colors" # used for tmux-fzf-links p
 
 __my_vivid_load_hook() {
   # Check if we need to reload
-  if [[ "$force_generation_color_scheme" = (1|true|on|yes) || ! -f "$ls_colors_file" ]]; then
+  if [[ "$force_generation_color_scheme" = (1|true|on|yes) || ! -f "$src_ls_colors_file" ]]; then
     source "${${(%):-%x}:h}/__generate_ls_colors.zsh"
   fi
   source "$src_ls_colors_file"

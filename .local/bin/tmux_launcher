@@ -1,5 +1,7 @@
-#!/bin/bash -f
+#!/usr/bin/env -S bash --noprofile --norc
 
 PATH="$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin"
 export OSTYPE
+
+# Call tmux with the remaining arguments
 exec tmux "$@"

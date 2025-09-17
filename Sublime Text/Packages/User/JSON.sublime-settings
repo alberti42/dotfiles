@@ -4,13 +4,13 @@
 	"tab_size": 4,
 	"extensions":
 	[
-		".jscsrc",
-		"geojson",
-		".stylelintrc",
 		".jshintrc",
-		".bowerrc",
-		".csslintrc",
-		".babelrc",
 		".eslintrc",
+		".bowerrc",
+		".babelrc",
+		".stylelintrc",
+		".csslintrc",
+		"geojson",
+		".jscsrc"
 	],
 }

@@ -2,7 +2,7 @@
 # If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
 # "$schema" = "https://yazi-rs.github.io/schemas/yazi.json"
 
-[manager]
+[mgr]
 ratio          = [ 4, 6, 8 ]
 sort_by        = "alphabetical"
 sort_sensitive = false
@@ -22,12 +22,12 @@ tab_size        = 2
 max_width       = 1000
 max_height      = 3000
 cache_dir       = ""
-image_delay     = 30
+image_delay     = 0
 image_filter    = "triangle"
 image_quality   = 75
-sixel_fraction  = 15
 ueberzug_scale  = 1
 ueberzug_offset = [ 0, 0, 0, 0 ]
+# adapter         = "wezterm"
 
 [opener]
 edit = [
@@ -87,6 +87,16 @@ image_alloc      = 536870912  # 512MB
 image_bound      = [ 0, 0 ]
 suppress_preload = false
 
+# [[plugin.prepend_fetchers]]
+# id   = "git"
+# name = "*"
+# run  = "git"
+
+# [[plugin.prepend_fetchers]]
+# id   = "git"
+# name = "*/"
+# run  = "git"
+
 [plugin]
 
 fetchers = [
@@ -124,12 +134,13 @@ preloaders = [
 prepend_previewers = [
     { name = "*.csv", run = "bat" },
     { name = "*.md", run = "bat" },
+    { name = "*.markdown", run = "bat" },
 ]
 previewers = [
 	{ name = "*/", run = "folder", sync = true },
-	# Code
+	# Bat
 	{ mime = "text/*", run = "bat" },
-	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "bat" },
+	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "bat" },	
 	# JSON
 	{ mime = "application/{json,ndjson}", run = "json" },
 	# Image

@@ -4,7 +4,7 @@
 
 [general]
 live_config_reload = true
-import = ["~/.config/alacritty/alacritty_local.toml"]
+# import = ["~/.config/alacritty/alacritty_local.toml"]
 
 [colors]
 draw_bold_text_with_bright_colors = false
@@ -30,7 +30,7 @@ draw_bold_text_with_bright_colors = false
   white   = "0xffffff"  # ANSI 7
   
 [colors.primary]
-  background = "0x282935"
+  background = "0x111111"
   foreground = "0xffffff"
 
 [cursor]
@@ -50,10 +50,13 @@ draw_bold_text_with_bright_colors = false
   # TERM = "alacritty-direct"
   TERM_PROGRAM = "alacritty"
 
+[font]
+  size = 17
+
 [font.normal]
   family = "MesloLGS NF"
   style = "Regular"
-  
+
 # See https://alacritty.org/config-alacritty-bindings.html
 [keyboard]
   bindings = [
@@ -108,6 +111,8 @@ draw_bold_text_with_bright_colors = false
   decorations = "Buttonless"
   padding = { x = 12, y = 10 }
   option_as_alt = "OnlyLeft"
+  position = { x = 800, y = 280 }
+  dimensions = { columns = 180, lines = 55}
 
 # Links
 [[hints.enabled]]

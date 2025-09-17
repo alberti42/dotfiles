@@ -1,137 +1,232 @@
 -- ~/config/wezterm/wezterm.lua
 local wezterm = require 'wezterm'
+local home = os.getenv("HOME")
 
 wezterm.on("gui-startup", function(cmd)
   local screen = wezterm.gui.screens().active
-  local ratio_x = 0.7
-  local ratio_y = 0.82
-  local width, height = screen.width * ratio_x, screen.height * ratio_y
-  -- Decide how to center the window based on architecture
-  local divisor = 1
-  if wezterm.target_triple == 'aarch64-apple-darwin' then
-    divisor = 1  -- Apple Silicon: no extra halving
-  end
+  local ratio_x = 0.70
+  local ratio_y = 0.87
+
+  -- These are still in logical points, which is correct for sizing the window
+  local width_pt, height_pt = screen.width * ratio_x, screen.height * ratio_y
+
+  -- Calculate the position in POINTS first
+  local x_pos_pt = (screen.width - width_pt) / 2
+  local y_pos_pt = (screen.height - height_pt) / 2
+
   local tab, pane, window = wezterm.mux.spawn_window {
-  	position = {
-      x = (screen.width - width)/divisor,
-      y = (screen.height - height)/divisor,
+    position = {
+      x = tostring(x_pos_pt) .. "pt",
+      y = tostring(y_pos_pt) .. "pt",
       origin = 'ActiveScreen'
     }
   }
-  window:gui_window():set_inner_size(width, height)
+
+  window:gui_window():set_inner_size(width_pt, height_pt)
 end)
 
-return {
-  -- General options
-  check_for_updates = false,
-  adjust_window_size_when_changing_font_size = false,
+function get_appearance()
+  local appearance = wezterm.gui.get_appearance()
+  if appearance:find "Dark" then
+    return "1"
+  else
+    return "0"
+  end
+end
 
-  -- Font configuration
-  font = wezterm.font('MesloLGS NF', { weight = 'Regular' }),
-  font_size = 15.0,
+function scheme_for_appearance(appearance)
+	local tmux_bin = home .. "/.local/share/zinit/polaris/bin/tmux"
 
-  -- Colors
-  colors = {
-    foreground = '#ffffff',
-    background = '#282935',
-    cursor_bg = '#ffffff',
-    cursor_fg = '#000000',
-    cursor_border = '#ffffff',
+  if appearance:find "Dark" then
+  	pcall(wezterm.run_child_process, { tmux_bin, "set-option", "-q", "@dark_appearance", "1" })
+    return "Catppuccin Macchiato"
+  else
+  	pcall(wezterm.run_child_process, { tmux_bin, "set-option", "-q", "@dark_appearance", "0" })
+    return "Catppuccin Frappe"
+  end
+end
 
-    ansi = {
-      '#000000', -- black
-      '#c91b00', -- red
-      '#00c300', -- green
-      '#c7c400', -- yellow
-      '#0226c8', -- blue
-      '#ca30c7', -- magenta
-      '#00c5c8', -- cyan
-      '#c7c7c7', -- white
-    },
-    brights = {
-      '#686868', -- bright black
-      '#ff6e68', -- bright red
-      '#60fa67', -- bright green
-      '#fffc67', -- bright yellow
-      '#6872ff', -- bright blue
-      '#ff77ff', -- bright magenta
-      '#5ffdff', -- bright cyan
-      '#ffffff', -- bright white
-    },
+-- wezterm.on("update-status", function(window, pane)
+--     window:set_left_status(wezterm.format {
+--       { Text = 'Status bar' },
+--     })
+-- end)
+
+local platform
+if string.find(wezterm.target_triple, "darwin") then
+	platform = "darwin"
+elseif string.find(wezterm.target_triple, "windows") then
+	platform = "win"
+else
+	platform = "linux"
+end
+
+local is_linux = function()
+	return platform == "linux"
+end
+
+local is_mac = function()
+	return platform == "darwin"
+end
+
+local is_win = function()
+	return platform == "win"
+end
+
+config = {}
+
+-- Check for updates every day
+config.check_for_updates = false
+config.check_for_updates_interval_seconds = 86400
+  
+-- Font configuration
+config.adjust_window_size_when_changing_font_size = false
+config.font = wezterm.font('MesloLGS NF', { weight = 'Regular' })
+if is_mac() then
+	config.font_size = 17.0
+elseif is_linux() then
+	config.font_size = 12.0
+end
+
+-- Colors
+--[[
+config.colors = {
+	foreground = '#ffffff',
+	background = '#111111',
+	cursor_bg = '#ffffff',
+	cursor_fg = '#000000',
+	cursor_border = '#ffffff',
+
+	ansi = {
+    '#000000', -- black
+    '#c91b00', -- red
+    '#00c300', -- green
+    '#c7c400', -- yellow
+    '#0226c8', -- blue
+    '#ca30c7', -- magenta
+    '#00c5c8', -- cyan
+    '#c7c7c7', -- white
   },
-
-  -- Cursor style
-  default_cursor_style = 'SteadyBar',
-  cursor_blink_rate = 600,
-
-  -- Scrollback
-  scrollback_lines = 10000,
-
-  -- Workspace
-  default_workspace = "home",
-
-  -- Audible bell
-  audible_bell = "Disabled",
-
-  -- Tmux
-  default_prog = { os.getenv("HOME") .. "/.config/dotfiles/.local/bin/tmux_launcher", "-l", "new-session", "-A", "-s", "main" },
-
-  -- Mouse configuration
-  -- alternate_buffer_wheel_scroll_speed = 1,
-  hide_mouse_cursor_when_typing = false,
-
-  -- macOS Left and Right Option Key
-  send_composed_key_when_left_alt_is_pressed = false,
-  send_composed_key_when_right_alt_is_pressed = true,
-
-  -- Key bindings
-  disable_default_key_bindings = true,
-  keys = {
-    { key = 'LeftArrow', mods = 'ALT', action = wezterm.action { SendString = '\x1bb' } }, -- Alt + Left (Move backward one word)
-    { key = 'RightArrow', mods = 'ALT', action = wezterm.action { SendString = '\x1bf' } }, -- Alt + Right (Move forward one word)
-
-    -- { key = 'w', mods = 'CMD', action = wezterm.action { SendString = '\x02x' } }, -- Cmd + w -> Ctrl-b x (new tmux kill-panel)
-    -- { key = 't', mods = 'CMD', action = wezterm.action { SendString = '\x02c' } }, -- Cmd + t -> Ctrl-b c (new tmux window)
-
-    { key = 'Enter', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment }, -- Disable Alt + Enter (fullscreen toggle)
-
-    -- **Override WezTerm's default tab-switching behavior**
-    { key = '[', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02p' } }, -- Cmd + Shift + [ -> Move to previous tmux pane
-    { key = ']', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02n' } }, -- Cmd + Shift + ] -> Move to next tmux pane
-
-    { key = 'c', mods = 'SUPER', action = wezterm.action { CopyTo="Clipboard" } },
-    { key = 'v', mods = 'SUPER', action = wezterm.action { PasteFrom="Clipboard" } },
-    { key = 'f', mods = 'SUPER', action = wezterm.action.Search { CaseInSensitiveString = "" } },
-    { key = 'f', mods = 'SHIFT|SUPER', action = wezterm.action.Search { CaseSensitiveString = "" } },
-    { key = 'q', mods = 'SUPER', action = wezterm.action.QuitApplication },
-    { key = 'w', mods = 'CMD', action = wezterm.action.CloseCurrentTab{confirm=false} }, -- Cmd + w -> close window
-    { key = 'n', mods = 'CMD', action = wezterm.action.DisableDefaultAssignment }, -- Disable Cmd + n (new window)
+	brights = {
+    '#686868', -- bright black
+    '#ff6e68', -- bright red
+    '#60fa67', -- bright green
+    '#fffc67', -- bright yellow
+    '#6872ff', -- bright blue
+    '#ff77ff', -- bright magenta
+    '#5ffdff', -- bright cyan
+    '#ffffff', -- bright white
   },
-
-  -- Hyperlink hints
-  hyperlink_rules = {
-    {
-      regex = [[\b(mailto:|https://|http://|news:|file:|git://|ssh:|ftp://)[^\s<>"\(\)\[\]\{\}]+]],
-      format = '$0',
-    },
-  },
-
-  -- Window settings
-  window_background_opacity = 1,
-  use_resize_increments = true,
-  window_padding = {
-    left = 30,
-    right = 30,
-    top = 20,
-    bottom = 10,
-  },
-  window_decorations = 'RESIZE',
-  window_close_confirmation = 'NeverPrompt',
-
-  -- Hide tabs
-  enable_tab_bar = false,
-  -- hide_tab_bar_if_only_one_tab = true,
-
-  -- Clipboard settings
-  enable_kitty_keyboard = true, -- Enables clipboard integration
 }
+--]]
+
+-- Catppuccin color scheme https://github.com/catppuccin/wezter
+config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
+
+-- Cursor style
+config.default_cursor_style = 'SteadyBar'
+config.cursor_blink_rate = 250
+
+-- Scrollback
+config.scrollback_lines = 10000
+  
+-- Animation fps
+config.max_fps = 240
+
+if is_mac() then
+  config.front_end = "WebGpu"
+  config.webgpu_power_preference = "HighPerformance"
+elseif is_linux() then
+  config.front_end = "OpenGL"
+elseif is_win() then
+  config.front_end = "OpenGL"
+end
+	
+-- Workspace
+config.default_workspace = "home"
+
+-- Audible bell
+config.audible_bell = "Disabled"
+
+-- Tmux
+config.default_prog = { home .. "/.config/dotfiles/.local/bin/tmux_launcher", "-l", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-q", "@dark_appearance", get_appearance() }
+
+-- Mouse configuration
+config.alternate_buffer_wheel_scroll_speed = 1
+config.hide_mouse_cursor_when_typing = false
+config.precise_scroll_scale = 15
+config.tui_scroll_gesture_support = true
+
+-- macOS Left and Right Option Key
+config.send_composed_key_when_left_alt_is_pressed = false
+config.send_composed_key_when_right_alt_is_pressed = true
+
+-- macOS native fullscreen
+-- config.native_macos_fullscreen_mode = true
+
+-- Key bindings
+config.disable_default_key_bindings = true
+config.enable_csi_u_key_encoding = true
+config.keys = {
+  { key = 'LeftArrow', mods = 'ALT', action = wezterm.action { SendString = '\x1bb' } }, -- Alt + Left (Move backward one word)
+  { key = 'RightArrow', mods = 'ALT', action = wezterm.action { SendString = '\x1bf' } }, -- Alt + Right (Move forward one word)
+
+  { key = '[', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02p') }, -- Cmd + Shift + [ -> Move to previous tmux pane
+  { key = ']', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02n') }, -- Cmd + Shift + ] -> Move to next tmux pane
+  
+  { key = '[', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02p' } }, -- Cmd + Shift + [ -> Move to previous tmux pane
+  { key = ']', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02n' } }, -- Cmd + Shift + ] -> Move to next tmux pane
+
+  { key = "{", mods = "CTRL|SHIFT", action = wezterm.action.SendKey { key = "LeftArrow", mods = "CTRL|SHIFT" } },
+  { key = "}", mods = "CTRL|SHIFT", action = wezterm.action.SendKey { key = "RightArrow", mods = "CTRL|SHIFT" } },
+
+  { key = "{", mods = "ALT|SHIFT", action = wezterm.action.SendKey { key = "LeftArrow", mods = "ALT|SHIFT" } },
+  { key = "}", mods = "ALT|SHIFT", action = wezterm.action.SendKey { key = "RightArrow", mods = "ALT|SHIFT" } },
+
+  { key = "+", mods = "ALT|SHIFT", action = wezterm.action.SendKey { key = "UpArrow", mods = "ALT|SHIFT" } },
+  { key = "\"", mods = "ALT|SHIFT", action = wezterm.action.SendKey { key = "DownArrow", mods = "ALT|SHIFT" } },
+
+  -- { key = 'LeftArrow', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02p' } }, -- Cmd + Shift + [ -> Move to previous tmux pane
+  -- { key = 'RightArrow', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02n' } }, -- Cmd + Shift + ] -> Move to next tmux pane
+
+  -- { key = 'w', mods = 'CMD', action = wezterm.action { SendString = '\x02x' } }, -- Cmd + w -> Ctrl-b x (new tmux kill-panel)
+  -- { key = 't', mods = 'CMD', action = wezterm.action { SendString = '\x02c' } }, -- Cmd + t -> Ctrl-b c (new tmux window)
+
+  { key = 'Enter', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment }, -- Disable Alt + Enter (fullscreen toggle)
+
+  
+  { key = 'c', mods = 'SUPER', action = wezterm.action { CopyTo="Clipboard" } },
+  { key = 'v', mods = 'SUPER', action = wezterm.action { PasteFrom="Clipboard" } },
+  -- { key = 'f', mods = 'SUPER', action = wezterm.action.Search { CaseInSensitiveString = "" } },
+  -- { key = 'f', mods = 'SHIFT|SUPER', action = wezterm.action.Search { CaseSensitiveString = "" } },
+  { key = 'q', mods = 'SUPER', action = wezterm.action.QuitApplication },
+  { key = 'w', mods = 'SUPER', action = wezterm.action.CloseCurrentTab{confirm=false} }, -- Cmd + w -> close window
+  { key = 'n', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment }, -- Disable Cmd + n (new window)
+  { key = 'L', mods = 'SUPER', action = wezterm.action.ShowDebugOverlay },
+  { key = 'f', mods = 'SUPER|SHIFT', action = wezterm.action.ToggleFullScreen },
+}
+
+-- Hyperlink hints
+config.hyperlink_rules = wezterm.default_hyperlink_rules()
+
+-- Window settings
+config.window_background_opacity = 1
+config.use_resize_increments = false
+config.window_padding = {
+  left = "15pt",
+  right = "15pt",
+  top = "10pt",
+  bottom = "10pt",
+}
+config.window_decorations = 'RESIZE|MACOS_DISABLE_TITLEBAR_DRAG'
+config.window_close_confirmation = 'NeverPrompt'
+config.use_fancy_tab_bar = true
+  
+-- Hide tabs
+config.enable_tab_bar = false
+-- config.hide_tab_bar_if_only_one_tab = true
+
+-- Clipboard settings
+config.enable_kitty_keyboard = true -- Enables clipboard integration
+
+return config

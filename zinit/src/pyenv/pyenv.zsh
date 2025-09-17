@@ -13,7 +13,7 @@ zinit wait depth=1 light-mode lucid as'null' nocompletions nocompile for \
 
 # Pyenv manager
 zinit ice wait depth=1 light-mode lucid binary \
-  atinit'export PYENV_ROOT="$HOME/.pyenv"' \
+  atinit"export PYENV_ROOT='$HOME/.pyenv'" \
   atclone"source '${${(%):-%x}:h}/__pyenv_atclone_hook.zsh'" \
   atpull"%atclone" \
   completions \

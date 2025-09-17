@@ -8,12 +8,32 @@
     "workbench.editor.empty.hint": "hidden",
     "workbench.startupEditor": "none",
     "workbench.localHistory.maxFileEntries": 500,
-    "workbench.preferredLightColorTheme": "Catppuccin Latte",
-    "workbench.preferredDarkColorTheme": "Catppuccin Frappé",
+    "workbench.preferredLightColorTheme": "Catppuccin Frappé",
+    "workbench.preferredDarkColorTheme": "Catppuccin Macchiato",
     "workbench.tree.indent": 25,
     "workbench.settings.editor": "json",
     "workbench.colorCustomizations": {
+        "[Dracula Theme]": {
+            "editorStickyScroll.border": "#6a798d",
+            "editorStickyScroll.background": "#292f36",
+            // selections
+            "editor.selectionHighlightBackground": "#989898e3",
+            "editor.selectionHighlightBorder": "#838ba7",
+            // symbol under cursor
+            "editor.wordHighlightBackground": "#00000000",
+            "editor.wordHighlightBorder": "#00000000",
+        },
         "[Catppuccin Frappé]": {
+            "editorStickyScroll.border": "#6a798d",
+            "editorStickyScroll.background": "#292f36",
+            // selections
+            "editor.selectionHighlightBackground": "#00000000",
+            "editor.selectionHighlightBorder": "#838ba7",
+            // symbol under cursor
+            "editor.wordHighlightBackground": "#00000000",
+            "editor.wordHighlightBorder": "#00000000",
+        },
+        "[Catppuccin Macchiato]": {
             "editorStickyScroll.border": "#6a798d",
             "editorStickyScroll.background": "#292f36",
             // selections
@@ -25,7 +45,13 @@
         },
         "[Catppuccin Latte]": {
             "editorStickyScroll.border": "#adadad",
-            "editorStickyScroll.background": "#e4e6eb"
+            "editorStickyScroll.background": "#e4e6eb",
+            // selections
+            "editor.selectionHighlightBackground": "#00000000",
+            "editor.selectionHighlightBorder": "#838ba7",
+            // symbol under cursor
+            "editor.wordHighlightBackground": "#00000000",
+            "editor.wordHighlightBorder": "#00000000",
         }
     },
 
@@ -95,6 +121,8 @@
     "editor.insertSpaces": true,
     "editor.minimap.showSlider": "always",
     "editor.minimap.enabled": false,
+    "editor.hover.enabled": true,
+    "editor.hover.delay": 500,
     "editor.semanticTokenColorCustomizations": {
         // "[Catppuccin Frappé]": {
         //     "rules": {
@@ -118,9 +146,11 @@
     "terminal.integrated.fontSize": 16,
 
     // LTeX
-    "ltex.languageToolOrg.username": "secret@gmail.com",
-    "ltex.languageToolOrg.apiKey": "secret",
+    "ltex.languageToolOrg.username": "...",
+    "ltex.languageToolOrg.apiKey": "...",
     "ltex.language": "auto",
+    // "ltex.language": "de-DE",
+    // "ltex.language": "en-US",
     
     // git
     "git.confirmSync": false,
@@ -129,7 +159,7 @@
     
     // Python
     "python.venvPath": "~/.virtualenvs",
-    "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/3.13.0/bin/python",
+    "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/py313/bin/python",
     "python.languageServer": "Pylance",
     "python.analysis.typeCheckingMode": "basic",
 
@@ -142,12 +172,14 @@
     
     // Explorer
     "explorer.confirmDelete": false,
-    
+
     // Latex Workshop
     "latex-workshop.latex.outDir": "%DIR%/._aux",
     "latex-workshop.latex.autoBuild.run": "never",
     "latex-workshop.latex.recipe.default": "lastUsed",
     "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
+    "latex-workshop.synctex.afterBuild.enabled": true,
+    "latex-workshop.view.pdf.invert": 0,
 
     // Sublime Merge
     "vscsm.smergeExecutablePath": "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge",
@@ -158,12 +190,14 @@
         "editor.wordWrap": "on",
         "editor.tabSize": 2
     },
+
+    // TeX files
     "[tex]": {
         "editor.tabSize": 2
     },
-    // Latex files
+
+    // Shell scripts
     "[shellscript]": {
         "editor.tabSize": 2
     },
-    "latex-workshop.synctex.afterBuild.enabled": true
 }

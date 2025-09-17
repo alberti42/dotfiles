@@ -107,6 +107,19 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
 zinit depth=1 light-mode lucid nocompile as'completion' from'gh' \
   compile'_*' wait for @conda-incubator/conda-zsh-completion
 
+# Import local plugins
+{
+  local __local_plugins=(
+    # Import plugin to ssh into tmux
+    id-as:local/ssh-tmux "$DOTFILES_DIR/oh-my-zsh/custom/plugins/ssh-tmux"
+
+    # Import useful misc zsh functions
+    id-as:local/zsh-misc-functions atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" \
+      "$DOTFILES_DIR/oh-my-zsh/custom/plugins/zsh-misc-functions"
+  )
+  zinit lucid wait light-mode for "${__local_plugins[@]}"
+}
+
 # Load syntax highlightin (plugin must be loaded after plugins issuing compdef)
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
 
@@ -123,16 +136,21 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/yazi/yazi.zsh"
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tmux/tmux.zsh"
 
 # Import Tmux Plugins
-zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for \
-  @tmux-plugins/tmux-sensible \
-  @tmux-plugins/tmux-cpu \
-  @tmux-plugins/tmux-battery \
-  id-as'tmux-plugins/tmux-catppuccin' @catppuccin/tmux \
-  @tmux-plugins/tmux-yank \
-  id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect \
-  id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend \
-  id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus \
-  depth='' id-as'tmux-plugins/tmux-fzf-links' @alberti42/tmux-fzf-links
+() {
+  local __tmux_plugins=(
+    @tmux-plugins/tmux-sensible
+    # @tmux-plugins/tmux-cpu
+    # @tmux-plugins/tmux-battery
+    # id-as'tmux-plugins/tmux-tokyo-night' @janoamaral/tokyo-night-tmux
+    # id-as'tmux-plugins/tmux-catppuccin' @catppuccin/tmux \
+    @tmux-plugins/tmux-yank
+    id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect
+    id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend
+    # id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus
+    depth='' id-as'tmux-plugins/tmux-fzf-links' @alberti42/tmux-fzf-links
+  )
+  zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for "${__tmux_plugins[@]}" 
+}
 
 # Import tig
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tig/tig.zsh"
@@ -158,6 +176,9 @@ zinit binary lucid light-mode wait depth=1 make from'gh' lbin'bin/btop -> btop' 
 # Import viu
 zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'viu* -> viu' for @atanunq/viu
 
+# Import neovim
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/neovim/neovim.zsh"
+
 # Import imgcat
 zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'imgcat -> imgcat' for @danielgatis/imgcat 
 
@@ -166,52 +187,6 @@ zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'dist/superfile*/spf -
 
 # Wrapper snippet for Sublime Text
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
-
-###################################
-# Useful small utility functions  #
-###################################
-
-# Retrieve ip addresses
-ip-internal() { echo "Wireless  :: IP => $( ipconfig getifaddr en0 )" }
-ip-external() { echo "External :: IP => $( curl --silent https://ifconfig.me )" }
-ip-info() { ip-internal && ip-external }
-
-# Find processes matching the pattern
-function ppgrep() { pgrep -f -d ',' "$@" | xargs --no-run-if-empty ps xw -p; }
-
-# Clear screen and scroll back
-function clc() {
-  # clear screen
-  command clear
-  # clear terminal history
-  printf '\033[3J'
-}
-
-# Show current directory of given process PID
-function pwdx() { lsof -a -d cwd -p $1 -n -Fn | awk '/^n/ {print substr($0,2)}'; }
-
-# Activate venv by passing the name of the venv
-function conda_init() {
-  eval "$($HOME/miniforge3/bin/conda shell.zsh hook)"
-  source "$HOME/miniforge3/etc/profile.d/conda.sh"
-}
-
-reload!() {
-    # Reset the path array (ensuring no duplicates)
-    unset path
-    typeset -U path
-    path=(
-        /usr/local/bin
-        /usr/bin
-        /bin
-        /usr/sbin
-        /sbin
-    )
-    # Export PATH from the cleaned path array
-    export PATH="${(j.:.)path}"
-    # Preserve essential environment variables while resetting everything else
-    exec env PATH=$PATH zsh --login
-}
 
 #####################
 # Keybindings       #
@@ -272,9 +247,16 @@ setopt PUSHD_MINUS                 # Exchanges the meanings of `+' and `-' when 
 # ENV VARIABLE      #
 #####################
 
-# Set CLICOLOR for Ansi Colors: With this setting,
-# BSD systems directly assume color output (e.g., -G option in ls)
-if [[ $OSTYPE =~ 'darwin*' ]]; then export CLICOLOR=1; fi
+# macOS dependent variables
+if [[ $OSTYPE =~ 'darwin*' ]]; then
+  # Set CLICOLOR for Ansi Colors: With this setting,
+  # BSD systems directly assume color output (e.g., -G option in ls)
+  export CLICOLOR=1;
+
+  if [[ ${SHELL:t} != zsh_macos_(arm|intel)_launcher ]]; then
+    echo $ZINIT[col-warn]Warning:$ZINIT[col-rst] macOS shell set to $SHELL instead of zsh special launcher
+  fi
+fi
 
 # Preferred editor for local and remote sessions
 local editor_app
@@ -294,11 +276,20 @@ else
   export EDITOR="nano"
 fi
 
+# Always tell bat to use less -R for colors
+export BAT_PAGER="less -sR -j5"
+
 # Man pager with modern look
-export MANPAGER="sh -c 'col -bx | bat -l man --style=plain --paging=always --pager='\''less -R'\'''"  # for syntax highlighting
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS: man uses backspace overstrikes, so we need col -bx
+  export MANPAGER="sh -c 'col -bx | bat -l man --style=plain --paging=always'"
+else
+  # Linux: man already uses ANSI escapes, so skip col
+  export MANPAGER="sh -c 'bat -l man --style=plain --paging=always'"
+fi
 
 # Configure PAGER to display 5 lines before search results (https://stackoverflow.com/a/14964428/4216175)
-export LESS="-j5"
+export LESS="-sR -j5"
 export PAGER="less -sR -j5"
 
 #####################
@@ -352,7 +343,9 @@ alias dotfiles="cd $DOTFILES_DIR"
 alias zshrc="$editor_app $HOME/.zshrc"
 alias zshenv="$editor_app $HOME/.zshenv"
 alias sshconf="$editor_app ~/.ssh/config"
-alias tmuxconf="$editor_app $HOME/.tmux.conf"
+alias tmuxconf="$editor_app $HOME/.config/tmux/tmux.conf"
+alias weztermconf="$editor_app $HOME/.config/wezterm/wezterm.lua"
+alias nvimconf="nvim $HOME/.config/nvim/init.lua"
 
 # Misc
 alias rsync='rsync -e "ssh -o RemoteCommand=None -o RequestTTY=no"'

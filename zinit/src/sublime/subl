@@ -9,9 +9,9 @@ _subl_main() {
   local subl_path subl_paths
   typeset -a subl_paths
 
-  if [[ $OSTYPE =~ 'darwin*' ]]; then
+  if [[ $OSTYPE =~ darwin* ]]; then
     subl_paths=("/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl")
-  elif [[ $OSTYPE =~ 'linux*' ]]; then
+  elif [[ $OSTYPE =~ linux* ]]; then
     subl_paths=("$HOME/.local/bin/sublime_text")
   else
     # TODO: provide some meaningul alternative

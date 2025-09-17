@@ -27,5 +27,7 @@
 	"auto_match_enabled": true,
 
 	// Set to false to hide the gutter altogether
-	"gutter": true
+	"gutter": true,
+
+    "show_minimap": false
 }

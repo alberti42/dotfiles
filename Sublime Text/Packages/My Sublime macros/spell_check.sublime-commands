@@ -3,7 +3,7 @@
         "caption": "Switch to German Dictionary",
         "command": "switch_dictionary",
         "args": {
-        	"language": "Packages/Language - German/German_de_DE.dic",
+        	"language": "Packages/Dictionaries/German_de_DE.dic",
         	"ltex.language": "de-DE"
         }
     },
@@ -11,7 +11,7 @@
         "caption": "Switch to English Dictionary",
         "command": "switch_dictionary",
         "args": {
-        	"language": "Packages/Language - English/en_US.dic",
+        	"language": "Packages/Dictionaries/English (American).dic",
         	"ltex.language": "en-US"
         }
     }

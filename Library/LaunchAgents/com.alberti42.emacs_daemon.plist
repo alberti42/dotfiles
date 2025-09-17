@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<false/>
+	<key>EnvironmentVariables</key>
+	<dict/>
+	<key>Label</key>
+	<string>com.alberti42.emacs_daemon_launcher</string>
+	<key>LowPriorityIO</key>
+	<false/>
+	<key>Nice</key>
+	<integer>0</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/andrea/.config/dotfiles/.local/bin/emacs_daemon_launcher</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>

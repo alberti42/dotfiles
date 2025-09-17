@@ -9,7 +9,7 @@
 		"Makefile",
 		"makefile"
 	],
-	"makefile": "/Users/andrea/LS_COLORS/Makefile",
+	"makefile": "Makefile",
 	"selector": "source.makefile",
 	"syntax": "Packages/Makefile/Make Output.sublime-syntax",
 	"target": "make_targets",

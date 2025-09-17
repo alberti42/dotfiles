@@ -1,0 +1,10 @@
+#!/bin/zsh -fd
+
+if [ -x /usr/local/bin/zsh ]; then
+    exec /usr/local/bin/zsh -o NO_GLOBAL_RCS -c 'COLORTERM=truecolor TERM=xterm-256color emacs --daemon'
+elif [ -x /opt/homebrew/bin/zsh ]; then
+    exec /opt/homebrew/bin/zsh -o NO_GLOBAL_RCS -c 'COLORTERM=truecolor TERM=xterm-256color emacs --daemon'
+else
+    echo "No suitable zsh found for launching Emacs." >&2
+    exit 1
+fi

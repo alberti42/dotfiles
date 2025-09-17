@@ -8,11 +8,6 @@
     // file use JavaScript syntax, set new_file_syntax to 'JavaScript'.
     "new_file_syntax": false,
 
-    // Auto add extensions to language settings file in User folder.
-    // Do not manually remove "apply_syntax_extensions" from the settings file.
-    // "extenstions" are ignored by "match": "all" setting.
-    "add_exts_to_lang_settings": true,
-
     // Control level of logging in the console.
     // (true|false|"verbose")
     "debug": false,
@@ -38,5 +33,12 @@
                 {"file_path": ".*/git/config(~|$)"},
             ],
         }
-    ]
+    ],
+
+    // Auto add extensions to language settings file in User folder.
+    // Do not manually remove "ApplySyntax.ext-list" from the User folder
+    // as it is used to track which extensions ApplySyntax added so
+    // they can be removed later if needed.
+    // "extenstions" are ignored by "match": "all" setting.
+    "add_exts_to_lang_settings": true,
 }

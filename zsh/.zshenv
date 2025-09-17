@@ -136,3 +136,6 @@ fi
 ###########################
 
 source "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
+
+# Debug path
+# print -l $path | grep --color=always 'zinit\|\/usr\/local\/bin\|$'

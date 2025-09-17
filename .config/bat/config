@@ -1,1 +1,1 @@
--p --theme="Catppuccin Frappe"
+-p --theme-dark="Catppuccin Mocha" --theme-light="Catppuccin Macchiato"

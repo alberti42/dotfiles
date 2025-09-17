@@ -1,10 +1,8 @@
 {
-  "dictionary": "Packages/Language - German/German_de_DE.dic",
+  "dictionary": "Packages/Dictionaries/German_de_DE.dic",
   "gutter": true,
   "ignored_packages":
   [
-    "LSP-pyright",
-    "SideBarTools",
     "Vintage",
   ],
   "draw_white_space": "selection",
@@ -15,11 +13,7 @@
   "open_files_in_new_window": "never",
   "scroll_past_end": true,
   
-  "show_minimap": true,
-  "always_show_minimap_viewport": true,
-
   "show_panel_on_build": true,
-  "theme": "Adaptive.sublime-theme",
   
   // Disables horizontal scrolling if enabled.
   // May be set to true, false, or "auto", where it will be disabled for
@@ -56,9 +50,6 @@
   // character when saving
   "ensure_newline_at_eof_on_save": false,
 
-  // Color scheme
-  // "color_scheme": "Monokai Pro (Filter Octagon).sublime-color-scheme",
-
   // Note that the font_face and font_size are overridden in the platform
   // specific settings file, for example, "Preferences (Linux).sublime-settings".
   // Because of this, setting them here will have no effect: you must set them
@@ -68,18 +59,15 @@
   // "font-options": [],
 
   "windows":
-	{
+  {
     // "font_size": 14,
     "ignored_packages":
-	  [
-	    "Terminal",
-	    "Vintage",
-	    "Recent Files Tracker"
+    [
+      "Terminal",
+      "Vintage",
+      "RecentFilesTracker"
     ],
-	},
-
-  // Ignore version control system-based (VCS-based) packages
-  "ignore_vcs_package": true,
+  },
 
   // Used by the plugin https://github.com/SublimeText/GenerateUUID
   "uuid_uppercase": false,
@@ -212,20 +200,103 @@
     "Elliptizität",
     "raumfeste",
   ],
-  "color_scheme": "Catppuccin Frappe.sublime-color-scheme",
   "auto_complete_triggers":
   [
-		{
-			"characters": "<",
-			"selector": "text.html, text.xml",
-		},
-		{
-			"rhs_empty": true,
-			"selector": "punctuation.accessor",
-		},
-		{
-			"characters": "\\",
-			"selector": "text.tex.latex",
-		}
+    {
+      "characters": "<",
+      "selector": "text.html, text.xml",
+    },
+    {
+      "rhs_empty": true,
+      "selector": "punctuation.accessor",
+    },
+    {
+      "characters": "\\",
+      "selector": "text.tex.latex",
+    }
   ],
+
+  // The theme controls the look of Sublime Text's UI (buttons, tabs, scroll
+  // bars, etc)
+  // The value "auto" will switch between the "light_theme" and "dark_theme"
+  // based on the operating system appearance.
+  "theme": "auto",
+  
+  // Controls the "theme" when to "auto"
+  "dark_theme": "Adaptive.sublime-theme",
+  "light_theme": "Adaptive.sublime-theme",
+
+  // Sets the colors used within the text area.
+  // The value "auto" will switch between the "light_color_scheme" and
+  // "dark_color_scheme" based on the operating system appearance.
+  "color_scheme": "auto",
+
+  // Controls the "color_scheme" when set to "auto"
+  "light_color_scheme": "Catppuccin Frappe.sublime-color-scheme",
+  "dark_color_scheme": "Catppuccin Macchiato.sublime-color-scheme",
+
+  // Adaptive theme only: controls if a custom or default title bar is used.
+  // Note that on Windows, the hamburger menu is used whenever this is
+  // enabled and the adaptive theme is in use.
+  "themed_title_bar": true,
+
+  // remember_full_screen will allow Sublime Text to start in full screen
+  // mode if it was exited in full screen mode. When set to false, Sublime
+  // Text will never start in full screen mode.
+  "remember_full_screen": true,
+
+  // Valid values are "system", "enabled" and "disabled"
+  "overlay_scroll_bars": "enabled",
+
+  // Additional spacing at the bottom of each line, in pixels
+  "line_padding_bottom": 2,
+  
+  // Additional spacing at the top of each line, in pixels
+  "line_padding_top": 2,
+
+  // Show folders in the sidebar in bold
+  "bold_folder_labels": false,
+
+  // Controls how the indent guides are drawn. Options may be combined, with
+  // valid options being:
+  //  - "draw_normal" - will draw plain indent guides for every indentation
+  //    group
+  //  - "draw_active" - will draw indent guides for the group
+  //    containing the caret in a different color
+  //  - "draw_active_single" - will draw the right-most indent guide in the
+  //    group containing the caret in a different color
+  //  - "solid" - can be combined with any of the draw_* options to draw
+  //    solid instead of stippled lines
+  "indent_guide_options": ["draw_normal", "draw_active"],
+
+  // Valid options on all platforms are:
+  //  - "no_bold": Disables bold text
+  //  - "no_italic": Disables italic text
+  // Antialiasing options:
+  //  - "no_antialias": Disables antialiasing
+  //  - "gray_antialias": Uses grayscale antialiasing instead of subpixel
+  // Ligature options:
+  //  - "no_liga": Disables standard ligatures (OpenType liga feature)
+  //  - "no_clig": Disables contextual ligatures (OpenType clig feature)
+  //  - "no_calt": Disables contextual alternatives (OpenType calt feature)
+  //  - "dlig": Enables discretionary ligatures (OpenType dlig feature)
+  //  - "ss01": Enables OpenType stylistic set 1. Can enable sets 1 to 10
+  //        by changing the last two digits.
+  // Windows-only options:
+  //  - "directwrite": (default) Use DirectWrite for font rendering
+  //  - "gdi": Use GDI for font rendering
+  //  - "dwrite_cleartype_classic": Only applicable to "directwrite" mode,
+  //        should render fonts similar to traditional GDI
+  //  - "dwrite_cleartype_natural": Only applicable to "directwrite" mode,
+  //        should render fonts similar to ClearType "natural quality" GDI
+  //  - "subpixel_antialias": Force ClearType antialiasing when disabled
+  //        at system level
+  // Mac-only options:
+  //  - "no_round": Don't round glyph widths for monospace fonts when
+  //        "font_size" is small.
+  // "font_options": ["gray_antialias", "subpixel_antialias"], // for retina Mac & Windows
+  
+  // Always visualise the viewport on the minimap, as opposed to only
+  // showing it on mouse over
+  "always_show_minimap_viewport": false,
 }

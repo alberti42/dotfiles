@@ -56,3 +56,5 @@
 	textconv = plutil -convert xml1 -o - --
 [pretty]
     reflog = %C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)
+[credential]
+	helper = store

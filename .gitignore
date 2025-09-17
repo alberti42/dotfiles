@@ -1,5 +1,13 @@
 .DS_Store
 **/*.sublime-workspace
 Sublime Text/Packages/User/OverrideAudit.status
+Sublime Text/Packages/User/ApplySyntax.ext-list
 **/*.zwc
 .local/share/tmux/resurrect/*
+.config/btop/btop.log
+.config/emacs/eln-cache/
+.config/emacs/history
+.config/emacs/elpa/
+Sublime Text/Packages/User/sftp/*.sublime-color-scheme
+Sublime Text/Packages/User/Terminus/Terminus.hidden-color-scheme
+

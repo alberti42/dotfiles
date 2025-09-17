@@ -1,0 +1,14 @@
+// Documentation at https://www.sublimetext.com/docs/color_schemes.html
+{
+	"variables":
+	{
+	},
+	"globals":
+	{
+		"active_guide": "color(var(blue) alpha(0.75))",
+	},
+	"rules":
+	[
+		
+	]
+}

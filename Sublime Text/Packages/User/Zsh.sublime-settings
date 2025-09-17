@@ -1,0 +1,15 @@
+// These settings override both User and Default settings for the Zsh syntax
+{
+    // The number of spaces a tab is considered equal to
+    "tab_size": 2,
+
+    // Set to true to insert spaces when tab is pressed
+    "translate_tabs_to_spaces": true,
+
+    // Associated extensions
+    "extensions": [
+        "zlogin", "zlogout", "zprofile", "zshenv", "zshrc",
+    ],
+    
+    "ensure_newline_at_eof_on_save": false,
+}

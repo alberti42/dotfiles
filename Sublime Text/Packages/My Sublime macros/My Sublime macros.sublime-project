@@ -9,8 +9,11 @@
                 ".ipynb_checkpoints",
                 "__pycache__",
                 ".vscode"
-            ]
-        }
+            ],
+        },
+        {
+			"path": "/Users/andrea/Downloads/LaTeXTools"
+		},
     ],
     "settings": {
         "LSP": {
@@ -27,9 +30,9 @@
                         "/Applications/Sublime Text.app/Contents/MacOS/Lib/python38",
                     ],
                     "basedpyright.analysis.typeCheckingMode": "basic",
-                    "basedpyright.analysis.reportOptionalSubscript": "error"
-                }
-            }
-        }
-    }
+                    "basedpyright.analysis.reportOptionalSubscript": "error",
+                },
+            },
+        },
+    },
 }

@@ -4,10 +4,10 @@
 
 	// Set to true to insert spaces when tab is pressed
 	"translate_tabs_to_spaces": true,
-
+    
+    "ensure_newline_at_eof_on_save": false,
+    
 	"extensions":
 	[
 	],
-    
-    "ensure_newline_at_eof_on_save": false,
 }

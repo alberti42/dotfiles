@@ -2,23 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Disabled</key>
+	<key>KeepAlive</key>
 	<false/>
-	<key>EnvironmentVariables</key>
-	<dict/>
 	<key>Label</key>
-	<string>Tmux launcher</string>
-	<key>LowPriorityIO</key>
-	<false/>
-	<key>Nice</key>
-	<integer>0</integer>
+	<string>com.alberti42.tmux_launcher</string>
+	<key>LimitLoadToSessionType</key>
+	<string>Aqua</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/bin/sh</string>
+		<string>/bin/bash</string>
+		<string>--noprofile</string>
+		<string>--norc</string>
 		<string>-c</string>
-		<string>if [ -x /usr/libexec/path_helper ]; then eval $(/usr/libexec/path_helper -s); fi; tmux has-session -t main 2&gt; /dev/null || ( cd $HOME; tmux new-session -d -s main )</string>
+		<string>cd $HOME; $HOME/google-drive/dotfiles/.local/bin/tmux_launcher new-session -d -smain</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
+	<key>StandardErrorPath</key>
+	<string>/tmp/tmux-launcher.err</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/tmux-launcher.out</string>
 </dict>
 </plist>

@@ -9,10 +9,19 @@ after-login-command = []
 # You can use it to add commands that run after AeroSpace startup.
 # 'after-startup-command' is run after 'after-login-command'
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = []
+after-startup-command = [
+	'workspace l',
+	'layout tiling',
+	'layout tiles horizontal',
+	'workspace d',
+	'layout accordion horizontal',
+	'workspace m',
+	'layout accordion horizontal',
+	'workspace 1',
+	'layout floating',]
 
 # Start AeroSpace at login
-start-at-login = false
+start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
@@ -21,7 +30,7 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
 # You can set 0 to disable the padding feature
-accordion-padding = 10
+accordion-padding = 20
 
 # Possible values: tiles|accordion
 default-root-container-layout = 'tiles'
@@ -67,6 +76,10 @@ automatically-unhide-macos-hidden-apps = false
 
 # Detect opened window and associate them with their workspace
 [[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = ['layout floating', 'move-node-to-workspace 1']
+
+[[on-window-detected]]
 if.app-id = 'com.googlecode.iterm2'
 run = 'move-node-to-workspace t'
 
@@ -76,7 +89,7 @@ run = ['layout tiling', 'move-node-to-workspace t']
 
 [[on-window-detected]]
 if.app-id = 'com.github.wez.wezterm'
-run = ['layout tiling', 'move-node-to-workspace t']
+run = ['move-node-to-workspace t']
 
 [[on-window-detected]]
 if.app-id = 'org.mozilla.firefox'
@@ -99,13 +112,24 @@ run = 'move-node-to-workspace b'
 if.app-id = 'md.obsidian'
 run = 'move-node-to-workspace o'
 
+# 1) Main MailMate window(s) — match on "(xx messages)"
 [[on-window-detected]]
 if.app-id = 'com.freron.MailMate'
-run = 'move-node-to-workspace m'
+if.window-title-regex-substring = '\(\d+ messages\)'
+run = ['layout tiling', 'move-node-to-workspace m']
+
+# 2) All other MailMate windows → treat as composers
+[[on-window-detected]]
+if.app-id = 'com.freron.MailMate'
+run = ['layout floating', 'move-node-to-workspace m']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Gmail'
+run = ['layout tiling', 'move-node-to-workspace m']
 
 [[on-window-detected]]
 if.app-id = 'com.sublimetext.4'
-run = 'move-node-to-workspace d'
+run = 'move-node-to-workspace s'
 
 [[on-window-detected]]
 if.app-id = 'com.microsoft.VSCode'
@@ -117,7 +141,7 @@ run = 'move-node-to-workspace d'
 
 [[on-window-detected]]
 if.app-id = 'net.sourceforge.skim-app.skim'
-run = 'move-node-to-workspace d'
+run = 'move-node-to-workspace l'
 
 [[on-window-detected]]
 if.app-id = 'com.busymac.busycal3'
@@ -136,20 +160,24 @@ if.app-id = 'com.readdle.PDFExpert-Mac'
 run = 'move-node-to-workspace p'
 
 [[on-window-detected]]
+if.app-id = 'com.adobe.Acrobat.Pro'
+run = 'move-node-to-workspace p'
+
+[[on-window-detected]]
 if.app-id = 'com.reinvented.KeepIt'
 run = 'move-node-to-workspace k'
 
 [[on-window-detected]]
 if.app-id = 'com.sublimemerge'
-run = 'move-node-to-workspace g'
+run = 'move-node-to-workspace d'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Music'
-run = 'move-node-to-workspace 9'
+run = 'move-node-to-workspace 0'
 
 # Make all windows float by default
 [[on-window-detected]]
-# check-further-callbacks = true
+check-further-callbacks = true
 run = ['layout floating']
 
 # 'main' binding mode declaration
@@ -174,16 +202,6 @@ run = ['layout floating']
 
     # All possible commands: https://nikitabobko.github.io/AeroSpace/commands
 
-    # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
-    # You can uncomment the following lines to open up terminal with alt + enter shortcut
-    # (like in i3)
-    # alt-enter = '''exec-and-forget osascript -e '
-    # tell application "Terminal"
-    #     do script
-    #     activate
-    # end tell'
-    # '''
-
     # Full screen mode
     alt-shift-f = 'fullscreen'
 
@@ -192,37 +210,41 @@ run = ['layout floating']
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
     # alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
-    # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-    alt-slash = 'layout tiles horizontal vertical'
-    alt-comma = 'layout accordion horizontal vertical'
-
-    # See: https://nikitabobko.github.io/AeroSpace/commands#focus
-    alt-j = 'focus left'
-    alt-k = 'focus down'
-    alt-i = 'focus up'
-    alt-l = 'focus right'
-
-	# See: https://nikitabobko.github.io/AeroSpace/commands#mode
+    # See: https://nikitabobko.github.io/AeroSpace/commands#mode
     alt-shift-semicolon = 'mode service'
-	alt-tab = 'mode operations'
+    alt-tab = 'mode operations'
 
-	cmd-h = [] # Disable "hide application"
+    cmd-h = [] # Disable "hide application"
     cmd-alt-h = [] # Disable "hide others"
     
 [mode.operations.binding]
+    esc = ['mode main']
+    alt-tab = 'mode operations'
 
-	esc = ['mode main']
+    # See: https://nikitabobko.github.io/AeroSpace/commands#focus
+    left  = ['focus left',  'mode main']
+    down  = ['focus down',  'mode main']
+    up    = ['focus up',    'mode main']
+    right = ['focus right', 'mode main']
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move
-    left = ['move left','mode main']
-    down = ['move down','mode main']
-    up = ['move up','mode main']
-    right = ['mode main','move right']
+    shift-alt-left  = ['move left',  'mode main']
+    shift-alt-down  = ['move down',  'mode main']
+    shift-alt-up    = ['move up',    'mode main']
+    shift-alt-right = ['move right', 'mode main']
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#resize
-    minus = 'resize smart -50'
-    equal = 'resize smart +50'
+    shift-minus = 'resize smart -50'
+    shift-equal = 'resize smart +50'
 
+    # See: https://nikitabobko.github.io/AeroSpace/commands#layout
+    backslash =  ['layout tiling', 'layout tiles horizontal', 'mode main']
+    alt-backslash = ['layout tiling', 'layout accordion horizontal', 'mode main']
+    minus =  ['layout tiling', 'layout tiles vertical', 'mode main']
+    alt-minus =  ['layout tiling', 'layout accordion vertical', 'mode main']
+    equal =  ['layout floating', 'mode main']
+    alt-equal =  ['layout tiling', 'mode main']
+    
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
     1 = ['workspace 1', 'mode main']
     2 = ['workspace 2', 'mode main']
@@ -232,19 +254,75 @@ run = ['layout floating']
     6 = ['workspace 6', 'mode main']
     7 = ['workspace 7', 'mode main']
     8 = ['workspace 8', 'mode main']
-    9 = ['workspace 9', 'mode main'] # Music
-    k = ['workspace k', 'mode main'] # Keep It
-    t = ['workspace t', 'mode main'] # Terminal
-    o = ['workspace o', 'mode main'] # Obsidian
-    m = ['workspace m', 'mode main'] # Mailmate
+    9 = ['workspace 9', 'mode main']
+    0 = ['workspace 0', 'mode main'] # Music
+    l = ['workspace l', 'mode main'] # Latex
+    k = ['exec-and-forget open -b com.reinvented.KeepIt', 'mode main'] # Keep It
+    t = ['exec-and-forget open -b com.github.wez.wezterm', 'mode main'] # WezTerm
+    o = ['exec-and-forget open -b md.obsidian', 'mode main'] # Obsidian
+    m = ['exec-and-forget open -b com.freron.MailMate', 'mode main'] # Mailmate
+    n = ['exec-and-forget open -b com.apple.MobileSMS', 'mode main'] # Mailmate
     b = ['workspace b', 'mode main'] # Web browswer
-    w = ['workspace b', 'mode main'] # Web browswer
-    s = ['workspace d', 'mode main'] # Development
+    f = ['exec-and-forget open -b org.mozilla.firefox', 'mode main'] # Firefox 
+    s = ['exec-and-forget open -b com.sublimetext.4', 'mode main'] # Sublime
     d = ['workspace d', 'mode main'] # Development
     g = ['workspace g', 'mode main'] # Git
     p = ['workspace p', 'mode main'] # Pdf reading
     e = ['workspace e', 'mode main'] # Element
-    c = ['workspace c', 'mode main'] # Calendar
+    c = ['exec-and-forget open -b com.busymac.busycal3', 'mode main'] # BusyCal
+
+    # k = ['''exec-and-forget osascript -e '
+    # 	tell application id "com.reinvented.KeepIt"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # Keep It
+    # t = ['''exec-and-forget osascript -e '
+    # 	tell application id "com.github.wez.wezterm"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # WezTerm
+    # o = ['''exec-and-forget osascript -e '
+    # 	tell application id "md.obsidian"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # Obsidian
+    # m = ['''exec-and-forget osascript -e '
+    # 	tell application id "com.freron.MailMate"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # Mailmate
+    # b = ['workspace b', 'mode main'] # Web browswer
+    # f = ['''exec-and-forget osascript -e '
+    # 	tell application id "org.mozilla.firefox"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # Firefox 
+    # s = ['''exec-and-forget osascript -e '
+    # 	tell application id "com.sublimetext.4"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # Sublime
+    # d = ['workspace d', 'mode main'] # Development
+    # g = ['workspace g', 'mode main'] # Git
+    # p = ['workspace p', 'mode main'] # Pdf reading
+    # e = ['''exec-and-forget osascript -e '
+    # 	tell application id "im.riot.app"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # Element
+    # c = ['''exec-and-forget osascript -e '
+    # 	tell application id "com.busymac.busycal3"
+    # 		activate
+	# 	end tell
+	# 	'
+	# 	''', 'mode main'] # BusyCal
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
     alt-1 = ['move-node-to-workspace 1', 'workspace 1', 'mode main']
@@ -256,7 +334,8 @@ run = ['layout floating']
     alt-7 = ['move-node-to-workspace 7', 'workspace 7', 'mode main']
     alt-8 = ['move-node-to-workspace 8', 'workspace 8', 'mode main']
     alt-9 = ['move-node-to-workspace 9', 'workspace 9', 'mode main']
-    alt-k = ['move-node-to-workspace t', 'workspace k', 'mode main']
+    alt-l = ['move-node-to-workspace l', 'workspace l', 'mode main']
+    alt-k = ['move-node-to-workspace k', 'workspace k', 'mode main']
     alt-t = ['move-node-to-workspace t', 'workspace t', 'mode main']
     alt-o = ['move-node-to-workspace o', 'workspace o', 'mode main']
     alt-m = ['move-node-to-workspace m', 'workspace m', 'mode main']
@@ -264,10 +343,11 @@ run = ['layout floating']
     alt-d = ['move-node-to-workspace d', 'workspace d', 'mode main']
     alt-g = ['move-node-to-workspace g', 'workspace g', 'mode main']
     alt-p = ['move-node-to-workspace p', 'workspace p', 'mode main']
+    alt-s = ['move-node-to-workspace s', 'workspace s', 'mode main']
     alt-e = ['move-node-to-workspace e', 'workspace e', 'mode main']
     alt-c = ['move-node-to-workspace c', 'workspace c', 'mode main']
 
-	alt-left = ['join-with left', 'mode main']
+    alt-left = ['join-with left', 'mode main']
     alt-down = ['join-with down', 'mode main']
     alt-up = ['join-with up', 'mode main']
     alt-right = ['join-with right', 'mode main']
@@ -278,7 +358,9 @@ run = ['layout floating']
 # 'service' binding mode declaration.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
-    esc = ['reload-config', 'mode main']
+    esc = 'mode main'
+    alt-shift-semicolon = 'mode service'
+    shift-r = ['reload-config', 'mode main']
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
     # backspace = ['close-all-windows-but-current', 'mode main']

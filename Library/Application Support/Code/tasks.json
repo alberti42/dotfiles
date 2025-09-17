@@ -1,0 +1,66 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "tmux: new window with workspace directory",
+            "type": "process",
+            "command": "${userHome}/.config/dotfiles/bin/new_tmux_window_in_session.zsh",
+            "args": [
+                "-s", "main",
+                "-c", "${workspaceFolder}"
+            ],
+            "presentation": {
+                "echo": false,
+                "showReuseMessage": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "wezterm: activate",
+            "type": "process",
+            "command": "true",
+            "osx": {
+                "command": "/bin/sh",
+                "args": [
+                    "-c",
+                    "/usr/bin/osascript -e \"tell application id \\\"com.github.wez.wezterm\\\" to activate\" 2> /dev/null"
+                ]
+            },
+            "linux": {
+                "command": "/bin/sh",
+                "args": [
+                    "-c",
+                    "wmctrl -x -a org.wezfurlong.wezterm || wmctrl -a WezTerm || xdotool search --class WezTerm windowactivate || true"
+                ]
+            },
+            "presentation": {
+                "echo": false,
+                "showReuseMessage": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "New Tmux Window + Focus WezTerm",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "wezterm: activate",
+                "tmux: new window with workspace directory",
+            ],
+            "presentation": {
+                "echo": false,
+                "showReuseMessage": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated"
+            },
+        }
+    ]
+}

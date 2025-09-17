@@ -1,0 +1,6 @@
+// These settings override both User and Default settings for the C syntax
+{
+    // The number of spaces a tab is considered equal to
+    "tab_size": 2,
+    "translate_tabs_to_spaces": false,
+}

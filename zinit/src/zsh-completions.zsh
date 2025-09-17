@@ -136,7 +136,7 @@ function __my_completions_atinit_hook() {
   zstyle ':completion:complete:*' use-cache on
   zstyle ':completion:complete:*' cache-path "$HOME/.zcompcache"
 
-  # case insensitive path-completion
+  # Case insensitive path-completion
   zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
   unsetopt CASE_GLOB
 

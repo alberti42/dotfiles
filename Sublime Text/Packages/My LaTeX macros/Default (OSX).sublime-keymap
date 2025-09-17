@@ -71,6 +71,19 @@
         ]
     },
     {
+        "keys": ["super+l","p"],
+        "command": "insert_snippet",
+        "args": { "contents": "\\result[${1:1}]{${2:$SELECTION}}$0" },
+        "context":
+        [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "text.tex.latex"
+            }
+        ]
+    },
+    {
         "keys": ["super+l","i"],
         "command": "insert_snippet",
         "args": { "name": "Packages/My LaTeX macros/Snippets/emphasize.sublime-snippet" },

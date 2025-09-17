@@ -29,7 +29,7 @@
         "key": "cmd+shift+t",
         "command": "workbench.action.terminal.newWithCwd",
         "args": {
-          "cwd": "${fileDirname}"
+            "cwd": "${fileDirname}"
         }
     },
     {
@@ -38,11 +38,16 @@
         "when": "!terminalFocus"
     },
     {
+        "key": "alt+cmd+b",
+        "command": "latex-workshop.build",
+        "when": "!virtualWorkspace && editorLangId =~ /^build$|^latex$|^latex-class$|^latex-package$|^context$|^latex-expl3$|^doctex$|^rsweave$|^jlweave$|^pweave$/"
+    },
+    {
         "key": "cmd+shift+r",
-        "when": "editorLangId == latex && editorHasSelection",
         "command": "editor.action.insertSnippet",
+        "when": "editorHasSelection && editorLangId == 'latex'",
         "args": {
-            "snippet": "\\changeReferees{${1:$TM_SELECTED_TEXT}}{$TM_SELECTED_TEXT}"
+            "snippet": "\\result[${1:1}]{${TM_SELECTED_TEXT}}"
         }
     },
     {
@@ -53,14 +58,14 @@
             "snippet": "\\quotedblock{${1:block_label}}{$TM_SELECTED_TEXT}"
         }
     },
-    {
-        "key": "cmd+alt+r",
-        "when": "editorLangId == latex && editorHasSelection",
-        "command": "editor.action.insertSnippet",
-        "args": {
-            "snippet": "\\begin{referee}\n$TM_SELECTED_TEXT\n\\end{referee}"
-        }
-    },
+    // {
+    //     "key": "cmd+alt+r",
+    //     "when": "editorLangId == latex && editorHasSelection",
+    //     "command": "editor.action.insertSnippet",
+    //     "args": {
+    //         "snippet": "\\begin{referee}\n$TM_SELECTED_TEXT\n\\end{referee}"
+    //     }
+    // },
     {
         "key": "shift+cmd+f",
         "command": "-workbench.action.findInFiles"
@@ -129,4 +134,19 @@
         },
         "when": "editorTextFocus"
     },
+    {
+        "key": "shift+cmd+enter",
+        "command": "notebook.cell.executeAndSelectBelow",
+        "when": "notebookCellType == 'markup' || notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
+    },
+    {
+        "key": "cmd+enter",
+        "command": "notebook.cell.executeAndFocusContainer",
+        "when": "notebookMissingKernelExtension && !notebookCellExecuting && notebookCellType == 'code' || !notebookCellExecuting && notebookCellType == 'code' && notebookKernelCount > 0 || !notebookCellExecuting && notebookCellType == 'code' && notebookKernelSourceCount > 0"
+    },
+    {
+        "key": "cmd+alt+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "New Tmux Window + Focus WezTerm"
+    }
 ]
