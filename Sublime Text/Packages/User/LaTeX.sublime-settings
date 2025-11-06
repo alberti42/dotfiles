@@ -21,7 +21,7 @@
 	// Set to true to insert spaces when tab is pressed
 	"translate_tabs_to_spaces": true,
 
-	"tab_size": 4,
+	"tab_size": 2,
     
 	// Controls auto pairing of quotes, brackets etc	
 	"auto_match_enabled": true,

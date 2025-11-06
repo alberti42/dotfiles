@@ -1,47 +1,5 @@
 #!/hint/zsh
 
-##############################
-# Zsh management functions   #
-##############################
-
-function __zcompile_if_needed_and_source() {
-  # Utility function to compile zsh files and execute them
-  local script="$1"
-  local compiled_script="${script}.zwc"
-
-  if [[ ! -f "$compiled_script" || "$script" -nt "$compiled_script" ]]; then    
-    zcompile -Uz -- "$script" "$compiled_script"  
-  fi
-  builtin source "$@"
-}
-
-function _safe_one_off_load() {
-  emulate -LR zsh
-
-  local func=$1
-  shift  # Remove the function name from the arguments
-  local retval
-
-  # Save the original state of ERR_EXIT
-  local original_err_exit=${options[ERR_EXIT]}
-
-  set -e  # Enable ERR_EXIT for this function
-  "$func" "$@"  # Call the function with remaining arguments
-  retval=$?
-
-  # Restore the original state of ERR_EXIT
-  if [[ $original_err_exit == off ]]; then
-    set +e
-  fi
-
-  unfunction "$func"
-
-  if [[ $retval -ne 0 ]]; then
-    +zi-log "{error}Function '$func' exited with error code: $retval{rst}"
-  fi
-  return $retval
-}
-
 ###########################
 # zinit installation      #
 ###########################
@@ -65,7 +23,7 @@ fi
 # Source the Zinit main script to load its functionality (about 30 ms)
 __zcompile_if_needed_and_source "$ZINIT[HOME_DIR]/zinit.git/zinit.zsh"
 
-# Autoload the Zinit completion function (_zinit) to allow zsh's completion system to use it
+# Autoload the Zinit compnletion function (_zinit) to allow zsh's completion system to use it
 autoload -Uz _zinit
 
 # Safeguard for completion mapping:
@@ -74,14 +32,9 @@ autoload -Uz _zinit
 # This avoids errors if `_comps` isn't initialized yet (e.g., `compinit` hasn't run).
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-# Ensure ZPFX/bin is first in PATH
-path=($ZPFX/bin $path)
-typeset -U path
-
 # Notes:
 # - `compinit` is not invoked here to adhere to Zinit's philosophy of running it only once,
 #   typically at the end of `.zshrc`, to ensure optimal performance and avoid conflicts.
 # - The completion mapping ensures that if `_comps` is already initialized (e.g., during a re-source),
 #   Zinit's completion function is correctly registered without redundant `compinit` calls.
 # - This approach provides robustness and minimizes interference with the user's customizations.
-

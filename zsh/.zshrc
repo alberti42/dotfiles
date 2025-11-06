@@ -6,6 +6,13 @@
 # interactive shell (e.g. $LS_COLORS).
 
 ###########################
+# zinit installation      #
+###########################
+
+__zcompile_if_needed "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
+builtin source "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
+
+###########################
 # INSTANT PROMPT          #
 ###########################
 
@@ -120,8 +127,8 @@ zinit depth=1 light-mode lucid nocompile as'completion' from'gh' \
   zinit lucid wait light-mode for "${__local_plugins[@]}"
 }
 
-# Load syntax highlightin (plugin must be loaded after plugins issuing compdef)
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
+# Wrapper snippet for astral-sh/uv
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/uv/uv.zsh"
 
 # Wrapper for command-line fuzzy finder fzf
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzf/fzf.zsh"
@@ -138,7 +145,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tmux/tmux.zsh"
 # Import Tmux Plugins
 () {
   local __tmux_plugins=(
-    @tmux-plugins/tmux-sensible
+    # @tmux-plugins/tmux-sensible
     # @tmux-plugins/tmux-cpu
     # @tmux-plugins/tmux-battery
     # id-as'tmux-plugins/tmux-tokyo-night' @janoamaral/tokyo-night-tmux
@@ -187,6 +194,9 @@ zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'dist/superfile*/spf -
 
 # Wrapper snippet for Sublime Text
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
+
+# Load syntax highlighting (plugin must be loaded after plugins issuing compdef)
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
 
 #####################
 # Keybindings       #
@@ -277,7 +287,7 @@ else
 fi
 
 # Always tell bat to use less -R for colors
-export BAT_PAGER="less -sR -j5"
+# export BAT_PAGER="less -sR -j5"
 
 # Man pager with modern look
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -288,9 +298,12 @@ else
   export MANPAGER="sh -c 'bat -l man --style=plain --paging=always'"
 fi
 
-# Configure PAGER to display 5 lines before search results (https://stackoverflow.com/a/14964428/4216175)
-export LESS="-sR -j5"
-export PAGER="less -sR -j5"
+# Configure PAGER to display 5 lines before search results (https://stackoverflow.com/a/14964428/4216175),
+# to support the mouse, and support ANSI escape codes for colors (-R)
+export LESS="-sR -j5 --mouse"
+
+# Configure pager that is used by bat, git, and other utilities
+export PAGER="less"
 
 #####################
 # ALIASES           #
@@ -324,13 +337,13 @@ alias 9='cd -9'
 alias e='emacsclient -a= -nw -c'
 
 alias diff='diff --color=auto'
-alias ls='ls --color=auto'
 
 # List directory contents
-alias lsa='ls -lah'
-alias l='ls -lah'
-alias ll='ls -lh'
-alias la='ls -lAh'
+# alias ls='ls --color=auto'
+# alias lsa='ls -lah'
+# alias l='ls -lah'
+# alias ll='ls -lh'
+# alias la='ls -lAh'
 
 # Shell
 alias dotfiles="cd $DOTFILES_DIR"
@@ -349,7 +362,7 @@ alias nvimconf="nvim $HOME/.config/nvim/init.lua"
 
 # Misc
 alias rsync='rsync -e "ssh -o RemoteCommand=None -o RequestTTY=no"'
-alias zip='zip --symlinks --exclude ".DS_Store"'
+alias zip='zip --symlinks --exclude "**/.DS_Store"'
 alias rga='rg --no-ignore -aL.'
 alias fda='fd -HI'
 # alias mc='mc --nosubshell'

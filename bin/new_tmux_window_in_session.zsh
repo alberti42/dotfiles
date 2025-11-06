@@ -1,3 +1,5 @@
+#!/usr/bin/env -S zsh -o NO_GLOBAL_RCS -o NO_LOGIN
+
 function main() {
 
   local new_window_id window_name session_name curr_dir

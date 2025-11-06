@@ -22,7 +22,23 @@ ip-info() {
 # Find processes matching the pattern
 function ppgrep() {
   emulate -LR zsh
-  pgrep -f -d ',' "$@" | xargs --no-run-if-empty ps xw -p;
+  # Collect PIDs as a single comma-separated string (works on BSD + GNU)
+  local pids
+  pids=$(pgrep -f -d ',' "$@") || return
+  [[ -n $pids ]] || return
+
+  if [[ $OSTYPE = darwin* ]]; then
+    # macOS / BSD-style flags
+    # -x — show processes without a controlling terminal.
+    # -w — wide output.
+    # -p — specify PID list (works with both BSD and GNU).
+    ps -x -w -p "$pids"
+  else
+    # UNIX/GNU-style flags; -ww = don't truncate command
+    # -w — wide output. Use this option twice for unlimited width.
+    # -p — specify PID list (works with both BSD and GNU).
+    ps -ww -p "$pids"
+  fi
 }
 
 # Clear screen and scroll back
@@ -93,4 +109,10 @@ is_dark_appearance() {
     # Linux
   fi
   printf "%s" $__is_dark
+}
+
+pip_upgrade_outdated() {
+  emulate -LR zsh
+  local outdated=($(uv pip list --outdated --format=json | jq -r '.[].name'))
+  (( ${#outdated[@]} )) && uv pip install -U "${outdated[@]}" || echo '✅ All packages are up to date!'
 }

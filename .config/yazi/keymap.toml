@@ -10,6 +10,8 @@ prepend_keymap = [
     { on = "!",                run = 'shell "$SHELL" --block',               desc = "Open shell in current directory"},
     { on = "s",                run = 'search fd --args="--no-ignore"',       desc = "Search files by name using fd" },
     { on = "S",                run = 'search rg --args "--no-ignore"',       desc = "Search files by content using ripgrep" },
+    { on = [ "b", "f" ],       run = "plugin fazif faziffd",                 desc = "Find files/directories with fd and fzf"},
+    { on = [ "b", "r" ],       run = "plugin fazif fazifrg",                 desc = "Find files/directories with ripgrep and fzf"},
 ]
 
 [input]

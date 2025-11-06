@@ -1,0 +1,33 @@
+{
+    // Theme
+    // @jupyterlab/apputils-extension:themes
+    // Theme manager settings.
+    // *************************************
+
+    // Adaptive Theme
+    // Synchronize visual styling theme with system settings
+    "adaptive-theme": true,
+
+    // Theme CSS Overrides
+    // Override theme CSS variables by setting key-value pairs here
+    "overrides": {
+        "ui-font-size1": "15px",
+        "code-font-size": "15px"
+    },
+
+    // Preferred Dark Theme
+    // Application-level dark visual styling theme. Ignored when Adaptive Theme is disabled.
+    "preferred-dark-theme": "JupyterLab Dark",
+
+    // Preferred Light Theme
+    // Application-level light visual styling theme. Ignored when Adaptive Theme is disabled.
+    "preferred-light-theme": "JupyterLab Light",
+
+    // Selected Theme
+    // Application-level visual styling theme. Ignored when Adaptive Theme is enabled.
+    "theme": "JupyterLab Dark",
+
+    // Scrollbar Theming
+    // Enable/disable styling of the application scrollbars
+    "theme-scrollbars": false
+}

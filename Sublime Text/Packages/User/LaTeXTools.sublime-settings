@@ -3,112 +3,145 @@
 // Keep in the User directory. Personalize as needed
 
 {
-// ------------------------------------------------------------------
-// Output Directory settings settings
-// ------------------------------------------------------------------
+  // ------------------------------------------------------------------
+  // Output Directory settings settings
+  // ------------------------------------------------------------------
 
-    // OPTION: "aux_directory"
-    // Specifies the auxiliary directory
-    // Possible values:
-    //
-    // ""               the default; does not use any auxiliary directory
-    //
-    // path             the path to the auxiliary directory; if this is
-    //                  not an absolute path it is interpreted as a
-    //                  path relative to the main tex file
-    //
-    // "<<temp>>"       the auxiliary directory will be a temporary
-    //                  directory generated in as secure a manner as
-    //                  possible; note that this temporary directory
-    //                  is only valid until ST is restarted and will
-    //                  be deleted on the next start-up
-    //
-    // "<<project>>"    this creates an auxiliary directory in the same
-    //                  folder as the main tex file; the name is the
-    //                  MD5 hash of the absolute path of the main file;
-    //                  unlike <<temp>> this directory will persist
-    //
-    // "<<cache>>"      this creates an auxiliary directory in the ST
-    //                  cache directory on ST3 or a suitable directory
-    //                  on ST2; unlike <<temp>> this directory will
-    //                  persist; unlike <<project>>, it will not be
-    //                  in the same directory as the main tex file
-    //
-    // NOTE: This setting will be overridden by the corresponding
-    // %!TEX directive if any; also, while it is possible to define
-    // a global value here, it may make more sense to define this
-    // value in your project settings if you use STs project feature
-    // if you do so, however, note that the path will be interpreted
-    // relative to the location of your project file
+  // OPTION: "aux_directory"
+  // Specifies the auxiliary directory
+  // Possible values:
+  //
+  // ""               the default; does not use any auxiliary directory
+  //
+  // path             the path to the auxiliary directory; if this is
+  //                  not an absolute path it is interpreted as a
+  //                  path relative to the main tex file
+  //
+  // "<<temp>>"       the auxiliary directory will be a temporary
+  //                  directory generated in as secure a manner as
+  //                  possible; note that this temporary directory
+  //                  is only valid until ST is restarted and will
+  //                  be deleted on the next start-up
+  //
+  // "<<project>>"    this creates an auxiliary directory in the same
+  //                  folder as the main tex file; the name is the
+  //                  MD5 hash of the absolute path of the main file;
+  //                  unlike <<temp>> this directory will persist
+  //
+  // "<<cache>>"      this creates an auxiliary directory in the ST
+  //                  cache directory on ST3 or a suitable directory
+  //                  on ST2; unlike <<temp>> this directory will
+  //                  persist; unlike <<project>>, it will not be
+  //                  in the same directory as the main tex file
+  //
+  // NOTE: This setting will be overridden by the corresponding
+  // %!TEX directive if any; also, while it is possible to define
+  // a global value here, it may make more sense to define this
+  // value in your project settings if you use STs project feature
+  // if you do so, however, note that the path will be interpreted
+  // relative to the location of your project file
 
-    "aux_directory": "._aux",
+  "aux_directory": "._aux",
 
-    // OPTION: "output_directory"
-    // Specifies the output directory
-    // Possible values:
-    //
-    // ""               the default; does not use any output directory
-    //
-    // path             the path to the output directory; if this is
-    //                  not an absolute path it is interpreted as a
-    //                  path relative to the main tex file
-    //
-    // "<<temp>>"       the output directory will be a temporary
-    //                  directory generated in as secure a manner as
-    //                  possible; note that this temporary directory
-    //                  is only valid until ST is restarted and will
-    //                  be deleted on the next start-up
-    //
-    // "<<project>>"    this creates an output directory in the same
-    //                  folder as the main tex file; the name is the
-    //                  MD5 hash of the absolute path of the main file;
-    //                  unlike <<temp>> this directory will persist
-    //
-    // "<<cache>>"      this creates an output directory in the ST
-    //                  cache directory on ST3 or a suitable directory
-    //                  on ST2; unlike <<temp>> this directory will
-    //                  persist; unlike <<project>>, it will not be
-    //                  in the same directory as the main tex file
-    //
-    // NOTE: This setting will be overridden by the corresponding
-    // %!TEX directive if any; also, while it is possible to define
-    // a global value here, it may make more sense to define this
-    // value in your project settings if you use STs project feature
-    // if you do so, however, note that the path will be interpreted
-    // relative to the location of your project file
+  // OPTION: "output_directory"
+  // Specifies the output directory
+  // Possible values:
+  //
+  // ""               the default; does not use any output directory
+  //
+  // path             the path to the output directory; if this is
+  //                  not an absolute path it is interpreted as a
+  //                  path relative to the main tex file
+  //
+  // "<<temp>>"       the output directory will be a temporary
+  //                  directory generated in as secure a manner as
+  //                  possible; note that this temporary directory
+  //                  is only valid until ST is restarted and will
+  //                  be deleted on the next start-up
+  //
+  // "<<project>>"    this creates an output directory in the same
+  //                  folder as the main tex file; the name is the
+  //                  MD5 hash of the absolute path of the main file;
+  //                  unlike <<temp>> this directory will persist
+  //
+  // "<<cache>>"      this creates an output directory in the ST
+  //                  cache directory on ST3 or a suitable directory
+  //                  on ST2; unlike <<temp>> this directory will
+  //                  persist; unlike <<project>>, it will not be
+  //                  in the same directory as the main tex file
+  //
+  // NOTE: This setting will be overridden by the corresponding
+  // %!TEX directive if any; also, while it is possible to define
+  // a global value here, it may make more sense to define this
+  // value in your project settings if you use STs project feature
+  // if you do so, however, note that the path will be interpreted
+  // relative to the location of your project file
 
-    "output_directory": "._aux",
+  "output_directory": "._aux",
 
-    // OPTION: "builder"
-    // Specifies a build engine
-    // Possible values:
-    //
-    // "default" or ""  the default built-in build engine; currently
-    //                  this is the same as "traditional"
-    //
-    // "basic"          invokes pdflatex / xelatex / lualatex as
-    //                  needed, then biber / bibtex and pdflatex /
-    //                  xelatex / lualatex again if needed. Unlike
-    //                  the "simple" builder this supports most of
-    //                  LaTeXTools builder features.
-    //
-    // "script"         external script: invokes the set of commands
-    //                  specified in the "script_commands" setting
-    //                  in the platform-specific part of the
-    //                  "builder_settings"
-    //
-    // "simple"         invokes pdflatex 1x or 2x as needed, then
-    //                  bibtex and pdflatex again if needed;
-    //                  intended mainly as a simple example for
-    //                  people writing their own build engines.
-    //
-    // "traditional"    replicates the 'old' system based on
-    //                  latexmk (TeXLive) / texify (MiKTeX)
-    //
-    // custom name      you can also use third-party build engines;
-    //                  if so, set the "builder_path" option below
-    //
-    // NOTE: custom builders CANNOT have the same name as an existing
-    // built-in build engine (including "default")
-    "builder": "traditional",
+  // OPTION: "builder"
+  // Specifies a build engine
+  // Possible values:
+  //
+  // "default" or ""  the default built-in build engine; currently
+  //                  this is the same as "traditional"
+  //
+  // "basic"          invokes pdflatex / xelatex / lualatex as
+  //                  needed, then biber / bibtex and pdflatex /
+  //                  xelatex / lualatex again if needed. Unlike
+  //                  the "simple" builder this supports most of
+  //                  LaTeXTools builder features.
+  //
+  // "script"         external script: invokes the set of commands
+  //                  specified in the "script_commands" setting
+  //                  in the platform-specific part of the
+  //                  "builder_settings"
+  //
+  // "simple"         invokes pdflatex 1x or 2x as needed, then
+  //                  bibtex and pdflatex again if needed;
+  //                  intended mainly as a simple example for
+  //                  people writing their own build engines.
+  //
+  // "traditional"    replicates the 'old' system based on
+  //                  latexmk (TeXLive) / texify (MiKTeX)
+  //
+  // custom name      you can also use third-party build engines;
+  //                  if so, set the "builder_path" option below
+  //
+  // NOTE: custom builders CANNOT have the same name as an existing
+  // built-in build engine (including "default")
+  "builder": "basic",
+
+  // OPTION: "hide_build_panel"
+  // level to hide the build panel after the build is finished
+  // Possible values are:
+  // "always" (hide the panel even if the build failed),
+  // "no_errors" (only hide the panel if the build was successful even with warnings),
+  // "no_warnings" (only hide the panel if no warnings occur)
+  // "no_badboxes" (only hide the panel if no badbox messages occur when badboxes are enabled) and
+  // "never" (default, never hide the build panel)
+  "show_panel_on_build": "errors",
+
+  // The density of the preview image. The higher the density the larger the phantom.
+  "preview_math_density": 300,
+
+  // If the image is not sharp enough increase this scale to get a better resolution.
+  // However also change the density by the same factor to keep the size the
+  // same.
+  "preview_math_scale_quotient": 2,
+
+  // Sync PDF to current editor position after building (true) or not
+  "forward_sync": true,
+
+    // An array of the used packages, from which the file for the live preview
+  // will be generated.
+  // Just write \\usepackage{packagename} to include other packages.
+  // (The xcolor package will be present, even if not in this list.)
+  "preview_math_template_packages": [
+    "\\usepackage{amsmath}",
+    "\\usepackage{amssymb}",
+    "\\usepackage{braket}",
+    "\\IfFileExists{latexsym.sty}{\\usepackage{latexsym}}{}",
+    "\\IfFileExists{mathtools.sty}{\\usepackage{mathtools}}{}"
+  ],
 }

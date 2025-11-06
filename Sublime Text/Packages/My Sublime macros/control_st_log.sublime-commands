@@ -1,12 +1,34 @@
 [
-    {
-        "caption": "Sublime Text: Enable Logging",
-        "command": "toggle_logging",
-        "args": { "enable": true }
-    },
-    {
-        "caption": "Sublime Text: Disable Logging",
-        "command": "toggle_logging",
-        "args": { "enable": false }
-    }
+	{
+		"caption": "Sublime Text: Toggle Logging Commands",
+		"command": "toggle_commands_logging",
+		"args": {},
+	},
+	{
+		"caption": "Sublime Text: Toggle Logging Input",
+		"command": "toggle_input_logging",
+		"args": {},
+	},
+	/*
+	{
+		"caption": "Sublime Text: Start Logging Commands",
+		"command": "toggle_commands_logging",
+		"args": { "enable": true },
+	},
+	{
+		"caption": "Sublime Text: Stop Logging Commands",
+		"command": "toggle_commands_logging",
+		"args": { "enable": false },
+	},
+	{
+		"caption": "Sublime Text: Start Logging Input",
+		"command": "toggle_input_logging",
+		"args": { "enable": true },
+	},
+	{
+		"caption": "Sublime Text: Stop Logging Input",
+		"command": "toggle_input_logging",
+		"args": { "enable": false },
+	},
+	*/
 ]

@@ -1,0 +1,13 @@
+<snippet>
+    <content><![CDATA[
+\begin{solution}
+	$1
+\end{solution}
+]]></content>
+    <!-- Tab Trigger: The text you type before pressing Tab -->
+    <tabTrigger>sol</tabTrigger>
+    <!-- Scope: Limits the snippet to only work in certain file types -->
+    <scope>text.tex.latex</scope>
+    <!-- Description: A friendly name for the snippet in the command palette -->
+    <description>LaTeX: Solution Environment</description>
+</snippet>

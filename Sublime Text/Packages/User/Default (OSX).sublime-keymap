@@ -1,149 +1,320 @@
 [
-    {
-        "keys":
-        [
-            "super+ctrl+f"
-        ],
-        "command": "toggle_distraction_free"
+  // LSP
+  {
+    "keys": ["super+shift+a"],
+    "command": "lsp_expand_selection",
+    "args": {},
+  },
+  {
+    "keys": ["super+shift+/"],
+    "command": "lsp_hover",
+    "args": {},
+  },
+  // >>> LATEX >>>
+  {
+    "keys": ["super+l", "p"],
+    "command": "show_panel",
+    "args": {"panel": "output.exec"},
+    "context": [
+      { "key": "selector", "operator": "equal", "operand": "text.tex.latex" },
+    ],
+  },
+  // <<< LATEX <<<
+  // >>> SUBLIME >>>
+  {
+    "keys": ["ctrl+]"],
+    "command": "jump_lines",
+    "args": { "forward": true, "show_at_center": true },
+  },
+  {
+    "keys": ["ctrl+["],
+    "command": "jump_lines",
+    "args": { "forward": false, "show_at_center": true },
+  },
+  {
+    "keys": ["ctrl+shift+]"],
+    "command": "jump_lines",
+    "args": { "forward": true, "extend": true, "show_at_center": true },
+  },
+  {
+    "keys": ["ctrl+shift+["],
+    "command": "jump_lines",
+    "args": { "forward": false, "extend": true, "show_at_center": true },
+  },
+  {
+    "keys": ["alt+up"],
+    "command": "move_by_block",
+    "args": { "forward": false },
+  },
+  {
+    "keys": ["alt+down"],
+    "command": "move_by_block",
+    "args": { "forward": true },
+  },
+  {
+    "keys": ["alt+shift+up"],
+    "command": "move_by_block",
+    "args": { "forward": false, "extend": true },
+  },
+  {
+    "keys": ["alt+shift+down"],
+    "command": "move_by_block",
+    "args": { "forward": true, "extend": true },
+  },
+  {
+    "keys": ["alt+up"],
+    "command": "move_by_block",
+    "args": { "forward": false, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
+    "context": [
+      { "key": "selector", "operator": "equal", "operand": "text.tex.latex" },
+    ],
+  },
+  {
+    "keys": ["alt+down"],
+    "command": "move_by_block",
+    "args": { "forward": true, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
+    "context": [
+      { "key": "selector", "operator": "equal", "operand": "text.tex.latex" },
+    ],
+  },
+  {
+    "keys": ["alt+shift+up"],
+    "command": "move_by_block",
+    "args": { "forward": false, "extend": true, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
+    "context": [
+      { "key": "selector", "operator": "equal", "operand": "text.tex.latex" },
+    ],
+  },
+  {
+    "keys": ["alt+shift+down"],
+    "command": "move_by_block",
+    "args": { "forward": true, "extend": true, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
+    "context": [
+      { "key": "selector", "operator": "equal", "operand": "text.tex.latex" },
+    ],
+  },
+  {
+    "keys": ["super+shift+o"],
+    "command": "toggle_overwrite",
+  },
+  {
+    "keys": ["super+ctrl+f"],
+    "command": "toggle_distraction_free",
+  },
+  {
+    "keys": ["super+shift+t"],
+    "command": "open_terminal_in_tmux",
+  },
+  /*
+  {
+      "keys":
+      [
+          "super+shift+ctrl+t"
+      ],
+      "command": "open_terminal_project_folder"
+  },
+  */
+  /*
+  {
+    "keys": ["alt+up"],
+    "command": "move",
+    "args": {
+      "by": "stops",
+      "empty_line": true,
+      "forward": false,
     },
-    // {
-    //     "keys":
-    //     [
-    //         "super+shift+t"
-    //     ],
-    //     "command": "open_terminal"
-    // },
-    // {
-    //     "keys":
-    //     [
-    //         "super+shift+ctrl+t"
-    //     ],
-    //     "command": "open_terminal_project_folder"
-    // },
-    {
-        "keys":
-        [
-            "alt+up"
-        ],
-        "command": "move",
-        "args":
-        {
-            "by": "stops",
-            "empty_line": true,
-            "forward": false
-        }
+  },
+  {
+    "keys": ["alt+down"],
+    "command": "move",
+    "args": {
+      "by": "stops",
+      "empty_line": true,
+      "forward": true,
     },
-    {
-        "keys":
-        [
-            "alt+down"
-        ],
-        "command": "move",
-        "args":
-        {
-            "by": "stops",
-            "empty_line": true,
-            "forward": true
-        }
+  },
+  {
+    "keys": ["alt+shift+up"],
+    "command": "move",
+    "args": {
+      "by": "stops",
+      "empty_line": true,
+      "forward": false,
+      "extend": true,
     },
-    {
-        "keys":
-        [
-            "alt+shift+up"
-        ],
-        "command": "move",
-        "args":
-        {
-            "by": "stops",
-            "empty_line": true,
-            "forward": false,
-            "extend": true
-        }
+  },
+  {
+    "keys": ["alt+shift+down"],
+    "command": "move",
+    "args": {
+      "by": "stops",
+      "empty_line": true,
+      "forward": true,
+      "extend": true,
     },
-    {
-        "keys":
-        [
-            "alt+shift+down"
-        ],
-        "command": "move",
-        "args":
-        {
-            "by": "stops",
-            "empty_line": true,
-            "forward": true,
-            "extend": true
-        }
+  },
+  */
+  {
+    "keys": ["super+shift+m"],
+    "command": "toggle_minimap",
+    "args": {},
+  },
+  // <<< SUBLIME <<<
+  
+  // >>> TERMINUS >>>
+  {
+    "keys": ["alt+`"],
+    "command": "toggle_terminus_panel",
+    "args": {
+      "cwd": "${file_path:${folder}}",
     },
-    {
-        "keys":
-        [
-            "super+shift+a"
-        ],
-        "command": "lsp_expand_selection",
-        "args":
-        {}
-    },
-    {
-        "keys":
-        [
-            "super+shift+m"
-        ],
-        "command": "toggle_minimap",
-        "args":
-        {}
-    },
-    // >>> TERMINUS >>>
-    { 
-        "keys": ["alt+`"],
-        "command": "toggle_terminus_panel",
-        "args": {
-            "cwd": "${file_path:${folder}}"
-        }
-    },
-    { 
-        "keys": ["super+shift+t"],
-        "command": "terminus_open",
-        "args": {
-        		"config_name": "Zsh",
-            "cwd": "${file_path:${folder}}",
-        }
-    },
-    { 
-        "keys": ["ctrl+alt+t"],
-        "command": "terminus_open",
-        "args": {
-            "cmd": "ipython3",
-            "cwd": "${file_path:${folder}}"
-        }
-    },
-    {
-        "keys": ["super+b"],
-        "command": "build_with_terminus",
-        "context": [
-            { "key": "setting.terminus_build", "operator": "equal", "operand": true }
-        ]
-    },
-    // >>> ORIGAMI >>>
-    // 
-	  // --- Move focus between panes: Ctrl-b + arrow (like tmux) ---
-	  { "keys": ["ctrl+b", "up"],    "command": "travel_to_pane", "args": {"direction": "up"} },
-	  { "keys": ["ctrl+b", "right"], "command": "travel_to_pane", "args": {"direction": "right"} },
-	  { "keys": ["ctrl+b", "down"],  "command": "travel_to_pane", "args": {"direction": "down"} },
-	  { "keys": ["ctrl+b", "left"],  "command": "travel_to_pane", "args": {"direction": "left"} },
+  },
 
-	  // --- Create/split panes (tmux semantics) ---
-	  // Ctrl-b %  -> split vertically -> new pane on the RIGHT
-	  { "keys": ["ctrl+b", "%"],   "command": "create_pane", "args": {"direction": "right", "give_focus": true} },
+  /*
+  {
+      "keys": ["super+shift+t"],
+      "command": "terminus_open",
+      "args": {
+          "config_name": "Zsh",
+          "cwd": "${file_path:${folder}}",
+      }
+  },
+  {
+      "keys": ["ctrl+alt+t"],
+      "command": "terminus_open",
+      "args": {
+          "cmd": "ipython3",
+          "cwd": "${file_path:${folder}}"
+      }
+  },
+  */
 
-	  // Ctrl-b "  -> split horizontally -> new pane BELOW
-	  // (On US keyboards, this is Shift + '  )
-	  { "keys": ["ctrl+b", "\""],   "command": "create_pane", "args": {"direction": "down", "give_focus": true} },
+  {
+    "keys": ["super+b"],
+    "command": "build_with_terminus",
+    "context": [
+      { "key": "setting.terminus_build", "operator": "equal", "operand": true },
+    ],
+  },
 
-	  // --- Kill current pane (tmux: Ctrl-b x). This avoids clobbering plain Ctrl-x "Cut" ---
-	  { "keys": ["ctrl+b", "x"], "command": "destroy_pane", "args": {"direction": "self"} },
+  // >>> ORIGAMI >>>
 
-	  // --- New Sublime window (tmux: Ctrl-b c) ---
-	  { "keys": ["ctrl+b", "c"], "command": "new_file" }
-		// <<< ORIGAMI <<<
+  // --- Move focus between panes: Ctrl-b + arrow (like tmux) ---
+  {
+    "keys": ["ctrl+b", "up"],
+    "command": "travel_to_pane",
+    "args": { "direction": "up" },
+  },
 
+  {
+    "keys": ["ctrl+b", "right"],
+    "command": "travel_to_pane",
+    "args": { "direction": "right" },
+  },
+
+  {
+    "keys": ["ctrl+b", "down"],
+    "command": "travel_to_pane",
+    "args": { "direction": "down" },
+  },
+
+  {
+    "keys": ["ctrl+b", "left"],
+    "command": "travel_to_pane",
+    "args": { "direction": "left" },
+  },
+
+  // --- Create/split panes (tmux semantics) ---
+  // Ctrl-b %  -> split vertically -> new pane on the RIGHT
+  {
+    "keys": ["ctrl+b", "%"],
+    "command": "create_pane",
+    "args": { "direction": "right", "give_focus": true },
+  },
+
+  // Ctrl-b "  -> split horizontally -> new pane BELOW
+  // (On US keyboards, this is Shift + '  )
+  {
+    "keys": ["ctrl+b", "\""],
+    "command": "create_pane",
+    "args": { "direction": "down", "give_focus": true },
+  },
+
+  // --- Kill current pane (tmux: Ctrl-b x). This avoids clobbering plain Ctrl-x "Cut" ---
+  {
+    "keys": ["ctrl+b", "x"],
+    "command": "destroy_pane",
+    "args": { "direction": "self" },
+  },
+
+  // --- New Sublime window (tmux: Ctrl-b c) ---
+  {
+    "keys": ["ctrl+b", "c"],
+    "command": "new_file"
+  },
+
+  // --- Move current file to pane ---
+  {
+    "keys": ["ctrl+b", "ctrl+right"],
+    "command": "carry_file_to_pane",
+    "args": {"direction": "right"}
+  },
+
+  {
+    "keys": ["ctrl+b", "ctrl+left"],
+    "command": "carry_file_to_pane",
+    "args": {"direction": "left"}
+  },
+
+  {
+    "keys": ["ctrl+b", "ctrl+up"],
+    "command": "carry_file_to_pane",
+    "args": {"direction": "up"}
+  },
+
+  {
+    "keys": ["ctrl+b", "ctrl+down"],
+    "command": "carry_file_to_pane",
+    "args": {"direction": "down"}
+  },
+  
+  // <<< ORIGAMI <<<
+
+  // bind reveal in Finder
+  {
+    "keys": ["super+shift+e"],
+    "command": "open_dir",
+    "args": { "dir": "$file_path", "file": "$file_name" },
+  },
+  // bind reveal in side bar
+  { "keys": ["super+shift+n"], "command": "reveal_in_side_bar" },
+
+  // >>> BracketHighlighter >>>
+  {
+    // Select text between brackets
+    "keys": ["ctrl+alt+super+s"],
+    "command": "bh_key",
+    "args": {
+      "no_outside_adj": null,
+      "lines": true,
+      "plugin": {
+        "command": "bh_modules.bracketselect",
+      },
+    },
+  },
+  {
+    // Select text including brackets
+    "keys": ["ctrl+alt+super+d"],
+    "command": "bh_key",
+    "args": {
+      "no_outside_adj": null,
+      "lines": true,
+      "plugin": {
+        "command": "bh_modules.bracketselect",
+        "args": { "always_include_brackets": true },
+      },
+    },
+  },
+  // <<< BracketHighlighter <<<
 ]
+// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

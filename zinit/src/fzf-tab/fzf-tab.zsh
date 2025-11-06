@@ -1,6 +1,6 @@
 # https://github.com/Aloxaf/fzf-tab
 
-__fzf_tab_init_hook() {
+function __fzf_tab_init_hook() {
   # disable sort when completing `git checkout`
   zstyle ":completion:*:git-checkout:*" sort false
   
@@ -37,55 +37,21 @@ __fzf_tab_init_hook() {
 
   # no preview for subcommands
   # zstyle ':fzf-tab:complete:*:argument-1' fzf-preview ''
-  
-  # preview for files
-  zstyle ":fzf-tab:complete:*:*" fzf-preview '
-    if [[ -d "$realpath" ]]; then
-      tree -C -L 3 "$realpath"
-    elif [[ -f "$realpath" ]]; then
-      if $(grep -qI . "$realpath"); then
-        bat -p --color=always "$realpath"
-      else
-        echo "Realpath: $realpath"
-        # Use gstat for Linux; fallback to stat for macOS or BSD
-        local gprefix
-        local -a stat_opts
-        local arch=$(uname -s)
-        if [[ $OSTYPE = darwin* ]]; then
-          # Darwin / FreeBSD version
-          command -v gstat &>/dev/null && gprefix=g
-          if [[ -z $gprefix ]]; then
-              stat_opts=(
-                "-f"
-                "File: %N\nLocation: %d:%i\nMode: %Sp (%Mp%Lp)\nLinks: %l\nOwner: %Su/%Sg\nSize: %z (%b blocks)\nChanged: %Sc\nModified: %Sm\nAccessed: %Sa"
-              )
-          fi
-        fi
-        # Linux or Darwin with GNU support
-        if [[ -z $stat_opts ]]; then
-          stat_opts=(
-            "-c"
-            "File: %N\nType: %F\nLocation: %d:%i\nMode: %A (%a)\nLinks: %h\nOwner: %U/%G\nSize: %s (%b blocks)\nChanged: %z\nModified: %y\nAccessed: %x"
-          )
-        fi
-        local stat_cmd="${gprefix}stat"
-        echo $($stat_cmd "$stat_opts[@]" "$realpath")
-      fi
-    fi'
 
-  # Force fzf-tab to use FZF_DEFAULT_OPTS
-  # zstyle ':fzf-tab:*' use-fzf-default-opts yes fzf-flags
+  # preview for files
+  local script_path="${(%):-%x}"
+  zstyle ":fzf-tab:complete:*:*" fzf-preview "__zcompile_if_needed_and_source '${script_path:h}/__fzf_file_preview.zsh' && __fzf_file_preview \$realpath"
+
+  # Force fzf-tab to use FZF_DEFAULT_OPTS; fzf-tab does not follow FZF_DEFAULT_OPTS by default
+  # NOTE: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
+  zstyle ':fzf-tab:*' use-fzf-default-opts yes
   
-  # Custom fzf flags. Note: fzf-tab does not follow FZF_DEFAULT_OPTS by default
   zstyle ":fzf-tab:*" fzf-flags \
     "--bind=tab:accept" \
     "--height=70%" \
     "--preview-window=right:60%" \
     "--padding=0,1,0,0" \
-    "--min-height=20" \
-    "--color=info:#b36198,prompt:#0050ff,pointer:#ffffff" \
-    "--color=hl:#ffffff" \
-    "--color=hl+:#ffffff"
+    "--min-height=20"
 }
 
 # Enable preview only for files and directories
@@ -97,5 +63,4 @@ zinit ice depth=1 wait light-mode lucid \
   atclone"source '${${(%):-%x}:h}/__fzf_tab_atclone_hook.zsh'" \
   atinit'_safe_one_off_load __fzf_tab_init_hook' \
   id-as'Aloxaf/fzf-tab'
-zinit light alberti42/fzf-tab-fork
-# zinit light Aloxaf/fzf-tab
+zinit light Aloxaf/fzf-tab

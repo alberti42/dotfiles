@@ -32,7 +32,12 @@
   // On Mac, this value is overridden in the platform specific settings.
   "hardware_acceleration": "opengl",
 
+  // Check for updates on startup
   "update_check": true,
+
+  // relative_line_numbers will draw each line number as the distance from
+  // the current line. Useful in conjunction with Vintage.
+  "relative_line_numbers": true,
 
   // Characters that are considered to separate words
   "word_separators": "./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}`~?",
@@ -63,7 +68,6 @@
     // "font_size": 14,
     "ignored_packages":
     [
-      "Terminal",
       "Vintage",
       "RecentFilesTracker"
     ],
@@ -299,4 +303,5 @@
   // Always visualise the viewport on the minimap, as opposed to only
   // showing it on mouse over
   "always_show_minimap_viewport": false,
+  "font_size": 16,
 }

@@ -1,8 +1,7 @@
 #!/bin/zsh
 
 # .zshenv is always sourced. It often contains exported variables that should be available to other
-# programs. For example, $PATH, $EDITOR, and $PAGER are often set in .zshenv. Also, you can set
-# $ZDOTDIR in .zshenv to specify an alternative location for the rest of your zsh configuration.
+# programs. For example, $PATH, $EDITOR, and $PAGER are often set in .zshenv.
 
 #########################
 # MISC CUSTOMIZATION    #
@@ -68,6 +67,7 @@ if [[ $OSTYPE =~ 'darwin*' ]]; then
     }
     path=("${brew_path:h}" $path)
   fi
+  typeset -U fpath
 fi
 
 #########################
@@ -132,10 +132,37 @@ if [[ $OSTYPE == darwin* ]]; then
 fi
 
 ###########################
-# zinit installation      #
+# Zinit path              #
 ###########################
 
-source "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
+() {
+  # We load it right away in zshenv because it is often needed by scripts executed without loading zshrc
+  local ZPFX="$HOME/.local/share/zinit/polaris/bin"
+  if [ -d "$HOME/.local/share/zinit/polaris/bin" ]; then
+    # Ensure ZPFX/bin is first in PATH
+    path=($ZPFX $path)
+    typeset -U path
+  fi
+}
 
-# Debug path
-# print -l $path | grep --color=always 'zinit\|\/usr\/local\/bin\|$'
+##############################
+# Zsh management functions   #
+##############################
+
+function __zcompile_if_needed() {
+  local script="${(%):-%x}" # expands to the path of the current sourced script (works reliably in zsh ≥5.0).
+  local compiled_script="${script}.zwc"
+
+  if [[ ! -f "$compiled_script" || "$script" -nt "$compiled_script" ]]; then
+    zcompile -Uz -- "$script" "$compiled_script"
+  fi
+}
+
+# Source (and compile if needed) __zcompile_if_needed_and_source function
+# used to compile (if needed) zsh files and source them immediately afterward
+__zcompile_if_needed "$DOTFILES_DIR/zinit/src/zinit/__zcompile_if_needed_and_source.zsh"
+builtin source "$DOTFILES_DIR/zinit/src/zinit/__zcompile_if_needed_and_source.zsh"
+
+# Source (and compile if needed) _safe_one_off_load function
+__zcompile_if_needed "$DOTFILES_DIR/zinit/src/zinit/__safe_one_off_load.zsh"
+builtin source "$DOTFILES_DIR/zinit/src/zinit/__safe_one_off_load.zsh"

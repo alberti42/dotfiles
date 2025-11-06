@@ -1,10 +1,10 @@
 {
-    "ignore_diff_white_space": false,
+    "ignore_diff_white_space": true,
     "trim_trailing_white_space_on_save": false,
     "side_bar_layout": "locations_as_column",
     "theme": "auto",
     "diff_style": "side-by-side",
     "visible_carriage_returns_at_eol": "auto",
     "editor_argument_format": "${file}:${line}:${col}",
-    "editor_path": "~/.local/bin/subl"
+    "editor_path": "~/.local/bin/subl",
 }

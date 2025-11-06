@@ -39,11 +39,35 @@ function scheme_for_appearance(appearance)
 
   if appearance:find "Dark" then
   	pcall(wezterm.run_child_process, { tmux_bin, "set-option", "-q", "@dark_appearance", "1" })
-    return "Catppuccin Macchiato"
+    return "Catppuccin Macchiato Custom"
   else
   	pcall(wezterm.run_child_process, { tmux_bin, "set-option", "-q", "@dark_appearance", "0" })
-    return "Catppuccin Frappe"
+    return "Catppuccin Frappe Custom"
   end
+end
+
+function extend_scheme(base_name, overrides)
+  local builtin = wezterm.color.get_builtin_schemes()
+  local base = builtin[base_name]
+  if not base then
+    wezterm.log_error("extend_scheme: scheme '" .. base_name .. "' not found")
+    return overrides or {}
+  end
+
+  -- make a shallow copy so we don’t mutate the builtin
+  local result = {}
+  for k, v in pairs(base) do
+    result[k] = v
+  end
+
+  -- apply overrides
+  if overrides then
+    for k, v in pairs(overrides) do
+      result[k] = v
+    end
+  end
+
+  return result
 end
 
 -- wezterm.on("update-status", function(window, pane)
@@ -120,6 +144,15 @@ config.colors = {
 }
 --]]
 
+-- Extend it with your overrides
+config.color_schemes = {
+  ["Catppuccin Macchiato Custom"] = extend_scheme("Catppuccin Macchiato", {
+  	-- background = 'white'
+  }),
+  ["Catppuccin Frappe Custom"] = extend_scheme("Catppuccin Frappe", {
+  	-- background = 'white'
+  }),
+}
 -- Catppuccin color scheme https://github.com/catppuccin/wezter
 config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
 
@@ -174,8 +207,8 @@ config.keys = {
   { key = '[', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02p') }, -- Cmd + Shift + [ -> Move to previous tmux pane
   { key = ']', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02n') }, -- Cmd + Shift + ] -> Move to next tmux pane
   
-  { key = '[', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02p' } }, -- Cmd + Shift + [ -> Move to previous tmux pane
-  { key = ']', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02n' } }, -- Cmd + Shift + ] -> Move to next tmux pane
+  -- { key = '[', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02p' } }, -- Cmd + Shift + [ -> Move to previous tmux pane
+  -- { key = ']', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02n' } }, -- Cmd + Shift + ] -> Move to next tmux pane
 
   { key = "{", mods = "CTRL|SHIFT", action = wezterm.action.SendKey { key = "LeftArrow", mods = "CTRL|SHIFT" } },
   { key = "}", mods = "CTRL|SHIFT", action = wezterm.action.SendKey { key = "RightArrow", mods = "CTRL|SHIFT" } },
@@ -203,14 +236,14 @@ config.keys = {
   { key = 'w', mods = 'SUPER', action = wezterm.action.CloseCurrentTab{confirm=false} }, -- Cmd + w -> close window
   { key = 'n', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment }, -- Disable Cmd + n (new window)
   { key = 'L', mods = 'SUPER', action = wezterm.action.ShowDebugOverlay },
-  { key = 'f', mods = 'SUPER|SHIFT', action = wezterm.action.ToggleFullScreen },
+  -- { key = 'f', mods = 'SUPER|SHIFT', action = wezterm.action.ToggleFullScreen },
 }
 
 -- Hyperlink hints
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
 
 -- Window settings
-config.window_background_opacity = 1
+config.window_background_opacity = 1.0
 config.use_resize_increments = false
 config.window_padding = {
   left = "15pt",

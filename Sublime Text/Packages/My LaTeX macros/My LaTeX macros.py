@@ -1,4 +1,33 @@
 import sublime, sublime_plugin
+import os
+import subprocess
+
+class OpenTerminalInTmuxCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        # Get the folder of the currently opened file
+        view = self.window.active_view()
+        if not view or not view.file_name():
+            sublime.error_message("No file is currently open.")
+            return
+
+        filename = view.file_name()
+
+        if filename is None:
+            return
+
+        folder = os.path.dirname(filename)
+
+        # Path to your tmux script
+        tmux_script = os.path.expanduser("~/.config/dotfiles/bin/new_tmux_window_in_session.zsh")
+
+        # First command: launch tmux window
+        subprocess.Popen([tmux_script, "-s", "main", "-c", folder])
+
+        # Second command: bring WezTerm to the front
+        subprocess.Popen(
+            ["/bin/sh", "-c",
+             "/usr/bin/osascript -e 'tell application id \"com.github.wez.wezterm\" to activate' 2>/dev/null"]
+        )
 import re
 
 class EncapsulateInEnvironmentCommand(sublime_plugin.TextCommand):
@@ -17,7 +46,6 @@ class EncapsulateInEnvironmentCommand(sublime_plugin.TextCommand):
                 self.view.insert(edit, self.view.sel()[0].begin(), "\\begin{" + env_name + "}\n")
                 self.view.insert(edit, self.view.sel()[0].end(), suffix+"\\end{" + env_name + "}")
 
-
 class NewLatexLineCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Walk through each region in the selection
@@ -25,7 +53,10 @@ class NewLatexLineCommand(sublime_plugin.TextCommand):
             if region.empty():
                 cursor = region.begin()
                 line = self.view.line(cursor)
-                # line_str = self.view.substr(line)
+                line_str = self.view.substr(line)
+                # Detect indentation (spaces or tabs)
+                indent_match = re.match(r'^(\s*)', line_str)
+                indent = indent_match.group(1) if indent_match else ''
                 line_r = self.view.substr(sublime.Region(cursor,line.end()))
                 # line_l = self.view.substr(sublime.Region(line.begin(),cursor))
                 isComment = any([self.view.match_selector(cursor,selector) for selector in ('comment.line.percentage.tex',)])
@@ -36,7 +67,7 @@ class NewLatexLineCommand(sublime_plugin.TextCommand):
                     else:
                         self.view.insert(edit,cursor,'\n% ')
                 else:
-                    self.view.insert(edit,cursor,'\n%\n')
+                    self.view.insert(edit,cursor,f"\n{indent}%\n{indent}")
                         
 class SplitLatexLinesCommand(sublime_plugin.TextCommand):
     def process_each_line(self, x):

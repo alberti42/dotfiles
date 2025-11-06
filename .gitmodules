@@ -21,3 +21,9 @@
 [submodule "Sublime Text/Packages/Dictionaries"]
 	path = Sublime Text/Packages/Dictionaries
 	url = https://github.com/titoBouzout/Dictionaries.git
+[submodule ".config/yazi/plugins/fazif.yazi"]
+	path = .config/yazi/plugins/fazif.yazi
+	url = git@github.com:Shallow-Seek/fazif.yazi.git
+[submodule ".config/eza/eza-themes"]
+	path = .config/eza/eza-themes
+	url = https://github.com/eza-community/eza-themes.git
