@@ -37,7 +37,8 @@ function ppgrep() {
     # UNIX/GNU-style flags; -ww = don't truncate command
     # -w — wide output. Use this option twice for unlimited width.
     # -p — specify PID list (works with both BSD and GNU).
-    ps -ww -p "$pids"
+    # -f — full-format listing.
+    ps -ww -f -p "$pids"
   fi
 }
 
