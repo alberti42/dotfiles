@@ -49,6 +49,17 @@ switch_to_public_tip() {
   run "git switch -C '$WORK_BRANCH' '$PUBLIC_REMOTE/$PUBLIC_BRANCH'"
 }
 
+# Reset every submodule to the exact commit recorded by the superproject
+clean_submodules_hard() {
+  log "Cleaning submodules to recorded commits…"
+  # Sync URLs from .gitmodules (in case they changed)
+  run "git submodule sync --recursive"
+  # Force-checkout recorded SHAs (discard local edits in submodules)
+  run "git submodule update --init --recursive --checkout --force"
+  # Extra belt-and-suspenders: scrub untracked files in submodules
+  run "git submodule foreach --recursive 'git reset --hard && git clean -fdx || true'"
+}
+
 transplant_private_tree() {
   log "Transplanting tree from $PRIVATE_REMOTE/$PRIVATE_BRANCH…"
   run "git restore --source '$PRIVATE_REMOTE/$PRIVATE_BRANCH' --worktree --staged :/"
@@ -118,6 +129,8 @@ sanitize_all() {
   sanitize_vscode_settings
   sanitize_sublime_ltex
 
+  run "git rm -f Sublime\ Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
+
   # Optional: best-effort scan for other obvious secrets (does not block).
   # if command -v rg >/dev/null 2>&1; then
   #  log "Scanning for likely secrets (best-effort)…"
@@ -153,6 +166,7 @@ main() {
   fetch_remotes
   switch_to_public_tip
   transplant_private_tree
+  clean_submodules_hard
   sanitize_all
   commit_and_push
 }
