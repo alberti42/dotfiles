@@ -65,14 +65,24 @@ transplant_private_tree() {
   run "git restore --source '$PRIVATE_REMOTE/$PRIVATE_BRANCH' --worktree --staged :/"
 }
 
-# Cross-platform sed -i -E
+# Cross-platform sed -i -E (requires GNU sed)
 sedi() {
   local re="$1"; shift
-  if sed --version >/dev/null 2>&1; then
-    sed -i -E "$re" "$@"
+  local sedcmd=""
+
+  # Prefer GNU sed explicitly if available
+  if command -v gsed >/dev/null 2>&1; then
+    sedcmd="gsed"
+  elif command -v sed >/dev/null 2>&1 && sed --version >/dev/null 2>&1; then
+    sedcmd="sed"
   else
-    sed -i '' -E "$re" "$@"
+    echo "❌ ERROR: GNU sed (gsed) not found. Please install it (e.g. 'brew install gnu-sed')." >&2
+    echo "    BSD sed is unsafe for secret redaction — aborting." >&2
+    exit 1
   fi
+
+  # Now run GNU sed safely
+  "$sedcmd" -i -E "$re" "$@"
 }
 
 safe_edit_and_stage() {
@@ -123,13 +133,28 @@ sanitize_sublime_ltex() {
     "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings"
 }
 
+drop_from_public() {
+  # Remove paths from the **index only**, keep working tree intact,
+  # and ensure they’re ignored going forward.
+  local file_to_be_dropped
+  for file_to_be_dropped in "$@"; do
+    run "git rm -f -- \"$file_to_be_dropped\" || true"
+  done
+}
+
 sanitize_all() {
   log "Starting sanitization…"
   sanitize_sublime_sftp
   sanitize_vscode_settings
   sanitize_sublime_ltex
 
-  run "git rm -f Sublime\ Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
+   # Files that must NEVER be published
+  local -a PRIVATE_ONLY_FILES=(
+    "Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
+  )
+
+  # Drop the private files 
+  drop_from_public "${PRIVATE_ONLY_FILES[@]}"
 
   # Optional: best-effort scan for other obvious secrets (does not block).
   # if command -v rg >/dev/null 2>&1; then
@@ -146,13 +171,13 @@ commit_and_push() {
   run "git add -A"
 
   log "Diff summary:"
-  run "git diff --staged --stat || true"
+  run "git -P diff --staged --stat || true"
 
   log "Creating single commit…"
   run "git commit -m '$COMMIT_PREFIX (from $private_tip), secrets sanitized'"
 
   log "Pushing to $PUBLIC_REMOTE/$PUBLIC_BRANCH…"
-  # run "git push -u '$PUBLIC_REMOTE' 'HEAD:$PUBLIC_BRANCH'"
+  run "git push -u '$PUBLIC_REMOTE' 'HEAD:$PUBLIC_BRANCH'"
 
   log "✅ Deployed to $PUBLIC_REMOTE/$PUBLIC_BRANCH as a single sanitized commit."
 }
