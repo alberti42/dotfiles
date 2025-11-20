@@ -8,7 +8,8 @@
         "${serverdir}/bin/${script}",
     ],
     // Extra variables to override/add to language server's environment.
-    "env": {
+    "env":
+    {
         "JAVA_OPTS": "-Xms64m -Xmx512m",
     },
     // The version of the server to use. "" or a GitHub release tag
@@ -22,7 +23,8 @@
     "allow_untested": false,
     // The server-specific settings.
     // @see https://valentjn.github.io/vscode-ltex/docs/settings.html
-    "settings": {
+    "settings":
+    {
         "ltex.enabled": [
             "bibtex",
             "context",
@@ -42,27 +44,34 @@
         // @see https://valentjn.github.io/vscode-ltex/docs/advanced-usage.html#magic-comments
         // @see https://valentjn.github.io/ltex/settings.html#ltexlanguage
         // new: "auto" but not recommended
-        "ltex.language":"en-US",
+        "ltex.language": "en-US",
         //Lists of additional words that should not be counted as spelling errors.
         // @see https://valentjn.github.io/vscode-ltex/docs/settings.html#ltexdictionary
-        "ltex.dictionary": {
-            "de-DE":
-            [
-				      "Magneton",
-              "Dipolkopplung",
-              "Operatorordnung",
+        "ltex.dictionary":
+        {
+            "de-DE": [
+                "Magneton",
+                "Dipolkopplung",
+                "Operatorordnung",
                 "Coulombfeld",
                 "eichkovariant",
                 "Spinanteil",
             ],
+            "en-US": [
+                "paraxial",
+                "collimate",
+            ],
         },
         // Lists of rules that should be disabled (if enabled by default by LanguageTool).
-        "ltex.disabledRules": {},
+        "ltex.disabledRules":
+        {},
         // Lists of rules that should be enabled (if disabled by default by LanguageTool).
-        "ltex.enabledRules": {},
+        "ltex.enabledRules":
+        {},
         // Lists of false-positive diagnostics to hide 
         // (by hiding all diagnostics of a specific rule will in a specific sentence).
-        "ltex.hiddenFalsePositives": {},
+        "ltex.hiddenFalsePositives":
+        {},
         // List of LATEX commands to be handled by the LATEX parser, listed together with empty arguments
         "ltex.latex.commands": [],
         // List of names of LATEX environments to be handled by the LATEX parser.
@@ -73,9 +82,10 @@
         "ltex.markdown.dummy": [],
         // @see https://valentjn.github.io/vscode-ltex/docs/settings.html#ltexconfigurationtarget
         // vscode-only. Sublime will ignore the settings (for now)
-        "ltex.configurationTarget": {
-            "dictionary": "user", 
-            "disabledRules": "user", 
+        "ltex.configurationTarget":
+        {
+            "dictionary": "user",
+            "disabledRules": "user",
             "hiddenFalsePositives": "user",
         },
         // Optional mother tongue of the user (e.g., "de-DE").
@@ -111,3 +121,5 @@
         "ltex.java.path": "",
     },
 }
+
+// # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 :

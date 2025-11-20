@@ -5,7 +5,7 @@ local home = os.getenv("HOME")
 wezterm.on("gui-startup", function(cmd)
   local screen = wezterm.gui.screens().active
   local ratio_x = 0.70
-  local ratio_y = 0.87
+  local ratio_y = 0.85
 
   -- These are still in logical points, which is correct for sizing the window
   local width_pt, height_pt = screen.width * ratio_x, screen.height * ratio_y
@@ -236,7 +236,7 @@ config.keys = {
   { key = 'w', mods = 'SUPER', action = wezterm.action.CloseCurrentTab{confirm=false} }, -- Cmd + w -> close window
   { key = 'n', mods = 'SUPER', action = wezterm.action.DisableDefaultAssignment }, -- Disable Cmd + n (new window)
   { key = 'L', mods = 'SUPER', action = wezterm.action.ShowDebugOverlay },
-  -- { key = 'f', mods = 'SUPER|SHIFT', action = wezterm.action.ToggleFullScreen },
+  { key = 'f', mods = 'SUPER|SHIFT', action = wezterm.action.ToggleFullScreen },
 }
 
 -- Hyperlink hints
