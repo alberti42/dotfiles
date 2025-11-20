@@ -180,6 +180,9 @@ commit_and_push() {
   run "git push -u '$PUBLIC_REMOTE' 'HEAD:$PUBLIC_BRANCH'"
 
   log "✅ Deployed to $PUBLIC_REMOTE/$PUBLIC_BRANCH as a single sanitized commit."
+  
+  log "Checking out local $PRIVATE_BRANCH"
+  run "git checkout '$PRIVATE_BRANCH'"
 }
 
 #=============================#
