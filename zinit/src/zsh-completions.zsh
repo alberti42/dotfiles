@@ -209,10 +209,41 @@ function __my_completions_atinit_hook() {
       ps -u $USER -o pid,user,comm -w -w
     fi
   "  
-  zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;36=0=01'
+
+  # Nice menu behavior like kill
   zstyle ':completion:*:*:kill:*' menu yes select
   zstyle ':completion:*:*:kill:*' force-list always
   zstyle ':completion:*:*:kill:*' insert-ids single
+
+  # Colorize process names
+  zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;36=0=01'
+  
+  # Killall (completes process *names*, not PIDs)
+  
+  # Provide candidate process names for killall completion.
+  # - macOS: `ps -axo comm` works well.
+  # - Linux: `ps -u $USER -o comm` is fine; we uniq/sort to avoid duplicates.
+  zstyle ':completion:*:*:killall:*:processes-names' command '
+    if [[ $OSTYPE = darwin* ]]; then
+      ps -axo comm= 2>/dev/null
+    else
+      if [[ $EUID = 0 || ${_comp_priv_prefix[1]-} = sudo ]]; then
+        ps -eo comm= 2>/dev/null
+      else
+        ps -u "$USER" -o comm= 2>/dev/null
+      fi
+    fi |
+      sed -E "s/[[:space:]]*<defunct>$//" |
+      sed "s|.*/||" |
+      LC_ALL=C sort -u
+  '
+
+  # Nice menu behavior like kill
+  zstyle ':completion:*:*:killall:*' menu yes select
+  zstyle ':completion:*:*:killall:*' force-list always
+
+  # Colorize process names (simple “word” coloring)
+  zstyle ':completion:*:*:killall:*:processes-names' list-colors '=(#b)([^ ]##)=01;36'
 
   # Enable completion on manual page
   zstyle ':completion:*:manuals'    separate-sections true
@@ -237,3 +268,5 @@ zinit ice wait depth=1 light-mode lucid blockf \
   atinit'_safe_one_off_load __my_completions_atinit_hook' \
   atpull'zinit creinstall -q .'
 zinit light zsh-users/zsh-completions
+
+## vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

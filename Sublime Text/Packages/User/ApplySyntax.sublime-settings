@@ -15,7 +15,7 @@
     // Put your custom syntax rules here:
     "syntaxes": [
         {
-            "syntax": "SSH Config/SSH Config",
+            "syntax": "SSH Config/syntax/SSH Config",
             "rules": [
                 {"file_path": ".*/\\.ssh/config(~|$)"},
                 {"file_path": ".*/ssh_config(~|$)"},

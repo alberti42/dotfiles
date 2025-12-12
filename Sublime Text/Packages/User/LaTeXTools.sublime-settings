@@ -142,6 +142,18 @@
     "\\usepackage{amssymb}",
     "\\usepackage{braket}",
     "\\IfFileExists{latexsym.sty}{\\usepackage{latexsym}}{}",
-    "\\IfFileExists{mathtools.sty}{\\usepackage{mathtools}}{}"
+    "\\IfFileExists{mathtools.sty}{\\usepackage{mathtools}}{}",
+    "\\usepackage{siunitx}",
+    "\\usepackage{physunits}",
+    "\\sisetup{",
+    "detect-weight=true,",
+    "exponent-product={\\times},",
+    "output-decimal-marker={.},",
+    "print-unity-mantissa=false,",
+    "}",
+    "\\DeclareSIUnit\\gauss{G}",
+    "\\DeclareSIUnit\\amu{u}",
+    "\\DeclareSIUnit\\year{a}",
+    "\\DeclareSIUnit\\lightyear{ly}"
   ],
 }
