@@ -1,4 +1,4 @@
-function __fzf_file_preview() {
+function __fzf_preview_file() {
   local realpath=$1
 
   if [[ -d "$realpath" ]]; then
