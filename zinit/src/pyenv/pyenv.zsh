@@ -20,5 +20,6 @@ zinit wait depth'1' light-mode lucid binary \
   atinit"export PYENV_ROOT='$HOME/.pyenv'" \
   atclone"source '${${(%):-%x}:h}/__pyenv_atclone_hook.zsh'" \
   atpull"%atclone" \
+  lbin'!bin/pyenv -> pyenv' \
   src"zi_pyenv_init.zsh" \
   for @pyenv/pyenv
