@@ -1,20 +1,25 @@
 [mgr]
 prepend_keymap = [
-    { on = "z",                run = "noop",                                 desc = "Jump to a directory via zoxide" },
-    { on = "Z",                run = "noop",                                 desc = "Jump to a directory via zoxide" },
-    { on = "F",                run = 'plugin fzf',                           desc = "Jump to a file/directory via fzf" },
-    { on = "<A-Up>",           run = 'seek -1',                              desc = "Scroll up"},
-    { on = "<A-Down>",         run = 'seek +1',                              desc = "Scroll down"},
-    { on = "<A-PageUp>",       run = 'seek -15',                             desc = "Scroll page up"},
-    { on = "<A-PageDown>",     run = 'seek +15',                             desc = "Scroll page down"},
-    { on = "!",                run = 'shell "$SHELL" --block',               desc = "Open shell in current directory"},
-    { on = "s",                run = 'search fd --args="--no-ignore"',       desc = "Search files by name using fd" },
-    { on = "S",                run = 'search rg --args "--no-ignore"',       desc = "Search files by content using ripgrep" },
-    { on = [ "b", "f" ],       run = "plugin fazif faziffd",                 desc = "Find files/directories with fd and fzf"},
-    { on = [ "b", "r" ],       run = "plugin fazif fazifrg",                 desc = "Find files/directories with ripgrep and fzf"},
+    { on = "z",                    run = "noop",                                 desc = "Jump to a directory via zoxide" },
+    { on = "Z",                    run = "noop",                                 desc = "Jump to a directory via zoxide" },
+    { on = "F",                    run = 'plugin fzf',                           desc = "Jump to a file/directory via fzf" },
+    { on = "<A-Up>",               run = 'seek -1',                              desc = "Scroll up"},
+    { on = "<A-Down>",             run = 'seek +1',                              desc = "Scroll down"},
+    { on = "<A-PageUp>",           run = 'seek -15',                             desc = "Scroll page up"},
+    { on = "<A-PageDown>",         run = 'seek +15',                             desc = "Scroll page down"},
+    { on = "!",                    run = 'shell "$SHELL" --block',               desc = "Open shell in current directory"},
+    { on = "s",                    run = 'search fd --args="--no-ignore"',       desc = "Search files by name using fd" },
+    { on = "S",                    run = 'search rg --args "--no-ignore"',       desc = "Search files by content using ripgrep" },
+    { on = [ "b", "f" ],           run = "plugin fazif faziffd",                 desc = "Find files/directories with fd and fzf"},
+    { on = [ "b", "r" ],           run = "plugin fazif fazifrg",                 desc = "Find files/directories with ripgrep and fzf"},
+    { on   = [ "g", "p" ],         run = "plugin command",                       desc = "Yazi command prompt" },
+    { on   = [ "<Backspace>" ],    run = "back",                                 desc = "Go back to the previous directory" },
+    { on   = [ "<Home>" ],         run = "arrow top",                            desc = "Move the cursor to the bottom" },
+    { on   = [ "<End>" ],          run = "arrow bot",                            desc = "Move the cursor to the bottom" },
 ]
 
 [input]
 prepend_keymap = [
     { on = "<Esc>",            run  = "close",                               desc = "Cancel input" }
 ]
+

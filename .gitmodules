@@ -27,3 +27,6 @@
 [submodule ".config/eza/eza-themes"]
 	path = .config/eza/eza-themes
 	url = https://github.com/eza-community/eza-themes.git
+[submodule ".config/yazi/plugins/command.yazi"]
+	path = .config/yazi/plugins/command.yazi
+	url = https://github.com/KKV9/command.yazi.git

@@ -23,7 +23,7 @@ fi
 # Source the Zinit main script to load its functionality (about 30 ms)
 __zcompile_if_needed_and_source "$ZINIT[HOME_DIR]/zinit.git/zinit.zsh"
 
-# Autoload the Zinit compnletion function (_zinit) to allow zsh's completion system to use it
+# Autoload the Zinit completion function (_zinit) to allow zsh's completion system to use it
 autoload -Uz _zinit
 
 # Safeguard for completion mapping:

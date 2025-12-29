@@ -12,3 +12,5 @@ _pyenv () {
 
 # Define the completion for pyenv
 compdef _pyenv pyenv
+
+# vim: set filetype=zsh expandtab tabstop=4 shiftwidth=4 softtabstop=4 :

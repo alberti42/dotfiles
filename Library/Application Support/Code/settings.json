@@ -121,7 +121,7 @@
     "editor.insertSpaces": true,
     "editor.minimap.showSlider": "always",
     "editor.minimap.enabled": false,
-    "editor.hover.enabled": true,
+    "editor.hover.enabled": "on",
     "editor.hover.delay": 500,
     "editor.semanticTokenColorCustomizations": {
         // "[Catppuccin Frappé]": {
