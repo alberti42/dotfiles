@@ -200,7 +200,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
 
 # Finalize Zsh initialization after all plugins and completions are loaded
-zinit ice lucid as'null' wait atload'
+zinit ice id-as'zinit/compinit' lucid as'null' wait atload'
   # Set compinit options to avoid re-generating .zcompdump if it exists and is up-to-date
   ZINIT[COMPINIT_OPTS]=-C
   
