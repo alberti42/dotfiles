@@ -34,11 +34,6 @@ function __fsh_atload_hook() {
  
 # Load syntax highlightin (plugin must be loaded after plugins issuing compdef)
 zinit ice wait depth=1 light-mode lucid \
-  atinit'
-    ZINIT[COMPINIT_OPTS]=-C
-    zicompinit
-    zicdreplay
-  ' \
   blockf \
   atload'_safe_one_off_load __fsh_atload_hook'
   

@@ -1,16 +1,33 @@
-# _pyenv completion script
-_pyenv () {
-    local words completions
-    read -cA words
-    if [ "${#words}" -eq 2 ]; then
+#compdef pyenv
+
+# This is the modern completion function for the 'pyenv' command.
+_pyenv() {
+    # The `words` array and `$CURRENT` variable are automatically populated by the
+    # zsh completion system when using compdef.
+    #
+    # words: an array of the words on the command line.
+    # CURRENT: the index of the word the cursor is currently on.
+
+    local completions
+
+    # If we are completing the first argument (the subcommand)...
+    # (words[1] is 'pyenv', so words[2] is the subcommand)
+    if [ "$CURRENT" -eq 2 ]; then
         completions="$(pyenv commands)"
     else
-        completions="$(pyenv completions ${words[2,-2]})"
+        # For any other argument, we ask pyenv itself for completions.
+        # We pass all the arguments on the line so far (from the 2nd word
+        # to the one just before the cursor).
+        completions="$(pyenv completions ${words[2,$CURRENT-1]})"
     fi
-    reply=(${(ps:\n:)completions})
+
+    # Use `compadd` to feed the results to the completion system.
+    # This is the standard, modern approach that fzf-tab can hook into.
+    # The parameter expansion `(${(ps:\n:)completions})` splits the
+    # command's output by newlines into an array of completion candidates.
+    compadd -- ${(ps:\n:)completions}
 }
 
-# Define the completion for pyenv
-compdef _pyenv pyenv
+_pyenv "$@"
 
 # vim: set filetype=zsh expandtab tabstop=4 shiftwidth=4 softtabstop=4 :

@@ -35,4 +35,4 @@ _activate() {
 }
 
 # Register the function for the `activate` command
-compdef _activate activate
+_activate "$@"

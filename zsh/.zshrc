@@ -89,10 +89,6 @@ zinit wait lucid depth=1 light-mode for @zsh-users/zsh-history-substring-search
 # Wrapper snippet for zsh-users/zsh-completions
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zsh-completions.zsh"
 
-# Load custom completions
-zinit depth=1 lucid light-mode as'completion' proto:'ssh' from'github' \
-  compile'src/_*' wait for @alberti42/zsh-misc-completions
-
 # Wrapper snippet for zdharma-continuum/history-search-multi-word
 # Disabled for now; replaced by fzf key bindings
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/history-search-multi-word.zsh"
@@ -111,20 +107,25 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/jq.zsh"
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
 
 # Conda completions
-zinit depth=1 light-mode lucid nocompile as'completion' from'gh' \
-  compile'_*' wait for @conda-incubator/conda-zsh-completion
+# zinit depth=1 light-mode lucid nocompile as'completion' from'gh' \
+#   compile'_*' wait for @conda-incubator/conda-zsh-completion
 
 # Import local plugins
 {
+  # Define the absolute path to your local plugin
+  local __local_plugin_path="$DOTFILES_DIR/oh-my-zsh/custom/plugins"
   local __local_plugins=(
-    # Import plugin to ssh into tmux
-    id-as:local/ssh-tmux "$DOTFILES_DIR/oh-my-zsh/custom/plugins/ssh-tmux"
+    # Import plugin ssh-tmux
+    id-as:local/ssh-tmux "$__local_plugin_path/ssh-tmux"
+
+    # Import useful zsh completions
+    id-as:local/zsh-misc-completions blockf completions "$__local_plugin_path/zsh-misc-completions"
 
     # Import useful misc zsh functions
     id-as:local/zsh-misc-functions atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" \
-      "$DOTFILES_DIR/oh-my-zsh/custom/plugins/zsh-misc-functions"
+      "$__local_plugin_path/zsh-misc-functions"
   )
-  zinit lucid wait light-mode for "${__local_plugins[@]}"
+  zinit lucid wait nocompile light-mode for "${__local_plugins[@]}"
 }
 
 # Wrapper snippet for astral-sh/uv
@@ -195,14 +196,27 @@ zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'dist/superfile*/spf -
 # Wrapper snippet for Sublime Text
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
 
-# Load syntax highlighting (plugin must be loaded after plugins issuing compdef)
+# Load syntax highlighting
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
+
+# Finalize Zsh initialization after all plugins and completions are loaded
+zinit ice lucid as'null' wait atload'
+  # Set compinit options to avoid re-generating .zcompdump if it exists and is up-to-date
+  ZINIT[COMPINIT_OPTS]=-C
+  
+  # Initialize the Zsh completion system
+  zicompinit
+
+  # Replay any `compdef` calls that plugins made before `compinit` was ready
+  zicdreplay
+'
+zinit light zdharma-continuum/null
 
 #####################
 # Keybindings       #
 #####################
 
-zinit is-snippet lucid for \
+zinit is-snippet lucid light-mode for \
   id-as:'local/key-bindings' $DOTFILES_DIR/zinit/src/key-bindings.zsh
 
 #####################
@@ -371,3 +385,5 @@ alias fda='fd -HI'
 # Local customizations   #
 ##########################
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rc_local.zsh"
+
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :
