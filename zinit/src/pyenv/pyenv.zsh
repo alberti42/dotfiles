@@ -8,7 +8,7 @@ zinit ice wait from'gh-r' as'command' lbin'!ccache -> ccache' lucid
 zinit light ccache/ccache
 
 # 2. Pyenv plugins
-zinit wait depth=1 light-mode lucid as'null' nocompletions nocompile for \
+zinit wait'1' depth=1 light-mode lucid as'null' nocompletions nocompile for \
   id-as:'pyenv/doctor' pyenv/pyenv-doctor \
   id-as:'pyenv/update' pyenv/pyenv-update \
   id-as:'pyenv/pip-migrate' pyenv/pyenv-pip-migrate \
@@ -16,7 +16,7 @@ zinit wait depth=1 light-mode lucid as'null' nocompletions nocompile for \
   id-as:'pyenv/ccache' pyenv/pyenv-ccache
 
 # 3. Pyenv manager
-zinit wait depth'1' light-mode lucid binary \
+zinit wait'1' depth'1' light-mode lucid binary \
   atinit"export PYENV_ROOT='$HOME/.pyenv'" \
   atclone"source '${${(%):-%x}:h}/__pyenv_atclone_hook.zsh'" \
   atpull"%atclone" \

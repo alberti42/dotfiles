@@ -14,7 +14,8 @@ function __pyenv_atclone_hook() {
   ln -sf $ZINIT[PLUGINS_DIR]/pyenv---virtualenv $PYENV_ROOT/plugins/pyenv-virtualenv &&
   ln -sf $ZINIT[PLUGINS_DIR]/pyenv---ccache $PYENV_ROOT/plugins/pyenv-ccache &&
   env PYENV_ROOT=$PYENV_ROOT ./libexec/pyenv init - > zi_pyenv_init.zsh &&
-  gsed -i"" 's@^source .*/completions/pyenv\.zsh\s*@#&@' zi_pyenv_init.zsh &&
+  sed -i.bak 's@^source .*/completions/pyenv\.zsh\s*@#&@' zi_pyenv_init.zsh &&
+  rm -f zi_pyenv_init.zsh.bak &&
   cp -f $DOTFILES_DIR/zinit/src/pyenv/_pyenv . &&
   cp -f man/man1/pyenv.1 $ZINIT[MAN_DIR]/man1/
 }

@@ -1,12 +1,12 @@
 # https://github.com/tmux/tmux
 
-zinit ice \
-  binary \
-  lbin'tmux -> tmux' \
-  atclone"source '${${(%):-%x}:h}/__tmux_atclone_hook.zsh'" \
-  atpull'%atclone' \
-  depth=1 \
-  lucid \
-  nocompletions \
-  nocompile
-zinit light @tmux/tmux
+zinit ice from"gh-r" \
+    atclone'
+        # Change into the extracted, versioned subdirectory
+        cd tmux-*/ && \
+        CPPFLAGS="-I$(brew --prefix)/include" LDFLAGS="-L$(brew --prefix)/lib" \
+        ./configure --prefix="$ZPFX" --enable-utf8proc && \
+        make && make install
+    ' \
+    null nocompletions lucid
+zinit light tmux/tmux

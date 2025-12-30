@@ -59,3 +59,5 @@ zinit ice depth=1 wait light-mode lucid \
   atinit'_safe_one_off_load __fzf_tab_init_hook' \
   id-as'Aloxaf/fzf-tab'
 zinit light Aloxaf/fzf-tab
+
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

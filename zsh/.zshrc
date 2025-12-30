@@ -30,11 +30,9 @@ fi
 # Load a few important annexes (i.e. extensions) without Turbo.
 # These are actually required for many zinit packages to be imported.
 zinit light-mode lucid depth=1 for \
-  @zdharma-continuum/zinit-annex-as-monitor \
   @zdharma-continuum/zinit-annex-binary-symlink \
   @zdharma-continuum/zinit-annex-patch-dl \
   @zdharma-continuum/zinit-annex-bin-gem-node
-# Note that we use my fork of zinit-annex-patch-dl to fix a bug
 
 # Load annex (i.e. extension) to import meta plugins (i.e. sets of plugins)
 # https://github.com/zdharma-continuum/zinit-annex-meta-plugins
@@ -93,8 +91,8 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zsh-completions.zsh"
 # Disabled for now; replaced by fzf key bindings
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/history-search-multi-word.zsh"
 
-# Wrapper snippet for jqlang/jq
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/jq.zsh"
+# Install jq: a lightweight command-line JSON processor akin to sed,awk,grep for JSON data (https://github.com/jqlang/jq)
+zinit from"gh-r" lbin'jq-* -> jq' null lucid wait light-mode for @jqlang/jq
 
 # Load powerlevel10k and customize prompt with ~/.p10k.zsh.
 () {
@@ -116,16 +114,15 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
   local __local_plugin_path="$DOTFILES_DIR/oh-my-zsh/custom/plugins"
   local __local_plugins=(
     # Import plugin ssh-tmux
-    id-as:local/ssh-tmux "$__local_plugin_path/ssh-tmux"
+    $__local_plugin_path/ssh-tmux
 
     # Import useful zsh completions
-    id-as:local/zsh-misc-completions blockf completions "$__local_plugin_path/zsh-misc-completions"
+    blockf completions $__local_plugin_path/zsh-misc-completions
 
     # Import useful misc zsh functions
-    id-as:local/zsh-misc-functions atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" \
-      "$__local_plugin_path/zsh-misc-functions"
+    atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" $__local_plugin_path/zsh-misc-functions
   )
-  zinit lucid wait nocompile light-mode for "${__local_plugins[@]}"
+  zinit lucid wait nocompile link light-mode for "${__local_plugins[@]}"
 }
 
 # Wrapper snippet for astral-sh/uv
@@ -178,8 +175,8 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/eza/eza.zsh"
 # Import ripgrep
 zinit binary lucid light-mode wait from'gh-r' lbin'**/rg(.exe|) -> rg' cp"ripgrep*/doc/rg.1 -> $ZINIT[MAN_DIR]/man1/rg.1" for @BurntSushi/ripgrep
 
-# Import btop+
-zinit binary lucid light-mode wait depth=1 make from'gh' lbin'bin/btop -> btop' for @aristocratos/btop
+# Import btop
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/btop/btop.zsh"
 
 # Import viu
 zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'viu* -> viu' for @atanunq/viu
@@ -216,8 +213,7 @@ zinit light zdharma-continuum/null
 # Keybindings       #
 #####################
 
-zinit is-snippet lucid light-mode for \
-  id-as:'local/key-bindings' $DOTFILES_DIR/zinit/src/key-bindings.zsh
+zinit is-snippet lucid light-mode nocompile link id-as'local/key-bindings' for $DOTFILES_DIR/zinit/src/key-bindings.zsh
 
 #####################
 # HISTORY           #

@@ -35,40 +35,42 @@ local __FZF_DEFAULT_OPTS_MOCHA="$FZF_DEFAULT_OPTS \
   --color=selected-bg:-1 \
   --color=border:#6C7086,label:#CDD6F4"
 
-# For keybinding, add the ICE: src'key-bindings.zsh'
-zinit ice \
-  binary \
-  atclone"source '${${(%):-%x}:h}/__fzf_atclone_hook.zsh'" \
-  atpull'%atclone' \
-  atinit"local __is_dark=\$(is_dark_appearance)
-  if [[ \$__is_dark = "1" ]]; then
-    export FZF_DEFAULT_OPTS=\"$__FZF_DEFAULT_OPTS_MOCHA\"
-  else
-    export FZF_DEFAULT_OPTS=\"$__FZF_DEFAULT_OPTS_MACCHIATO\"
-  fi" \
-  depth=1 \
-  lucid \
-  wait \
-  nocompile \
-  src'shell/init.zsh' \
-  lbin'bin/fzf -> fzf; bin/fzf-tmux -> fzf-tmux; bin/fzf-preview.sh -> fzf-preview'
-zinit light @junegunn/fzf
+# junegunn/fzf - A command-line fuzzy finder
+() {
+  # Define the base URL for supporting files to keep the `dl` ice clean
+  local fzf_base_url="https://raw.githubusercontent.com/junegunn/fzf/master"
 
-# Alternative downloading the binary from the latest release
+  function __fzf_init_hook() {
+    local __is_dark=$(is_dark_appearance)
+    if [[ $__is_dark = "1" ]]; then
+      export FZF_DEFAULT_OPTS="$__FZF_DEFAULT_OPTS_MOCHA"
+    else
+      export FZF_DEFAULT_OPTS="$__FZF_DEFAULT_OPTS_MACCHIATO"
+    fi
+  }
 
-# zinit for \
-# binary \
-# dl="
-#   https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/key-bindings.zsh;
-#   https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/shell/completion.zsh -> $ZPFX/share/fzf/completion.zsh;
-#   https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/bin/fzf-preview.sh -> fzf-preview;
-#   https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/bin/fzf-tmux -> fzf-tmux;
-#   https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/man/man1/fzf.1 -> $ZPFX/share/man/man1/fzf.1;
-#   https://raw.githubusercontent.com/junegunn/fzf/refs/heads/master/man/man1/fzf-tmux.1 -> $ZPFX/share/man/man1/fzf-tmux.1;
-#   " \
-# from'gh-r' \
-# nocompletions \
-# nocompile \
-# pick'$ZPFX/bin/fzf; fzf-tmux; fzf-preview' \
-# lbin'fzf -> fzf; fzf-tmux -> fzf-tmux; fzf-preview -> fzf-preview' \
-# @junegunn/fzf
+  function __fzf_apull_hook() {
+    # Make the downloaded scripts executable
+    chmod +x fzf-tmux fzf-preview.sh
+
+    # Now that the files from `dl` exist, copy the man pages
+    # Use -f to avoid errors if they already exist.
+    cp -f fzf.1 "$ZPFX/man/man1/"
+    cp -f fzf-tmux.1 "$ZPFX/man/man1/"
+  }
+
+  zinit ice from"gh-r" \
+    dl"
+      ${fzf_base_url}/shell/completion.zsh;
+      ${fzf_base_url}/bin/fzf-tmux;
+      ${fzf_base_url}/bin/fzf-preview.sh;
+      ${fzf_base_url}/man/man1/fzf.1;
+      ${fzf_base_url}/man/man1/fzf-tmux.1;
+    " \
+    atpull'_safe_one_off_load __fzf_apull_hook' \
+    lbin"fzf -> fzf; fzf-tmux -> fzf-tmux; fzf-preview.sh -> fzf-preview;" \
+    atinit'_safe_one_off_load __fzf_init_hook' \
+    src'completion.zsh' \
+    null lucid wait
+  zinit light junegunn/fzf
+}

@@ -15,6 +15,11 @@ ZINIT[NO_ALIASES]=1
 [[ ! -d ${XDG_CACHE_HOME:-$HOME/.cache}/zsh ]] && command mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 ZINIT[ZCOMPDUMP_PATH]=${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump
 
+# Disable interactive mode
+ZINIT[NO_PAGER]=1
+# Limit the maximum number of lines to log
+ZINIT[NO_PAGER_MAX_LINES]=0
+
 # Check if Zinit is not already installed
 if [[ ! -f $ZINIT[HOME_DIR]/zinit.git/zinit.zsh ]]; then
   source "${${(%):-%x}:h}/__my_install_zinit.zsh"
