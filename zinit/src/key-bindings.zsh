@@ -3,12 +3,12 @@
 # man zshzle; note: the key bindings are case sensitive!
 # for other key bindings check: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/refs/heads/master/lib/key-bindings.zsh
 
-# Load fuzzy search for history and bind to arrow keys
-autoload -U up-line-or-beginning-search
+# Bind to arrow keys
+autoload -Uz up-line-or-beginning-search
 zle -N up-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search  # Up arrow
 bindkey "^[OA" up-line-or-beginning-search  # Up arrow
-autoload -U down-line-or-beginning-search
+autoload -Uz down-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "^[[B" down-line-or-beginning-search  # Down arrow
 bindkey "^[OB" down-line-or-beginning-search  # Down arrow
@@ -171,6 +171,10 @@ zle -N x-backward-kill-word
 zle -N x-kill-word
 zle -N x-backward-kill-word
 
+# Disable ZLE correction
+# We prefer zstyle ':completion:*' completer _complete _approximate
+unsetopt correct correctall
+
 # Rebind keys to use the custom widget
 bindkey "^w" x-kill-region
 bindkey "^[w" x-copy-region-as-kill
@@ -186,7 +190,7 @@ bindkey "^[D" x-kill-word
 bindkey "^[^?" backward-kill-word
 
 # Edit the current command line in $EDITOR
-autoload -U edit-command-line
+autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '\C-x\C-e' edit-command-line
 

@@ -22,7 +22,7 @@ ZINIT[NO_PAGER_MAX_LINES]=0
 
 # Check if Zinit is not already installed
 if [[ ! -f $ZINIT[HOME_DIR]/zinit.git/zinit.zsh ]]; then
-  source "${${(%):-%x}:h}/__my_install_zinit.zsh"
+  source "${${(%):-%x}:a:h}/__my_install_zinit.zsh"
 fi
 
 # Source the Zinit main script to load its functionality (about 30 ms)

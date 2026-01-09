@@ -8,12 +8,12 @@ typeset -g ls_colors_file="$ZSH_CACHE_DIR/ls_colors" # used for tmux-fzf-links p
 __my_vivid_load_hook() {
   # Check if we need to reload
   if [[ "$force_generation_color_scheme" = (1|true|on|yes) || ! -f "$src_ls_colors_file" ]]; then
-    source "${${(%):-%x}:h}/__generate_ls_colors.zsh"
+    source "${${(%):-%x}:a:h}/__generate_ls_colors.zsh"
   fi
   source "$src_ls_colors_file"
 }
 
-zinit ice depth=1 wait lucid \
+zinit ice depth=1 wait'0a' lucid \
   from:'gh-r' \
   lbin:'vivid -> vivid' \
   atload'_safe_one_off_load __my_vivid_load_hook; unset ls_color_theme force_generation_color_scheme ls_colors_file'

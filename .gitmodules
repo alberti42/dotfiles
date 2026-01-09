@@ -30,3 +30,6 @@
 [submodule ".config/yazi/plugins/command.yazi"]
 	path = .config/yazi/plugins/command.yazi
 	url = https://github.com/KKV9/command.yazi.git
+[submodule "zinit/src/annexes/zinit-annex-latest-release"]
+	path = zinit/src/annexes/zinit-annex-latest-release
+	url = https://github.com/alberti42/zinit-annex-latest-release.git

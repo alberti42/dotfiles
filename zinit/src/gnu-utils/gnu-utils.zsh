@@ -4,8 +4,8 @@
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/gnu-utils
 
 if [[ $OSTYPE =~ 'darwin*' ]]; then
-  zinit depth=1 null wait lucid light-mode \
+  zinit depth=1 null wait'0a' lucid light-mode \
     src:'OMZP::gnu-utils' \
-    atclone"source '${${(%):-%x}:h}/__gnu_utils_atclone.zsh'" \
+    atclone"source '${${(%):-%x}:a:h}/__gnu_utils_atclone.zsh'" \
     for @OMZP::gnu-utils
 fi

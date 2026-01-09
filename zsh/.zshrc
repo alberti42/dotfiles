@@ -32,7 +32,8 @@ fi
 zinit light-mode lucid depth=1 for \
   @zdharma-continuum/zinit-annex-binary-symlink \
   @zdharma-continuum/zinit-annex-patch-dl \
-  @zdharma-continuum/zinit-annex-bin-gem-node
+  @zdharma-continuum/zinit-annex-bin-gem-node \
+  @alberti42/zinit-annex-latest-release
 
 # Load annex (i.e. extension) to import meta plugins (i.e. sets of plugins)
 # https://github.com/zdharma-continuum/zinit-annex-meta-plugins
@@ -122,7 +123,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
     # Import useful misc zsh functions
     atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" $__local_plugin_path/zsh-misc-functions
   )
-  zinit lucid wait nocompile link light-mode for "${__local_plugins[@]}"
+  zinit lucid wait nocompile light-mode for "${__local_plugins[@]}"
 }
 
 # Wrapper snippet for astral-sh/uv
@@ -207,7 +208,7 @@ zinit ice id-as'zinit/compinit' lucid as'null' wait atload'
   # Replay any `compdef` calls that plugins made before `compinit` was ready
   zicdreplay
 '
-zinit light zdharma-continuum/null
+  zinit light zdharma-continuum/null
 
 #####################
 # Keybindings       #

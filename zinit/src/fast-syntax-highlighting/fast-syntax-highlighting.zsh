@@ -24,7 +24,7 @@ function __fsh_atload_hook() {
   
   # Compare modification times
   if [[ $process_ini -ne 0 || "$overlay_ini" -nt "$overlay_zsh" ]]; then
-    source "${${(%):-%x}:h}/__generate_overlay_fsh.zsh"
+    source "${${(%):-%x}:a:h}/__generate_overlay_fsh.zsh"
   fi
 
   # Configure how zsh highlighting behaves when text is pasted into zle
@@ -33,7 +33,7 @@ function __fsh_atload_hook() {
 }
  
 # Load syntax highlightin (plugin must be loaded after plugins issuing compdef)
-zinit ice wait depth=1 light-mode lucid \
+zinit ice wait'0a' depth=1 light-mode lucid \
   blockf \
   atload'_safe_one_off_load __fsh_atload_hook'
   

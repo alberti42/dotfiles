@@ -7,7 +7,7 @@ function __my_autosuggest_atinit_hook() {
 }
 
 # Load autosuggestions
-zinit ice wait depth=1 light-mode lucid \
+zinit ice wait'0a' depth=1 light-mode lucid \
   atinit'_safe_one_off_load __my_autosuggest_atinit_hook' \
   atload"_zsh_autosuggest_start"
 zinit light zsh-users/zsh-autosuggestions

@@ -7,14 +7,14 @@
 function ssh-tmux() {
   emulate -LR zsh
 
-  local loader_path="${(%):-%x}"
+  local loader_path="${${(%):-%x}:a:h}"
 
   # Determine the directory of the loader and append the src path
-  local src_path="${loader_path:h}/src/ssh-tmux.zsh"
+  local src_path="${loader_path}/src/ssh-tmux.zsh"
 
   # Source the actual code after determining
   # the directory of the loader and append the src path
-  source "${loader_path:h}/src/ssh-tmux.zsh"
+  source "${loader_path}/src/ssh-tmux.zsh"
 
   # Overwrite this function with the actual implementation
   ssh-tmux "$@"

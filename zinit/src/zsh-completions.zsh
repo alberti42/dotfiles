@@ -106,9 +106,6 @@ function __my_completions_atinit_hook() {
   # Substitute environment variables
   zstyle ':completion:*' substitute true
   
-  # Configures which completion functions are used in Zsh and in what order when pressing <Tab>
-  zstyle ":completion:*" completer _expand _complete _ignored _approximate
-
   # Check if LS_COLORS is defined
   if (( ${+LS_COLORS} )); then
     zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"
@@ -117,7 +114,7 @@ function __my_completions_atinit_hook() {
     [[ ${ZINIT[MUTE_WARNINGS]} != (1|true|on|yes) && $quiet != -q ]] && \
       +zi-log "{u-warn}Warning{b-warn}: zsh-completions cannot use LS_COLORS."
   fi
-  zstyle ":completion:*" menu yes select # highlight case in interactive menu
+  zstyle ':completion:*' menu no # recommended for fzf-tab
   zstyle ":completion:*" matcher-list "" "m:{a-zA-Z}={A-Za-z}" "r:|[._-]=* r:|=*" "l:|=* r:|=*"
   zstyle ":completion:*" select-prompt "%SScrolling active: current selection at %p%s"
   zstyle ":completion:*:descriptions" format "--- %d ---"
@@ -149,14 +146,17 @@ function __my_completions_atinit_hook() {
   # zstyle ':completion:*' verbose yes
 
   # Fuzzy match mistyped completions.
+  # Removed _approximate because of bug https://github.com/Aloxaf/fzf-tab/issues/470
   zstyle ':completion:*' completer _complete _match _approximate
   zstyle ':completion:*:match:*' original only
   zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
   # Increase the number of errors based on the length of the typed word. But make
   # sure to cap (at 7) the max-errors to avoid hanging.
-  zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3>7?7:($#PREFIX+$#SUFFIX)/3))numeric)'
-
+  zstyle -e ':completion:*:approximate:*' max-errors '
+    (( ${#PREFIX} + ${#SUFFIX} < 6 )) && reply=(1 numeric) || reply=(2 numeric)
+  '
+  
   # Don't complete unavailable commands.
   zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
 
@@ -262,9 +262,12 @@ function __my_completions_atinit_hook() {
   # partial completion suggestions
   zstyle ':completion:*' list-suffixes
   zstyle ':completion:*' expand prefix suffix
+
+  # Hard override: disable menu-select globally so fzf-tab can display all groups, including [corrections]
+  # zstyle ':completion:*:*:*:*:*' menu no
 }
 
-zinit ice wait depth=1 light-mode lucid blockf \
+zinit ice wait'0a' depth=1 light-mode lucid blockf \
   atinit'_safe_one_off_load __my_completions_atinit_hook' \
   atpull'zinit creinstall -q .'
 zinit light zsh-users/zsh-completions

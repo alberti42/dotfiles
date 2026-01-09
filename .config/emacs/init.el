@@ -1,38 +1,48 @@
 (setq backup-inhibited t) ; disable backup
 (setq make-backup-files nil) ; stop creating ~ files
+(setq auto-save-default nil) ; disable auto-save completely (no #…# files)
+(setq create-lockfiles nil) ; stop lock files (.#filename)
 (menu-bar-mode -1) ; turn off menu bar
 (setq vc-follow-symlinks t) ; do not ask confirmation before following symbolic links
 
-;; Emacs packages
-;; Any add to list for package-archives (to add marmalade or melpa) goes here
-;; MELPA is a popular emacs package loader
-(require 'package)
-(setq package-archives
-      '(("gnu"   . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")))  ; was http + "MELPA"
-(package-initialize)
+;; Packages: straight.el + use-package
+;; straight is not on MELPA; it bootstraps itself from GitHub.
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; Function installing packages and refreshing cache if needed
-(defun install-packages-at-startup (pkgs)
-  (let ((refreshed nil))
-    (dolist (pkg pkgs)
-      (unless (package-installed-p pkg)
-        ;; If we don't even see the package in the current metadata, refresh once.
-        (unless (assoc pkg package-archive-contents)
-          (package-refresh-contents)
-          (setq refreshed t))
-        (condition-case err
-            (package-install pkg)
-          ;; If install fails (e.g. stale version URL), refresh once and retry.
-          (error
-           (unless refreshed
-             (package-refresh-contents)
-             (setq refreshed t))
-           (package-install pkg)))))))
+;; Install and configure use-package via straight
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
 
-;; Install the listed packages if not already installed
-(install-packages-at-startup
- '(use-package magit catppuccin-theme lua-mode ssh-config-mode pbcopy xclip))
+;; Install packages (straight will install them if missing)
+(use-package magit)
+(use-package catppuccin-theme)
+(use-package lua-mode)
+(use-package ssh-config-mode)
+(use-package pbcopy)
+(use-package xclip)
+
+;; Example for a GitHub-only package (uncomment if needed):
+;; (use-package vim-modeline
+;;   :straight (vim-modeline :type git :host github :repo "cinsk/emacs-vim-modeline"))
+
+(use-package vim-file-locals
+  :straight (vim-file-locals
+             :type git
+             :host github
+             :repo "abougouffa/emacs-vim-file-locals")
+  :config
+  (vim-file-locals-mode 1))
 
 ;; Configure TAB character’s length
 (setq-default tab-width 4)
@@ -103,3 +113,13 @@
   (defun track-mouse (e))
   (setq mouse-sel-mode t))
 
+;; Prevent sudden recentering / keep point away from window edges
+(setq scroll-margin 2)
+(setq scroll-conservatively 101)
+(setq scroll-step 1)
+
+;; Smoother horizontal scrolling too
+(setq hscroll-margin 2)
+(setq hscroll-step 1)
+
+;; vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

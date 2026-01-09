@@ -3,7 +3,7 @@
 # For keybinding, add the ICE: src'key-bindings.zsh'
 zinit ice light-mode \
   binary \
-  atclone"source '${${(%):-%x}:h}/__rmate_rs_atclone_hook.zsh'" \
+  atclone"source '${${(%):-%x}:a:h}/__rmate_rs_atclone_hook.zsh'" \
   dl'
     https://raw.githubusercontent.com/alberti42/zsh-misc-completions/refs/heads/main/src/_subl;
     https://raw.githubusercontent.com/alberti42/zsh-misc-completions/refs/heads/main/src/_rmate;

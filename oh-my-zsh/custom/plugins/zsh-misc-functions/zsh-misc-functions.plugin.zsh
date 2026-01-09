@@ -100,14 +100,19 @@ ${cmd}() {
 is_dark_appearance() {
   emulate -LR zsh
   local __is_dark="0"  # default answer
-  if [[ $OSTYPE =~ 'darwin*' ]]; then
-    if [[ $(defaults read $HOME/Library/Preferences/.GlobalPreferences.plist AppleInterfaceStyle 2>/dev/null) = Dark ]]; then
-      __is_dark=1
-    else
-      __is_dark=0
-    fi
+  if [[ -n "$TMUX" ]]; then
+    __is_dark=$(tmux show-options -qv @dark_appearance)  
+    __is_dark="${__is_dark[1]:-0}" # select first character (1-based indexing)
   else
-    # Linux
+    if [[ $OSTYPE =~ 'darwin*' ]]; then
+      if [[ $(defaults read $HOME/Library/Preferences/.GlobalPreferences.plist AppleInterfaceStyle 2>/dev/null) = Dark ]]; then
+        __is_dark=1
+      else
+        __is_dark=0
+      fi
+    else
+      # Linux
+    fi
   fi
   printf "%s" $__is_dark
 }

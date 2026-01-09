@@ -1,6 +1,6 @@
 # https://github.com/astral-sh/uv
 
-zinit ice binary wait lucid from'gh-r' \
+zinit ice binary wait'0a' lucid from'gh-r' \
     lbin'!uv -> uv; uvx -> uvx' \
     depth=1 \
     lucid \
@@ -10,7 +10,7 @@ zinit ice binary wait lucid from'gh-r' \
 
 zinit light @astral-sh/uv
 
-zinit ice binary wait lucid from'gh-r' \
+zinit ice binary wait'0a' lucid from'gh-r' \
     lbin'!ruff -> ruff' \
     depth=1 \
     lucid \

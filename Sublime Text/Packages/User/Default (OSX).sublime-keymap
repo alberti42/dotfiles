@@ -42,27 +42,27 @@
     "args": { "forward": false, "extend": true, "show_at_center": true },
   },
   {
-    "keys": ["alt+up"],
+    "keys": ["ctrl+up"],
     "command": "move_by_block",
     "args": { "forward": false },
   },
   {
-    "keys": ["alt+down"],
+    "keys": ["ctrl+down"],
     "command": "move_by_block",
     "args": { "forward": true },
   },
   {
-    "keys": ["alt+shift+up"],
+    "keys": ["ctrl+shift+up"],
     "command": "move_by_block",
     "args": { "forward": false, "extend": true },
   },
   {
-    "keys": ["alt+shift+down"],
+    "keys": ["ctrl+shift+down"],
     "command": "move_by_block",
     "args": { "forward": true, "extend": true },
   },
   {
-    "keys": ["alt+up"],
+    "keys": ["ctrl+up"],
     "command": "move_by_block",
     "args": { "forward": false, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
     "context": [
@@ -70,7 +70,7 @@
     ],
   },
   {
-    "keys": ["alt+down"],
+    "keys": ["ctrl+down"],
     "command": "move_by_block",
     "args": { "forward": true, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
     "context": [
@@ -78,7 +78,7 @@
     ],
   },
   {
-    "keys": ["alt+shift+up"],
+    "keys": ["ctrl+shift+up"],
     "command": "move_by_block",
     "args": { "forward": false, "extend": true, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
     "context": [
@@ -86,7 +86,7 @@
     ],
   },
   {
-    "keys": ["alt+shift+down"],
+    "keys": ["ctrl+shift+down"],
     "command": "move_by_block",
     "args": { "forward": true, "extend": true, "separators": ["%\\s*","\\\\begin{.*","\\\\end{.*","\\\\\\[","\\\\\\]","$$"] },
     "context": [

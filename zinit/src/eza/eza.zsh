@@ -34,13 +34,15 @@ function __eza_init_hook() {
 }
 
 zinit ice \
-  binary \
-  atclone"source '${${(%):-%x}:h}/__eza_atclone_hook.zsh'" \
-  atpull'%atclone' \
-  depth=1 \
-  wait \
-  lucid \
-  atinit'_safe_one_off_load __eza_init_hook' \
-  nocompile \
-  lbin'target/release/eza -> eza'
+    null \
+    depth=1 \
+    wait'0a' \
+    lucid \
+    atinit'_safe_one_off_load __eza_init_hook' \
+    nocompile \
+    latest-release \
+    completions \
+    atclone"source '${${(%):-%x}:a:h}/__eza_atclone_hook.zsh'" \
+    atpull'%atclone' \
+    lbin'target/release/eza -> eza'
 zinit light @eza-community/eza

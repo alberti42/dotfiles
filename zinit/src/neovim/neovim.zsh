@@ -22,7 +22,7 @@ zinit ice \
   binary \
   lbin'neovim_shim.zsh -> nvim' \
   bpick"${__bpick}" \
-  atclone"source '${${(%):-%x}:h}/__neovim_atclone_hook.zsh'" \
+  atclone"source '${${(%):-%x}:a:h}/__neovim_atclone_hook.zsh'" \
   atpull'%atclone' \
   depth=1 \
   lucid \
