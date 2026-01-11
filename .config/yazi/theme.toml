@@ -1,5 +1,6 @@
 [flavor]
 dark = "catppuccin-frappe"
 
-[mgr]
-preview_hovered = { underline = false }
+[indicator]
+current = { reversed = true }
+preview = { underline = false }

@@ -23,7 +23,7 @@
 	url = https://github.com/titoBouzout/Dictionaries.git
 [submodule ".config/yazi/plugins/fazif.yazi"]
 	path = .config/yazi/plugins/fazif.yazi
-	url = git@github.com:Shallow-Seek/fazif.yazi.git
+	url = git@github.com:alberti42/fork-fazif.yazi.git
 [submodule ".config/eza/eza-themes"]
 	path = .config/eza/eza-themes
 	url = https://github.com/eza-community/eza-themes.git
@@ -33,3 +33,9 @@
 [submodule "zinit/src/annexes/zinit-annex-latest-release"]
 	path = zinit/src/annexes/zinit-annex-latest-release
 	url = https://github.com/alberti42/zinit-annex-latest-release.git
+[submodule ".config/yazi/plugins/faster-piper"]
+	path = .config/yazi/plugins/faster-piper
+	url = git@github.com:alberti42/faster-piper.yazi.git
+[submodule ".config/yazi/plugins/faster-piper.yazi"]
+	path = .config/yazi/plugins/faster-piper.yazi
+	url = git@github.com:alberti42/faster-piper.yazi.git

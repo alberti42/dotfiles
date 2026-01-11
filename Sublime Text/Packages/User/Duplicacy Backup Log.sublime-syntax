@@ -1,0 +1,304 @@
+%YAML 1.2
+---
+name: Duplicacy Backup Log
+file_extensions:
+  - backup.log
+scope: text.duplicacy.backup-log
+
+# Highlights Duplicacy backup logs:
+# - timestamps and start/end messages
+# - Uploaded/Skipped/etc
+# - chunk performance stats
+# - file paths + extensions
+# - summary blocks
+# - repository/storage settings
+# - URLs
+# Designed for Sublime Text; also works well with bat (syntect).
+
+contexts:
+
+  main:
+    - include: separators
+    - include: timestamp_lines
+    - include: repo_storage_lines
+    - include: parsing_indexing_lines
+    - include: backup_for_lines
+    - include: summaries
+    - include: chunk_lines
+    - include: file_transfer_lines
+    - include: urls
+    - include: keywords_general
+    - include: numbers_general
+    - include: absolute_paths_general
+
+  # ---------------------------------
+  # RUN BOUNDARIES
+  # ---------------------------------
+  separators:
+    - match: '^(=){5,}\s*$'
+      scope: comment.line.separator comment.line.separator.duplicacy
+
+  # ---------------------------------
+  # TIMESTAMPED LINES
+  # 2025-10-15T18:07:28.345+02:00: backup completed successfully
+  # ---------------------------------
+  timestamp_lines:
+    - match: '^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})(\.\d+)?((?:Z)|(?:[+-]\d{2}:\d{2}))(:)\s*'
+      captures:
+        1: constant.numeric.date constant.numeric.date.iso8601 constant.numeric.date.iso8601.duplicacy
+        2: constant.numeric.time constant.numeric.time.iso8601 constant.numeric.time.iso8601.duplicacy
+        3: constant.numeric.fractional constant.numeric.fractional.iso8601 constant.numeric.fractional.iso8601.duplicacy
+        4: constant.numeric.timezone constant.numeric.timezone.iso8601 constant.numeric.timezone.iso8601.duplicacy
+        5: punctuation.separator.key-value punctuation.separator.key-value.duplicacy
+      push:
+        - meta_scope: meta.timestamped-line meta.timestamped-line.duplicacy
+        - include: timestamp_message
+        - match: '$'
+          pop: true
+
+  timestamp_message:
+    - match: 'backup completed successfully'
+      scope: markup.heading.1 markup.heading.success markup.heading.success.duplicacy
+    - match: 'backup started'
+      scope: markup.heading.2 markup.heading.start markup.heading.start.duplicacy
+    - match: 'backup completed'
+      scope: markup.heading.2 markup.heading.end markup.heading.end.duplicacy
+    - match: '(?i)\b(error|failed|failure|warning)\b'
+      scope: markup.heading.1 markup.heading.failure markup.heading.failure.duplicacy
+    - include: status_verbs
+
+  # ---------------------------------
+  # STATUS VERBS
+  # ---------------------------------
+  status_verbs:
+    - match: '\bUploaded\b'
+      scope: keyword.control keyword.control.uploaded keyword.control.uploaded.duplicacy
+    - match: '\bSkipped\b'
+      scope: keyword.control keyword.control.skipped keyword.control.skipped.duplicacy
+    - match: '\bDeleted\b'
+      scope: keyword.control keyword.control.deleted keyword.control.deleted.duplicacy
+    - match: '\bRemoved\b'
+      scope: keyword.control keyword.control.removed keyword.control.removed.duplicacy
+    - match: '(?i)\bERROR\b'
+      scope: keyword.other keyword.other.error keyword.other.error.duplicacy
+    - match: '(?i)\bWARNING\b'
+      scope: keyword.other keyword.other.warning keyword.other.warning.duplicacy
+    - match: '(?i)\bFAIL(?:ED|URE)?\b'
+      scope: keyword.other keyword.other.failure keyword.other.failure.duplicacy
+
+  # ---------------------------------
+  # URLS
+  # ---------------------------------
+  urls:
+    - match: 'https?://[^\s)]+'
+      scope: constant.other.url constant.other.url.duplicacy
+
+  # ---------------------------------
+  # REPOSITORY / STORAGE / SETTINGS
+  # ---------------------------------
+  repo_storage_lines:
+    - match: '^(Repository set to)(:?)\s+(.+)$'
+      captures:
+        1: keyword.other keyword.other.setting keyword.other.setting.duplicacy
+        2: punctuation.separator.key-value punctuation.separator.key-value.duplicacy
+        3: string.unquoted.path string.unquoted.path.duplicacy
+
+    - match: '^(Storage set to)(:?)\s+(.+)$'
+      captures:
+        1: keyword.other keyword.other.setting keyword.other.setting.duplicacy
+        2: punctuation.separator.key-value punctuation.separator.key-value.duplicacy
+        3: constant.other.url string.unquoted.storage string.unquoted.storage.duplicacy
+
+    - match: '^(Download URL is)(:)\s+(https?://[^\s)]+)\s*$'
+      captures:
+        1: keyword.other keyword.other.setting keyword.other.setting.duplicacy
+        2: punctuation.separator.key-value punctuation.separator.key-value.duplicacy
+        3: constant.other.url constant.other.url.duplicacy
+
+    - match: '^Exclude files with no-backup attributes$'
+      scope: keyword.other keyword.other.setting keyword.other.setting.duplicacy
+
+  parsing_indexing_lines:
+    - match: '^(Indexing)\s+(.+)$'
+      captures:
+        1: keyword.other keyword.other.phase keyword.other.phase.duplicacy
+        2: string.unquoted.path string.unquoted.path.duplicacy
+
+    - match: '^(Parsing filter file)\s+(.+)$'
+      captures:
+        1: keyword.other keyword.other.phase keyword.other.phase.duplicacy
+        2: string.unquoted.path string.unquoted.path.duplicacy
+
+    - match: '^(Loaded)\s+(\d+)\s+(include/exclude pattern\(s\))$'
+      captures:
+        1: keyword.other keyword.other.phase keyword.other.phase.duplicacy
+        2: constant.numeric.integer constant.numeric.integer.duplicacy
+        3: keyword.other keyword.other.phase.detail keyword.other.phase.detail.duplicacy
+
+  # ---------------------------------
+  # BACKUP FOR LINES
+  # Backup for /Users/... at revision 15644 completed
+  # ---------------------------------
+  backup_for_lines:
+    - match: '^(Backup for)\s+(.+?)\s+(at)\s+(revision)\s+(\d+)\s+(completed)\s*$'
+      captures:
+        1: keyword.other keyword.other.phase keyword.other.phase.duplicacy
+        2: string.unquoted.path string.unquoted.path.duplicacy
+        3: keyword.other keyword.other.phase.detail keyword.other.phase.detail.duplicacy
+        4: keyword.other keyword.other.revision keyword.other.revision.duplicacy
+        5: constant.numeric.integer constant.numeric.integer.duplicacy
+        6: keyword.other keyword.other.phase.detail keyword.other.phase.detail.duplicacy
+
+  # ---------------------------------
+  # SUMMARY LINES
+  # Files: 331278 total, 220,584M bytes; ...
+  # ---------------------------------
+  summaries:
+    - match: '^(Files|File chunks|Metadata chunks|All chunks)(:)\s'
+      captures:
+        1: markup.bold markup.bold.summary.key markup.bold.summary.key.duplicacy
+        2: punctuation.separator.key-value punctuation.separator.key-value.duplicacy
+      push:
+        - meta_scope: meta.summary meta.summary.duplicacy
+        - include: summary_tail
+        - match: '$'
+          pop: true
+
+    - match: '^(Total running time)(:)\s+(\d{2}:\d{2}:\d{2})\s*$'
+      captures:
+        1: markup.bold markup.bold.summary.key markup.bold.summary.key.duplicacy
+        2: punctuation.separator.key-value punctuation.separator.key-value.duplicacy
+        3: constant.numeric.duration constant.numeric.duration.duplicacy
+
+  summary_tail:
+    - match: '\b(total|new|uploaded|bytes)\b'
+      scope: keyword.other keyword.other.summary.word keyword.other.summary.word.duplicacy
+
+    - match: '\b(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[kKMGTP](?:i)?B?|B)\b'
+      scope: constant.numeric.size constant.numeric.size.duplicacy
+
+    - match: '\b\d{1,3}(?:,\d{3})+\b'
+      scope: constant.numeric.integer constant.numeric.integer.grouped constant.numeric.integer.grouped.duplicacy
+    - match: '\b\d+\b'
+      scope: constant.numeric.integer constant.numeric.integer.duplicacy
+
+    - include: status_verbs
+
+  # ---------------------------------
+  # CHUNK LINES
+  # Uploaded chunk 1 size 7768958, 2.86MB/s 00:00:16 20.8%
+  # ---------------------------------
+  chunk_lines:
+    - match: '^(Uploaded|Skipped)\s+(chunk)\s+(\d+)\s+(size)\s+(\d+),\s+(\d+(?:\.\d+)?)([kKMGTP]?B/s)\s+(\d{2}:\d{2}:\d{2})\s+(\d+(?:\.\d+)?)(%)\s*$'
+      captures:
+        1: keyword.control keyword.control.chunk.status keyword.control.chunk.status.duplicacy
+        2: keyword.other keyword.other.chunk.word keyword.other.chunk.word.duplicacy
+        3: constant.numeric.integer constant.numeric.chunk.index constant.numeric.chunk.index.duplicacy
+        4: keyword.other keyword.other.chunk.sizeword keyword.other.chunk.sizeword.duplicacy
+        5: constant.numeric.integer constant.numeric.chunk.size constant.numeric.chunk.size.duplicacy
+        6: constant.numeric constant.numeric.throughput.value constant.numeric.throughput.value.duplicacy
+        7: constant.numeric constant.numeric.throughput.unit constant.numeric.throughput.unit.duplicacy
+        8: constant.numeric.duration constant.numeric.duration.duplicacy
+        9: constant.numeric.percentage constant.numeric.percentage.duplicacy
+        10: constant.numeric.percentage constant.numeric.percentage.duplicacy
+
+    # Fallback without percent
+    - match: '^(Uploaded|Skipped)\s+(chunk)\s+(\d+)\s+(size)\s+(\d+),\s+(\d+(?:\.\d+)?)([kKMGTP]?B/s)\s+(\d{2}:\d{2}:\d{2})\s*$'
+      captures:
+        1: keyword.control keyword.control.chunk.status keyword.control.chunk.status.duplicacy
+        2: keyword.other keyword.other.chunk.word keyword.other.chunk.word.duplicacy
+        3: constant.numeric.integer constant.numeric.chunk.index constant.numeric.chunk.index.duplicacy
+        4: keyword.other keyword.other.chunk.sizeword keyword.other.chunk.sizeword.duplicacy
+        5: constant.numeric.integer constant.numeric.chunk.size constant.numeric.chunk.size.duplicacy
+        6: constant.numeric constant.numeric.throughput.value constant.numeric.throughput.value.duplicacy
+        7: constant.numeric constant.numeric.throughput.unit constant.numeric.throughput.unit.duplicacy
+        8: constant.numeric.duration constant.numeric.duration.duplicacy
+
+  # ---------------------------------
+  # FILE TRANSFER LINES
+  # Uploaded <PATH WITH SPACES> (1.0kB)
+  # ---------------------------------
+  file_transfer_lines:
+    - match: '^(Uploaded|Skipped|Deleted|Removed)\s+(.+?)\s+\((\d+(?:\.\d+)?(?:[kKMGTP](?:i)?)?B)\)\s*$'
+      captures:
+        1: keyword.control keyword.control.fileop.status keyword.control.fileop.status.duplicacy
+        2: string.unquoted.path string.unquoted.path.duplicacy
+        3: constant.numeric.size constant.numeric.size.duplicacy
+      push:
+        - include: file_extension_highlights
+        - match: '$'
+          pop: true
+
+  # ---------------------------------
+  # EXTENSION HIGHLIGHTS
+  # ---------------------------------
+  file_extension_highlights:
+    - match: '\.pdf\b'
+      scope: support.type support.type.file.pdf support.type.file.pdf.duplicacy
+    - match: '\.(tex|sty|cls|bib)\b'
+      scope: support.type support.type.file.latex support.type.file.latex.duplicacy
+    - match: '\.(md|markdown)\b'
+      scope: support.type support.type.file.markdown support.type.file.markdown.duplicacy
+    - match: '\.(doc|docx|odt)\b'
+      scope: support.type support.type.file.word support.type.file.word.duplicacy
+    - match: '\.(xls|xlsx|ods|csv|tsv)\b'
+      scope: support.type support.type.file.spreadsheet support.type.file.spreadsheet.duplicacy
+    - match: '\.(png|jpg|jpeg|gif|svg|webp)\b'
+      scope: support.type support.type.file.image support.type.file.image.duplicacy
+    - match: '\.(db|sqlite|sqlite3|db-wal|db-shm)\b'
+      scope: support.type support.type.file.database support.type.file.database.duplicacy
+    - match: '\.(js|ts|jsx|tsx)\b'
+      scope: support.type support.type.file.javascript support.type.file.javascript.duplicacy
+    - match: '\.(py|ipynb)\b'
+      scope: support.type support.type.file.python support.type.file.python.duplicacy
+    - match: '\.(c|cc|cpp|h|hpp|m|mm|swift)\b'
+      scope: support.type support.type.file.code support.type.file.code.duplicacy
+    - match: '\.(json|yaml|yml|toml|ini|cfg)\b'
+      scope: support.type support.type.file.config support.type.file.config.duplicacy
+    - match: '\.(zip|tar|gz|bz2|xz|7z)\b'
+      scope: support.type support.type.file.archive support.type.file.archive.duplicacy
+
+  # ---------------------------------
+  # GENERAL KEYWORDS
+  # ---------------------------------
+  keywords_general:
+    - match: '\brevision\b'
+      scope: keyword.other keyword.other.revision keyword.other.revision.duplicacy
+    - match: '\bLast backup at\b'
+      scope: keyword.other keyword.other.phase keyword.other.phase.duplicacy
+    - match: '\bfound\b'
+      scope: keyword.other keyword.other.phase.detail keyword.other.phase.detail.duplicacy
+    - match: '\bcompleted\b'
+      scope: keyword.other keyword.other.phase.detail keyword.other.phase.detail.duplicacy
+
+  # ---------------------------------
+  # NUMBERS (fallback)
+  # Avoid matching numbers inside words/paths by requiring non-word-ish boundaries.
+  # ---------------------------------
+  numbers_general:
+    - match: '\b\d{2}:\d{2}:\d{2}\b'
+      scope: constant.numeric.duration constant.numeric.duration.duplicacy
+    - match: '\b\d+(?:\.\d+)?%\b'
+      scope: constant.numeric.percentage constant.numeric.percentage.duplicacy
+    - match: '\b\d+(?:\.\d+)?[kKMGTP]?B/s\b'
+      scope: constant.numeric constant.numeric.throughput constant.numeric.throughput.duplicacy
+    - match: '\b(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[kKMGTP](?:i)?)?B\b'
+      scope: constant.numeric.size constant.numeric.size.duplicacy
+
+    # grouped numbers
+    - match: '\b\d{1,3}(?:,\d{3})+\b'
+      scope: constant.numeric.integer constant.numeric.integer.grouped constant.numeric.integer.grouped.duplicacy
+
+    # bare integers not adjacent to path/filename chars
+    - match: '(?<![/\w.-])\d+(?![/\w.-])'
+      scope: constant.numeric.integer constant.numeric.integer.duplicacy
+
+  # ---------------------------------
+  # ABSOLUTE PATHS (fallback)
+  # Only highlight Unix absolute paths and b2:// style URIs.
+  # ---------------------------------
+  absolute_paths_general:
+    - match: '(?<!\S)/[^\s:]+'
+      scope: string.unquoted.path string.unquoted.path.duplicacy
+    - match: '\bb2://[^\s]+'
+      scope: constant.other.url string.unquoted.storage string.unquoted.storage.duplicacy

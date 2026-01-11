@@ -2,10 +2,10 @@ function __fzf_preview_file() {
   local realpath=$1
 
   if [[ -d "$realpath" ]]; then
-    tree -C -L 3 -- "$realpath"
+    eza -TL=1 --color=always --icons=always --group-directories-first --no-quotes -- "$realpath"
   elif [[ -f "$realpath" ]]; then
     if grep -qI . "$realpath"; then
-      bat -p --color=always -- "$realpath"
+      bat --color=always -- "$realpath"
     else
       echo "Realpath: $realpath"
       local gprefix=""

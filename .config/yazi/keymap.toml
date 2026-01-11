@@ -1,25 +1,169 @@
-[mgr]
-prepend_keymap = [
-    { on = "z",                    run = "noop",                                 desc = "Jump to a directory via zoxide" },
-    { on = "Z",                    run = "noop",                                 desc = "Jump to a directory via zoxide" },
-    { on = "F",                    run = 'plugin fzf',                           desc = "Jump to a file/directory via fzf" },
-    { on = "<A-Up>",               run = 'seek -1',                              desc = "Scroll up"},
-    { on = "<A-Down>",             run = 'seek +1',                              desc = "Scroll down"},
-    { on = "<A-PageUp>",           run = 'seek -15',                             desc = "Scroll page up"},
-    { on = "<A-PageDown>",         run = 'seek +15',                             desc = "Scroll page down"},
-    { on = "!",                    run = 'shell "$SHELL" --block',               desc = "Open shell in current directory"},
-    { on = "s",                    run = 'search fd --args="--no-ignore"',       desc = "Search files by name using fd" },
-    { on = "S",                    run = 'search rg --args "--no-ignore"',       desc = "Search files by content using ripgrep" },
-    { on = [ "b", "f" ],           run = "plugin fazif faziffd",                 desc = "Find files/directories with fd and fzf"},
-    { on = [ "b", "r" ],           run = "plugin fazif fazifrg",                 desc = "Find files/directories with ripgrep and fzf"},
-    { on   = [ "g", "p" ],         run = "plugin command",                       desc = "Yazi command prompt" },
-    { on   = [ "<Backspace>" ],    run = "back",                                 desc = "Go back to the previous directory" },
-    { on   = [ "<Home>" ],         run = "arrow top",                            desc = "Move the cursor to the bottom" },
-    { on   = [ "<End>" ],          run = "arrow bot",                            desc = "Move the cursor to the bottom" },
-]
+[[mgr.prepend_keymap]]
+on   = "z"
+run  = "noop"
+desc = "Jump to a directory via zoxide"
 
-[input]
-prepend_keymap = [
-    { on = "<Esc>",            run  = "close",                               desc = "Cancel input" }
-]
+[[mgr.prepend_keymap]]
+on   = "Z"
+run  = "noop"
+desc = "Jump to a directory via zoxide"
 
+[[mgr.prepend_keymap]]
+on   = "F"
+run  = "plugin fzf"
+desc = "Jump to a file/directory via fzf"
+
+[[mgr.prepend_keymap]]
+on   = "<A-Up>"
+run  = "seek -1"
+desc = "Scroll up"
+
+[[mgr.prepend_keymap]]
+on   = "<A-Down>"
+run  = "seek +1"
+desc = "Scroll down"
+
+[[mgr.prepend_keymap]]
+on   = "<A-PageUp>"
+run  = "seek -15"
+desc = "Scroll page up"
+
+[[mgr.prepend_keymap]]
+on   = "<A-PageDown>"
+run  = "seek +15"
+desc = "Scroll page down"
+
+[[mgr.prepend_keymap]]
+on   = "<A-Home>"
+run  = "seek -10000"
+desc = "Scroll to the top"
+
+[[mgr.prepend_keymap]]
+on   = "<A-End>"
+run  = "seek +10000"
+desc = "Scroll to the bottom"
+
+[[mgr.prepend_keymap]]
+on   = "!"
+run  = 'shell "$SHELL" --block'
+desc = "Open shell in current directory"
+
+[[mgr.prepend_keymap]]
+on   = "s"
+run  = 'search fd --args="--no-ignore"'
+desc = "Search files by name using fd"
+
+[[mgr.prepend_keymap]]
+on   = "S"
+run  = 'search rg --args "--no-ignore"'
+desc = "Search files by content using ripgrep"
+
+[[mgr.prepend_keymap]]
+on   = [ "b", "f" ]
+run  = "plugin fazif faziffd"
+desc = "Find files/directories with fd and fzf"
+
+[[mgr.prepend_keymap]]
+on   = [ "b", "r" ]
+run  = "plugin fazif fazifrg"
+desc = "Find files/directories with ripgrep and fzf"
+
+[[mgr.prepend_keymap]]
+on   = [ "g", "p" ]
+run  = "plugin command"
+desc = "Yazi command prompt"
+
+[[mgr.prepend_keymap]]
+on   = [ "<Backspace>" ]
+run  = "back"
+desc = "Go back to the previous directory"
+
+[[mgr.prepend_keymap]]
+on   = [ "<Home>" ]
+run  = "arrow top"
+desc = "Move the cursor to the bottom"
+
+[[mgr.prepend_keymap]]
+on   = [ "<End>" ]
+run  = "arrow bot"
+desc = "Move the cursor to the bottom"
+
+[[mgr.prepend_keymap]]
+on   = "C"
+run  = '''
+shell -- zsh --no-rcs --no-global-rcs -c '
+set -eu
+
+make_target() {
+  local src="$1"
+  local dir="${src:h}"
+  local base="${src:t}"
+
+  # Split base into name/ext (treat dotfiles like ".bashrc" as "no ext")
+  local name ext
+  if [[ "$base" == .* || "$base" != *.* ]]; then
+    name="$base"
+    ext=""
+  else
+    name="${base:r}"   # root (without last extension)
+    ext=".${base:e}"   # extension (without dot) -> add dot back
+  fi
+
+  local cand="${dir}/${name}_copy${ext}"
+  if [[ ! -e "$cand" ]]; then
+    print -r -- "$cand"
+    return 0
+  fi
+
+  local n=2
+  while :; do
+    cand="${dir}/${name}_copy${n}${ext}"
+    if [[ ! -e "$cand" ]]; then
+      print -r -- "$cand"
+      return 0
+    fi
+    (( n++ ))
+  done
+}
+
+local -a cp_cmd
+if [[ "$OSTYPE" == darwin* ]] && command -v gcp >/dev/null; then
+  cp_cmd=(gcp -a --)
+else
+  cp_cmd=(cp -a --)
+fi
+
+for src in "$@"; do
+  dst="$(make_target "$src")"
+  "${cp_cmd[@]}" "$src" "$dst"
+done
+' _ %s
+'''
+desc = "Duplicate selected items to *_copy* (auto-number)"
+
+[[mgr.prepend_keymap]]
+on   = "j"
+run  = "arrow 1"
+desc = "Down (no wrap)"
+
+[[mgr.prepend_keymap]]
+on   = "k"
+run  = "arrow -1"
+desc = "Up (no wrap)"
+
+[[mgr.prepend_keymap]]
+on   = "<Down>"
+run  = "arrow 1"
+desc = "Down (no wrap)"
+
+[[mgr.prepend_keymap]]
+on   = "<Up>"
+run  = "arrow -1"
+desc = "Up (no wrap)"
+
+[[input.prepend_keymap]]
+on = "<Esc>"
+run  = "close"
+desc = "Cancel input"
+
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

@@ -173,6 +173,9 @@ zinit binary lucid wait light-mode depth=1 from'gh-r' cp"just.1 -> $ZINIT[MAN_DI
 # Import eza
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/eza/eza.zsh"
 
+# Import glow
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/glow/glow.zsh"
+
 # Import ripgrep
 zinit binary lucid light-mode wait from'gh-r' lbin'**/rg(.exe|) -> rg' cp"ripgrep*/doc/rg.1 -> $ZINIT[MAN_DIR]/man1/rg.1" for @BurntSushi/ripgrep
 
@@ -303,10 +306,10 @@ fi
 # Man pager with modern look
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # macOS: man uses backspace overstrikes, so we need col -bx
-  export MANPAGER="sh -c 'col -bx | bat -l man --style=plain --paging=always'"
+  export MANPAGER="sh -c 'col -bx | bat -p -l man --paging=always'"
 else
   # Linux: man already uses ANSI escapes, so skip col
-  export MANPAGER="sh -c 'bat -l man --style=plain --paging=always'"
+  export MANPAGER="sh -c 'bat -p -l man --paging=always'"
 fi
 
 # Configure PAGER to display 5 lines before search results (https://stackoverflow.com/a/14964428/4216175),
