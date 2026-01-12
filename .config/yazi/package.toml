@@ -10,8 +10,8 @@ hash = "3996fc74044bc44144b323686f887e1"
 
 [[plugin.deps]]
 use = "alberti42/faster-piper"
-rev = "0972cc3"
-hash = "8e2591b5218ecfec35dd9389ea9f2f5f"
+rev = "222b719"
+hash = "3ebd3b794c1d8972a0324bdd918fe51"
 
 [[plugin.deps]]
 use = "KKV9/command"

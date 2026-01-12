@@ -82,25 +82,33 @@ ueberzug_offset = [ 0, 0, 0, 0 ]
 url = "*.backup.log"
 run = 'faster-piper --rely-on-preloader'
 
+[[plugin.prepend_preloaders]]
+url = "*.backup.log"
+run = 'faster-piper -- bat -p -n --color=always -- "$1"'
+
 [[plugin.prepend_previewers]]
 url = "*.md"
 run = 'faster-piper --rely-on-preloader'
+
+[[plugin.prepend_preloaders]]
+url = "*.md"
+run = 'faster-piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dracula -- "$1"'
 
 [[plugin.prepend_previewers]]
 url = "*.tar*"
 run = 'faster-piper --format=url --rely-on-preloader'
 
 [[plugin.prepend_preloaders]]
-url = "*.backup.log"
-run = 'faster-piper -- bat -p -n --color=always -- "$1"'
-
-[[plugin.prepend_preloaders]]
-url = "*.md"
-run = 'faster-piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dracula -- "$1"'
-
-[[plugin.prepend_preloaders]]
 url = "*.tar*"
 run = 'faster-piper -- tar tf "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*.txt.gz"
+run = 'faster-piper --rely-on-preloader'
+
+[[plugin.prepend_preloaders]]
+url = "*.txt.gz"
+run = 'faster-piper -- gzip -dc "$1"'
 
 [[plugin.prepend_fetchers]]
 id  = "git"
