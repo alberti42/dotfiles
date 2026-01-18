@@ -120,6 +120,104 @@ id  = "git"
 url = "*/"
 run = "git"
 
+# [[opener.edit]]
+# run = "${EDITOR:-vi} %s"
+# desc = "$EDITOR (non-blocking)"
+# for = "unix"
+# block = false
+# orphan = true
+
+[[opener.edit]]
+run = "subl -w %s"
+desc = "Sublime Text Editor"
+for = "unix"
+block = false
+orphan = true
+
+[[opener.edit]]
+run = "subl -w %s"
+desc = "Sublime Text Editor (block)"
+for = "unix"
+block = true
+orphan = false
+
+[[opener.edit]]
+run = "emacsclient -a= -nw -c %s"
+desc = "emacs"
+for = "unix"
+block = true
+orphan = true
+
+[[opener.edit]]
+run = "nvim %s"
+desc = "neovim"
+for = "unix"
+block = true
+orphan = false
+
+[[opener.edit]]
+run = "code %s"
+desc = "code"
+for = "windows"
+orphan = true
+
+[[opener.edit]]
+run = "code -w %s"
+desc = "code (blocking)"
+for = "windows"
+block = true
+
+[[opener.reveal]]
+run = "xdg-open %d1"
+desc = "Reveal"
+for = "linux"
+
+[[opener.reveal]]
+run = "open -R %s1"
+desc = "Reveal"
+for = "macos"
+
+[[opener.reveal]]
+run = "explorer /select,%s1"
+desc = "Reveal"
+for = "windows"
+orphan = true
+
+[[opener.reveal]]
+run = "termux-open %d1"
+desc = "Reveal"
+for = "android"
+
+[[opener.reveal]]
+run = '''
+if [ -n "${TMUX-}" ] && command -v tmux >/dev/null 2>&1; then
+  MIN_WIDTH=80 &&
+  MIN_HEIGHT=24 &&
+  cw=$(tmux display -p "#{client_width}") &&
+  ch=$(tmux display -p "#{client_height}") &&
+  w=$(( (cw * 2 + 1) / 3 )) &&
+  h=$(( (ch * 2 + 1) / 3 )) &&
+
+  # clamp to minimum
+  [ "$w" -ge "$MIN_WIDTH" ] || w="$MIN_WIDTH" &&
+  [ "$h" -ge "$MIN_HEIGHT" ] || h="$MIN_HEIGHT" &&
+
+  # clamp to client maximum (so popup never exceeds the terminal)
+  [ "$w" -le "$cw" ] || w="$cw" &&
+  [ "$h" -le "$ch" ] || h="$ch" &&
+
+  tmux display-popup -E -w "$w" -h "$h" -T "EXIF" \
+  sh -lc '
+    exiftool -- "$1" | bat --color=always --plain -l exif --paging=always --pager="less -RX --tilde --clear-screen -Ps'' --mouse"
+  ' -- %s1
+else
+  exiftool -- %s1 | bat --color=always --plain -l exif --paging=always --pager="less -RX --tilde --clear-screen -Ps'' --mouse";
+fi
+'''
+desc = "Show EXIF"
+for = "unix"
+block = true
+
 [tasks]
 # Maximum number of concurrent micro-tasks
 micro_workers    = 10

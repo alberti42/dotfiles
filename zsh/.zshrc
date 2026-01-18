@@ -37,10 +37,7 @@ zinit light-mode lucid depth=1 for \
 
 # Load annex (i.e. extension) to import meta plugins (i.e. sets of plugins)
 # https://github.com/zdharma-continuum/zinit-annex-meta-plugins
-zinit lucid light-mode depth=1 for @zdharma-continuum/zinit-annex-meta-plugins
-
-# Manage rust updates
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rust/rust.zsh"
+# zinit lucid light-mode depth=1 for @zdharma-continuum/zinit-annex-meta-plugins
 
 ##########################
 # OMZ libs and plugins   #
@@ -49,12 +46,12 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rust/rust.zsh"
 # Check https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
 zinit wait lucid light-mode depth=1 for \
     OMZL::clipboard.zsh \
-    OMZL::compfix.zsh \
-    OMZL::completion.zsh \
-    OMZL::correction.zsh \
-    OMZL::grep.zsh \
-    OMZL::history.zsh \
-    OMZL::spectrum.zsh    
+    OMZL::grep.zsh
+    # OMZL::completion.zsh \
+    # OMZL::correction.zsh \
+    # OMZL::spectrum.zsh \
+    # OMZL::history.zsh \
+    # OMZL::compfix.zsh
 
 # Plugin binding GNU coreutils to their default names
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/gnu-utils/gnu-utils.zsh"
@@ -62,7 +59,15 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/gnu-utils/gnu-utils.zsh
 #####################
 # PLUGINS           #
 #####################
-# For examples and inspiratations: https://github.com/crivotz/dot_files/blob/master/linux/zinit/zshrc
+
+# Manage rust updates
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rust/rust.zsh"
+
+# Manage OpenAI codex updates
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/codex/codex.zsh"
+
+# Zsh Codex Completion plugin (https://github.com/tom-doerr/zsh_codex)
+# zinit wait lucid light-mode depth=1 atload'bindkey '^X^E' create_completion' for @tom-doerr/zsh_codex
 
 # Load vivid utility with automatic fast, loading of color scheme
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/vivid/vivid.zsh"
@@ -123,7 +128,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
     # Import useful misc zsh functions
     atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" $__local_plugin_path/zsh-misc-functions
   )
-  zinit lucid wait nocompile light-mode for "${__local_plugins[@]}"
+  zinit lucid wait light-mode for "${__local_plugins[@]}"
 }
 
 # Wrapper snippet for astral-sh/uv
@@ -211,21 +216,21 @@ zinit ice id-as'zinit/compinit' lucid as'null' wait atload'
   # Replay any `compdef` calls that plugins made before `compinit` was ready
   zicdreplay
 '
-  zinit light zdharma-continuum/null
+zinit light zdharma-continuum/null
 
 #####################
 # Keybindings       #
 #####################
 
-zinit is-snippet lucid light-mode nocompile link id-as'local/key-bindings' for $DOTFILES_DIR/zinit/src/key-bindings.zsh
+zinit is-snippet wait'0a' lucid light-mode nocompile link id-as'local/key-bindings' for $DOTFILES_DIR/zinit/src/key-bindings.zsh
 
 #####################
 # HISTORY           #
 #####################
 [ -z "$HISTFILE" ] && HISTFILE="$HOME/.zsh_history"
-HISTSIZE=50000
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
+
+[ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
+[ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
 
 # https://www.zsh.org/mla/users/2014/msg00715.html
 # zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
@@ -237,7 +242,7 @@ HISTDUP=erase
 setopt APPEND_HISTORY               # append history list to the history file rather than replacing it
 setopt SHARE_HISTORY                # share history across all zsh sessions at the same time
 # setopt EXTENDED_HISTORY           # record timestamp of command in HISTFILE
-# setopt HIST_IGNORE_DUPS           # Do not enter command lines into the history list if they are duplicates
+setopt HIST_IGNORE_DUPS             # Do not enter command lines into the history list if they are duplicates
 setopt HIST_IGNORE_ALL_DUPS         # If a new command line being added to the history list duplicates an older one, the older command is removed from the list
 setopt HIST_SAVE_NO_DUPS            # When writing out the history file, older commands that duplicate newer ones are omitted
 setopt HIST_IGNORE_SPACE            # Remove command lines from the history list when the first character on the line or of the expanded alias is a space
@@ -283,20 +288,21 @@ if [[ $OSTYPE =~ 'darwin*' ]]; then
 fi
 
 # Preferred editor for local and remote sessions
-local editor_app
+local -a editor_cmd
 
 if [[ -n $SSH_CONNECTION ]]; then
-  editor_app="rsubl"  # Remote Sublime Text
+  # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
+  editor_cmd=(rsubl -w)
 else
   # editor_app="emacsclient -a= -nw -c"  # Local emacs
-  editor_app="subl"
+  editor_cmd=(subl -nw)
 fi
 
 # Check whether the editor is found in the path
-if command -v "$editor_app" >/dev/null 2>&1; then
-  export EDITOR="$editor_app"
+if (( $#editor_cmd )) && command -v "$editor_cmd[1]" >/dev/null 2>&1; then
+  export EDITOR="${(j: :)editor_cmd}"
 else
-  # echo "Warning: '$editor_app' not found in the path. Using 'nano' as a fallback."
+  # echo "Warning: '$editor_cmd' not found in the path. Using 'nano' as a fallback."
   export EDITOR="nano"
 fi
 
@@ -367,11 +373,11 @@ alias dotfiles="cd $DOTFILES_DIR"
 # alias dkpurge="docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
 
 # Configuration files
-alias zshrc="$editor_app $HOME/.zshrc"
-alias zshenv="$editor_app $HOME/.zshenv"
-alias sshconf="$editor_app ~/.ssh/config"
-alias tmuxconf="$editor_app $HOME/.config/tmux/tmux.conf"
-alias weztermconf="$editor_app $HOME/.config/wezterm/wezterm.lua"
+alias zshrc="${editor_cmd[1]} $HOME/.zshrc"
+alias zshenv="${editor_cmd[1]} $HOME/.zshenv"
+alias sshconf="${editor_cmd[1]} ~/.ssh/config"
+alias tmuxconf="${editor_cmd[1]} $HOME/.config/tmux/tmux.conf"
+alias weztermconf="${editor_cmd[1]} $HOME/.config/wezterm/wezterm.lua"
 alias nvimconf="nvim $HOME/.config/nvim/init.lua"
 
 # Misc

@@ -12,6 +12,6 @@ function y() {
 
 # ya pack -a yazi-rs/plugins:max-preview
 
-zinit binary lucid wait'0a' light-mode depth=1 from'gh-r' \
+zinit binary lucid wait'0b' light-mode depth=1 from'gh-r' \
   lbin'yazi-*/ya -> ya; yazi-*/yazi -> yazi' \
   for @sxyazi/yazi

@@ -103,70 +103,110 @@ function __my_completions_atinit_hook() {
   #
   # ------------------------------------------------------------------------------
 
-  # Substitute environment variables
-  zstyle ':completion:*' substitute true
-  
+  # The zsh/complist module provides the menuselect UI, scrolling lists (where list-prompt applies),
+  # and the menu-select/reverse-menu-select widgets. It often gets loaded automatically the first
+  # time completion needs it (e.g. when you use menu select or certain listing behaviors).
+  zmodload -i zsh/complist
+
+  # Controls whether the _expand completer will first try to expand all substitutions in the string (such as ‘$(...)’ and ‘${...}’). 
+  zstyle ':completion:*' substitute false
+
+  # Use caching for any completion that support _store_cache, _retrieve_cache, and _cache_invalid functions
+  : ${ZSH_CACHE_DIR:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}  # := form (it only assigns if the parameter is unset or null)
+  zstyle ':completion:*' use-cache yes
+  zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
+
+  # Tells zsh’s completion system to include the "special" directory entries . and .. when completing directory names
+  zstyle ':completion:*' special-dirs true
+
+  unsetopt MENU_COMPLETE   # if unset, do not autoselect the first completion entry; if set, the first completion is inserted immediately, and each additional press of Tab cycles to the next match.
+  unsetopt FLOW_CONTROL    # disable output flow control via start/stop characters (usually assigned to ^S/^Q)
+  setopt AUTO_MENU         # shows completion menu on successive tab press
+  setopt COMPLETE_IN_WORD  # allows completing in the middle of a word/path; the cursor stays there and completion is done from both ends
+  setopt ALWAYS_TO_END     # if a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word
+  setopt CASE_GLOB         # if set, make globbing (filename generation) sensitive to case; unset makes globbing insensitive to case 
+  WORDCHARS=''             # Characters to be considered part of a word; by default: *?_-.[]~=/&;!#$%^(){}<>
+
   # Check if LS_COLORS is defined
   if (( ${+LS_COLORS} )); then
-    zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"
-    zstyle ":completion:*:default" list-colors ${(s.:.)LS_COLORS} "ma=38;2;255;255;255;1;48;2;210;0;255" # ma->"matched item"
-  else 
+    # General completion colors
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+    # Default list colors + highlight the matched substring/item with gray-blue background, normal foreground
+    # This configuration is only relevant for `menu select` and not relevant for fzf-tab
+    zstyle ':completion:*:default' list-colors \
+      "${(s.:.)LS_COLORS}" \
+      'ma=48;2;60;70;90'
+  else
     [[ ${ZINIT[MUTE_WARNINGS]} != (1|true|on|yes) && $quiet != -q ]] && \
       +zi-log "{u-warn}Warning{b-warn}: zsh-completions cannot use LS_COLORS."
   fi
-  zstyle ':completion:*' menu no # recommended for fzf-tab
-  zstyle ":completion:*" matcher-list "" "m:{a-zA-Z}={A-Za-z}" "r:|[._-]=* r:|=*" "l:|=* r:|=*"
-  zstyle ":completion:*" select-prompt "%SScrolling active: current selection at %p%s"
-  zstyle ":completion:*:descriptions" format "--- %d ---"
-  zstyle ":completion:*:processes" command "ps -au$USER"
-  zstyle ":completion:complete:*:options" sort false
-  zstyle ":completion:*:*:*:*:processes" command "ps -u $USER -o pid,user,comm,cmd -w -w"
-
-  # Apply ls colors
-  zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+  
+  # Choose menu select UI - it is superseded by fzf-tab
+  zstyle ':completion:*:*:*:*:*' menu select
+  
+  # Shows how many matches in menu select (list prompt UI)
+  # In this mode, list gets printed; we page through screenfuls
   zstyle ':completion:*:default' list-prompt '%S%M matches%s'
+  
+  # select-prompt is shown during menu selection (the menu select UI).
+  zstyle ':completion:*' select-prompt "%SScrolling active: current selection at %p%s"
+  
+  # Tells compsys to group matches into separate groups like “files”, “directories”, “users”, “options”, “commands”, etc.
+  zstyle ':completion:*:*' group yes
+  
+  # Configure how the groups/tags are displayed
+  zstyle ':completion:*:descriptions' format '%B%U%F{252}[%d]%f%u%b'
 
-  # pretty cd [tab] stuffs
-  zstyle ':completion:*:directory-stack' list-colors '=(#b) #([0-9]#)*( *)==95=38;5;12'
+  # Tells compsys to add a description for option matches (where available). Example: for --help it might show “display help”.
+  zstyle ':completion:*:options' description yes
 
-  # Use caching to make completion for commands such as dpkg and apt usable.
-  zstyle ':completion:complete:*' use-cache on
-  zstyle ':completion:complete:*' cache-path "$HOME/.zcompcache"
+  # It automatically invents a description for command-line options that don’t already have one, but only if:
+  # - the option takes exactly one argument, and
+  # - the completion function knows what that argument is
+  # For example, if %d is `file`, it displays `--output   takes file`
+  zstyle ':completion:*:options' auto-description 'takes %d'
+
+  # Avoid sorting for the group/tag that contains command-line options (e.g. --help, -v, etc.)
+  zstyle ':completion:*:options' sort false
+
+  # Use the tag name as the group name. Practical effect:
+  # commands, functions, aliases, builtins, reserved-words, etc → separate sections
+  # prevents tags from being lumped into -default- or merged into one group
+  zstyle ':completion:*' group-name ''
+  
+  # Many completion functions can generate matches in a simple and a verbose form
+  zstyle ':completion:*' verbose yes
 
   # Case insensitive path-completion
-  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-  unsetopt CASE_GLOB
+  zstyle ":completion:*" matcher-list "" "m:{a-zA-Z}={A-Za-z}" "r:|[._-]=* r:|=*" "l:|=* r:|=*"
 
-  # Group matches and describe.
-  # zstyle ':completion:*:*:*:*:*' menu select
-  # zstyle ':completion:*:matches' group 'yes'
-  # zstyle ':completion:*:options' description 'yes'
-  # zstyle ':completion:*:options' auto-description '%d'
-  # zstyle ':completion:*' group-name ''
-  # zstyle ':completion:*' verbose yes
+  # Don't complete unavailable functions (e.g.: when typing `unfunction <tab>`)
+  zstyle ':completion:*:functions' ignored-patterns '(_*|→*|+*|-*|@*|.*|:*|pre(cmd|exec))'
 
-  # Fuzzy match mistyped completions.
-  # Removed _approximate because of bug https://github.com/Aloxaf/fzf-tab/issues/470
+  # This sets the completer chain: when pressing Tab, zsh will try these completers in order:
+  # _complete _match _approximate
   zstyle ':completion:*' completer _complete _match _approximate
+
+  # This affects the _match completer. `original` only means: when _match runs, only complete
+  # against the original word you typed, rather than generating alternate transformed variants
+  # and offering them as separate "correction" candidates.
   zstyle ':completion:*:match:*' original only
-  zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
-  # Increase the number of errors based on the length of the typed word. But make
-  # sure to cap (at 7) the max-errors to avoid hanging.
-  zstyle -e ':completion:*:approximate:*' max-errors '
-    (( ${#PREFIX} + ${#SUFFIX} < 6 )) && reply=(1 numeric) || reply=(2 numeric)
-  '
+  # Increase max-errors based on length.
+  zstyle -e ':completion:*:approximate:*' max-errors '(( ${#PREFIX} + ${#SUFFIX} < 6 )) && reply=(1 numeric) || reply=(2 numeric)'
+
+  # Disable approximate/correct in subscripts
+  zstyle ':completion:*:approximate:-subscript-:*' max-errors 0
+  zstyle ':completion:*:correct:-subscript-:*' max-errors 0
   
-  # Don't complete unavailable commands.
-  zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
-
   # Prioritize numeric indexes when completing array subscripts (e.g., my_array[<TAB>]).
   # If the array is associative, complete keys only if no numeric indexes apply.
   zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
 
   # Directories
   zstyle ':completion:*:*:cd:*' tag-order local-directories directory-stack path-directories
-  zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
+  zstyle ':completion:*:*:cd:*:directory-stack' menu select
   zstyle ':completion:*:-tilde-:*' group-order 'named-directories' 'path-directories' 'users' 'expand'
   zstyle ':completion:*' squeeze-slashes true
 
@@ -174,7 +214,7 @@ function __my_completions_atinit_hook() {
   zstyle ':completion:*:history-words' stop yes
   zstyle ':completion:*:history-words' remove-all-dups yes
   zstyle ':completion:*:history-words' list false
-  zstyle ':completion:*:history-words' menu yes
+  zstyle ':completion:*:history-words' menu select
 
   # Environment Variables
   zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
@@ -211,7 +251,7 @@ function __my_completions_atinit_hook() {
   "  
 
   # Nice menu behavior like kill
-  zstyle ':completion:*:*:kill:*' menu yes select
+  zstyle ':completion:*:*:kill:*' menu select
   zstyle ':completion:*:*:kill:*' force-list always
   zstyle ':completion:*:*:kill:*' insert-ids single
 
@@ -239,7 +279,7 @@ function __my_completions_atinit_hook() {
   '
 
   # Nice menu behavior like kill
-  zstyle ':completion:*:*:killall:*' menu yes select
+  zstyle ':completion:*:*:killall:*' menu select
   zstyle ':completion:*:*:killall:*' force-list always
 
   # Colorize process names (simple “word” coloring)
@@ -249,7 +289,7 @@ function __my_completions_atinit_hook() {
   zstyle ':completion:*:manuals'    separate-sections true
   zstyle ':completion:*:manuals.*'  insert-sections   true
   # zstyle ':completion:*:manuals.(^1*)' insert-sections true
-  zstyle ':completion:*:man:*'      menu yes select
+  # zstyle ':completion:*:man:*'      menu select
 
   # SSH/SCP/RSYNC
   zstyle ':completion:*:(ssh|scp|rsync):*' tag-order 'hosts:-host:host hosts:-domain:domain hosts:-ipaddr:ip\ address *'
@@ -262,12 +302,9 @@ function __my_completions_atinit_hook() {
   # partial completion suggestions
   zstyle ':completion:*' list-suffixes
   zstyle ':completion:*' expand prefix suffix
-
-  # Hard override: disable menu-select globally so fzf-tab can display all groups, including [corrections]
-  # zstyle ':completion:*:*:*:*:*' menu no
 }
 
-zinit ice wait'0a' depth=1 light-mode lucid blockf \
+zinit ice wait'0b' depth=1 light-mode lucid blockf \
   atinit'_safe_one_off_load __my_completions_atinit_hook' \
   atpull'zinit creinstall -q .'
 zinit light zsh-users/zsh-completions

@@ -11,7 +11,7 @@ else
 fi
 
 # LS_COLORS theme - download the default profile
-zinit ice depth=1 wait'0a' light-mode lucid \
+zinit ice depth=1 wait'0b' light-mode lucid \
     atclone"source '${${(%):-%x}:a:h}/__my_lscolors_atclone_hook.zsh'" \
     atpull'%atclone' \
     git \

@@ -7,10 +7,10 @@ function __fzf_tab_init_hook() {
   zstyle ":completion:*:git-checkout:*" sort false
   
   # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
-  zstyle ':completion:*' menu no
+  zstyle ':completion:*:*:*:*:*' menu no
 
   # set descriptions format to enable group support
-  # Note: don't use escape sequences (like '%F{red}%d%f') here; fzf-tab will ignore them
+  # Note: don't use escape sequences (like 's%F{red}%d%f') here; fzf-tab will ignore them
   zstyle ':completion:*:descriptions' format '[%d]'
   
   # disable sort when completing `git checkout`
@@ -51,17 +51,24 @@ function __fzf_tab_init_hook() {
     --preview-window="right:60%" \
     --padding="0,1,0,0" \
     --min-height=20
+
+  # Configure Tab and Shift-Tab dynamically
+  if [[ -n "${terminfo[ht]}" ]]; then # Tab key via terminfo
+    bindkey "${terminfo[ht]}" expand-or-complete
+  else  # Default fallback for Tab
+    bindkey "^i" expand-or-complete
+  fi
 }
 
 # Add fzf support to zsh; check https://thevaluable.dev/practical-guide-fzf-example/
 # It requires zicompinit; zicompinit; so it must be called after fast-syntax-highlighting
-zinit ice wait'0a' light-mode lucid \
+zinit ice wait'0b' light-mode lucid \
   atclone"source '${${(%):-%x}:a:h}/__fzf_tab_atclone_hook.zsh'" \
   atinit'_safe_one_off_load __fzf_tab_init_hook' \
   ver'integrated' \
   id-as'Aloxaf/fzf-tab'
-
 zinit light alberti42/fzf-tab-fork
+
 # zinit light Aloxaf/fzf-tab
 # depth 1
 # latest-release

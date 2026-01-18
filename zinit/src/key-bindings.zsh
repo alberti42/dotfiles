@@ -3,6 +3,16 @@
 # man zshzle; note: the key bindings are case sensitive!
 # for other key bindings check: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/refs/heads/master/lib/key-bindings.zsh
 
+# Ensures that zsh/terminfo is loaded
+zmodload zsh/terminfo
+
+# Ensure that zsh/complist module is loaded: it provides the menuselect UI,
+# scrolling lists (where list-prompt applies), and the menu-select/reverse-menu-select widgets.
+# It often gets loaded automatically the first time completion needs it (e.g. when you use menu
+# select or certain listing behaviors).
+zmodload -i zsh/complist
+
+
 # Bind to arrow keys
 autoload -Uz up-line-or-beginning-search
 zle -N up-line-or-beginning-search
@@ -73,16 +83,42 @@ else
 fi
 
 # Configure Tab and Shift-Tab dynamically
-if [[ -n "${terminfo[ht]}" ]]; then
-  bindkey "${terminfo[ht]}" expand-or-complete  # Tab key via terminfo
-else
-  bindkey "^i" expand-or-complete              # Default fallback for Tab
+# move through the completion menu forward and backward (only relevant for `menu select`)
+if [[ -n "${terminfo[ht]}" ]]; then # Tab key via terminfo
+  bindkey "${terminfo[ht]}" menu-complete         # menu select
+else  # Default fallback for Tab
+  bindkey "^I" menu-complete                      # menu select
 fi
-# [Shift-Tab] - move through the completion menu backwards
-if [[ -n "${terminfo[kcbt]}" ]]; then
+if [[ -n "${terminfo[kcbt]}" ]]; then # Shift-Tab via terminfo
   bindkey "${terminfo[kcbt]}" reverse-menu-complete
+else # Fallback for Shift-Tab
+  bindkey "^[[Z" reverse-menu-complete    
+fi
+# PageUp / PageDown in menuselect
+if [[ -n ${terminfo[kpp]-} ]]; then
+  bindkey -M menuselect "${terminfo[kpp]}" backward-word
 else
-  bindkey "^[[Z" reverse-menu-complete    # Fallback for Shift-Tab
+  bindkey -M menuselect "^[[5~" backward-word
+fi
+if [[ -n ${terminfo[knp]-} ]]; then
+  bindkey -M menuselect "${terminfo[knp]}" forward-word
+else
+  bindkey -M menuselect "^[[6~" forward-word
+fi
+# Home / End in menuselect (top / bottom)
+if [[ -n ${terminfo[khome]-} ]]; then
+  bindkey -M menuselect "${terminfo[khome]}" beginning-of-history
+else
+  bindkey -M menuselect "^[[H" beginning-of-history   # common Home
+  bindkey -M menuselect "^[[1~" beginning-of-history  # xterm Home
+  bindkey -M menuselect "^[OH" beginning-of-history   # rxvt/Home
+fi
+if [[ -n ${terminfo[kend]-} ]]; then
+  bindkey -M menuselect "${terminfo[kend]}" end-of-history
+else
+  bindkey -M menuselect "^[[F" end-of-history         # common End
+  bindkey -M menuselect "^[[4~" end-of-history        # xterm End
+  bindkey -M menuselect "^[OF" end-of-history         # rxvt/End
 fi
 
 bindkey "^d"       delete-char

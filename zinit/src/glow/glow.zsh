@@ -6,7 +6,7 @@ function __glow_init_hook() {
 
 zinit ice \
     null \
-    wait'0a' \
+    wait'0b' \
     lucid \
     from'gh-r' \
     atinit'_safe_one_off_load __glow_init_hook' \

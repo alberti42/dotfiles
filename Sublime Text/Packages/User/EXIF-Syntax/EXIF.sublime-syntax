@@ -1,0 +1,85 @@
+%YAML 1.2
+---
+name: EXIF (ExifTool)
+file_extensions:
+  - exif
+  - exiftool
+scope: source.exif
+
+contexts:
+  main:
+    # Empty / whitespace
+    - match: '^\s*$'
+      scope: meta.empty.exif
+
+    # Separator lines like "--------" or "===="
+    - match: '^[=\-]{3,}\s*$'
+      scope: punctuation.separator.exif
+
+    # Grouped output: [EXIF] Tag Name : Value
+    - match: '^(\s*)(\[[^\]]+\])(\s+)([^:\n]+?)(\s*)(:)(\s*)(.*)$'
+      captures:
+        1: punctuation.whitespace.leading.exif
+        2: entity.name.namespace.exif
+        3: punctuation.whitespace.exif
+        4: entity.name.tag.exif
+        5: punctuation.whitespace.exif
+        6: punctuation.separator.key-value.exif
+        7: punctuation.whitespace.exif
+        8: meta.value.exif
+      push: value
+
+    # Plain output: Tag Name : Value
+    - match: '^(\s*)([^:\n]+?)(\s*)(:)(\s*)(.*)$'
+      captures:
+        1: punctuation.whitespace.leading.exif
+        2: entity.name.tag.exif
+        3: punctuation.whitespace.exif
+        4: punctuation.separator.key-value.exif
+        5: punctuation.whitespace.exif
+        6: meta.value.exif
+      push: value
+
+    # Fallback
+    - match: '.*\n?'
+      scope: text.plain.exif
+
+  value:
+    # We only want to highlight within the value part of the line
+    - meta_scope: meta.value.exif
+
+    # End of line -> back to main
+    - match: '$\n?'
+      pop: true
+
+    # Quoted strings
+    - match: '"([^"\\]|\\.)*"'
+      scope: string.quoted.double.exif
+    - match: '''([^''\\]|\\.)*'''
+      scope: string.quoted.single.exif
+
+    # ISO-ish date/time (kept permissive)
+    - match: '\b\d{4}[-:]\d{2}[-:]\d{2}([ T]\d{2}:\d{2}:\d{2})?\b'
+      scope: constant.numeric.datetime.exif
+
+    # GPS-ish / decimals
+    - match: '\b-?\d+\.\d+\b'
+      scope: constant.numeric.float.exif
+
+    # Integers
+    - match: '\b-?\d+\b'
+      scope: constant.numeric.integer.exif
+
+    # Hex
+    - match: '\b0x[0-9A-Fa-f]+\b'
+      scope: constant.numeric.hex.exif
+
+    # Common booleans / null-ish
+    - match: '\b(true|false|yes|no|null|none)\b'
+      scope: constant.language.exif
+
+    # Brackets / punctuation in values
+    - match: '[\[\]\(\)\{\}]'
+      scope: punctuation.section.brackets.exif
+    - match: '[,;/]'
+      scope: punctuation.separator.exif

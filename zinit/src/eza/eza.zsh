@@ -36,7 +36,7 @@ function __eza_init_hook() {
 zinit ice \
     null \
     depth=1 \
-    wait'0a' \
+    wait'0b' \
     lucid \
     atinit'_safe_one_off_load __eza_init_hook' \
     nocompile \

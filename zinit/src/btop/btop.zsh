@@ -7,7 +7,7 @@
     nocompile        # There are no zsh scripts to be z-compiled
     lucid            # Show output from hooks.
     null             # Don't source any files.
-    wait'0a'         # Run in the background.
+    wait'0b'         # Run in the background.
   )
   
   if [[ $OSTYPE == 'darwin'* ]]; then

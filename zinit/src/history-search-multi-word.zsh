@@ -15,7 +15,7 @@ function __history_smw_atload() {
 }
 
 # Load zdharma multi-word history search plugin
-zinit ice wait'0a' light-mode depth=1 lucid \
+zinit ice wait'0b' light-mode depth=1 lucid \
   atinit:'_safe_one_off_load __history_smw_atinit' \
   atload:'_safe_one_off_load __history_smw_atload'
 

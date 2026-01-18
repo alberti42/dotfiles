@@ -1,3 +1,4 @@
+
 # https://github.com/zdharma-continuum/fast-syntax-highlighting
 
 function __fsh_atload_hook() {
@@ -30,10 +31,15 @@ function __fsh_atload_hook() {
   # Configure how zsh highlighting behaves when text is pasted into zle
   # Choose zle_highlight=('paste:none') to disable highlighting
   zle_highlight=('paste:fg=#00E5FF,bg=#002B36')
+
+  # Remove function for debug purposes 
+  if (( ${+functions[/fshdbg]} )); then
+    unfunction /fshdbg
+  fi
 }
  
 # Load syntax highlightin (plugin must be loaded after plugins issuing compdef)
-zinit ice wait'0a' depth=1 light-mode lucid \
+zinit ice wait'0b' depth=1 light-mode lucid \
   blockf \
   atload'_safe_one_off_load __fsh_atload_hook'
   

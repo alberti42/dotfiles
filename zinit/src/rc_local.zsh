@@ -8,6 +8,6 @@ if [[ -d $HOME/.rc_local ]]; then
       local filename=${file:t:r}  # Extract filename without directory or extension
       zinit_snippets+=("id-as:local/${filename}" "${file}")  # id-as as one string
     done
-    zinit is-snippet wait'0a' lucid for "${(@)zinit_snippets}"
+    zinit is-snippet wait'0b' lucid for "${(@)zinit_snippets}"
   fi
 fi
