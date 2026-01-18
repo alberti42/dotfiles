@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Equivalent to `pyenv virtualenvs --bare`
+
 set -euo pipefail
 
 PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"

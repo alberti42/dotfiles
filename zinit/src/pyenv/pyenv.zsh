@@ -12,7 +12,7 @@ zinit wait'0c' depth=1 light-mode lucid as'null' nocompletions nocompile for \
   id-as'pyenv/doctor' pyenv/pyenv-doctor \
   id-as'pyenv/update' pyenv/pyenv-update \
   id-as'pyenv/pip-migrate' pyenv/pyenv-pip-migrate \
-    atload"export PYENV_VIRTUALENV_FAST_SCAN='${${(%):-%x}:a:h}/scan_virtualenv.bash'" \
+    atload"export PYENV_VIRTUALENV_FAST_SCAN='${${(%):-%x}:a:h}/scan_virtualenv_full.bash'" \
     atpull'%atclone' \
     atclone"python3 '${${(%):-%x}:a:h}/inject_pyenv_virtualenv_fast_scan.py' ./bin/pyenv-virtualenvs" \
     id-as:'pyenv/virtualenv' pyenv/pyenv-virtualenv \
