@@ -23,5 +23,10 @@ use = "yazi-rs/plugins:types"
 rev = "56971d0"
 hash = "daf9e3d12688cf855fce665839efcd6d"
 
+[[plugin.deps]]
+use = "alberti42/fzf-plus"
+rev = "60829da"
+hash = "a604d01f4548a9eb6a69cefa57a7149b"
+
 [flavor]
 deps = []

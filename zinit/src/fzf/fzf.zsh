@@ -55,6 +55,7 @@
     # Alt-c customization (cd widget)
     export FZF_ALT_C_COMMAND="fd -t d --hidden --follow --exclude .git"
     export FZF_ALT_C_OPTS="--preview '__zcompile_if_needed_and_source $DOTFILES_DIR/zinit/src/fzf-tab/__fzf_preview_file.zsh && __fzf_preview_file {}'"
+    export FZF_DEFAULT_COMMAND='fd'
     
     # Source completions and key-bindings
     __zcompile_if_needed_and_source init.zsh

@@ -1,17 +1,12 @@
 [[mgr.prepend_keymap]]
 on   = "z"
-run  = "noop"
-desc = "Jump to a directory via zoxide"
+run = "plugin fzf-plus -- --fzf-command='fd -d=1'"
+desc = "Jump to a file/directory via fzf"
 
 [[mgr.prepend_keymap]]
 on   = "Z"
 run  = "noop"
 desc = "Jump to a directory via zoxide"
-
-[[mgr.prepend_keymap]]
-on   = "F"
-run  = "plugin fzf"
-desc = "Jump to a file/directory via fzf"
 
 [[mgr.prepend_keymap]]
 on = "<BackTab>"

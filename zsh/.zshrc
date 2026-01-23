@@ -66,6 +66,9 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rust/rust.zsh"
 # Manage OpenAI codex updates
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/codex/codex.zsh"
 
+# Manage Zen OpenCode updates
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/opencode/opencode.zsh"
+
 # Zsh Codex Completion plugin (https://github.com/tom-doerr/zsh_codex)
 # zinit wait lucid light-mode depth=1 atload'bindkey '^X^E' create_completion' for @tom-doerr/zsh_codex
 

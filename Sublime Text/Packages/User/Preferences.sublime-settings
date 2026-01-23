@@ -59,8 +59,8 @@
   // specific settings file, for example, "Preferences (Linux).sublime-settings".
   // Because of this, setting them here will have no effect: you must set them
   // in your User File Preferences.
-  // "font_face": "MesloLGS NF",
-  // "font_size": 20,
+  "font_face": "MesloLGS NF",
+  "font_size": 16,
   // "font-options": [],
 
   "windows":
@@ -302,6 +302,5 @@
   
   // Always visualise the viewport on the minimap, as opposed to only
   // showing it on mouse over
-  "always_show_minimap_viewport": false,
-  "font_size": 16,
+  "always_show_minimap_viewport": true,
 }
