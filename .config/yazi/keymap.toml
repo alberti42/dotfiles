@@ -69,11 +69,6 @@ run  = "plugin fazif fazifrg"
 desc = "Find files/directories with ripgrep and fzf"
 
 [[mgr.prepend_keymap]]
-on   = [ "g", "p" ]
-run  = "plugin command"
-desc = "Yazi command prompt"
-
-[[mgr.prepend_keymap]]
 on   = [ "<Backspace>" ]
 run  = "back"
 desc = "Go back to the previous directory"

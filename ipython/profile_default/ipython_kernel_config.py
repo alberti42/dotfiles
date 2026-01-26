@@ -589,8 +589,8 @@ c = get_config()  #noqa
 # c.InteractiveShell.automagic = True
 
 ## The part of the banner to be printed before the profile
-#  Default: "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.0.2 -- An enhanced Interactive Python. Type '?' for help.\n"
-# c.InteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.0.2 -- An enhanced Interactive Python. Type '?' for help.\n"
+#  Default: "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.9.0 -- An enhanced Interactive Python. Type '?' for help.\n"
+# c.InteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.9.0 -- An enhanced Interactive Python. Type '?' for help.\n"
 
 ## The part of the banner to be printed after the profile
 #  Default: ''
@@ -729,7 +729,7 @@ c = get_config()  #noqa
 
 ## The part of the banner to be printed before the profile
 #  See also: InteractiveShell.banner1
-# c.ZMQInteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.0.2 -- An enhanced Interactive Python. Type '?' for help.\n"
+# c.ZMQInteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.9.0 -- An enhanced Interactive Python. Type '?' for help.\n"
 
 ## The part of the banner to be printed after the profile
 #  See also: InteractiveShell.banner2
@@ -863,7 +863,7 @@ c = get_config()  #noqa
 #  
 #  debug : bool
 #      whether to trigger extra debugging statements
-#  packer/unpacker : str : 'json', 'pickle' or import_string
+#  packer/unpacker : str : 'orjson', 'json', 'pickle', 'msgpack' or import_string
 #      importstrings for methods to serialize message parts.  If just
 #      'json' or 'pickle', predefined JSON and pickle packers will be used.
 #      Otherwise, the entire importstring must be used.

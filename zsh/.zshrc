@@ -69,9 +69,6 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/codex/codex.zsh"
 # Manage Zen OpenCode updates
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/opencode/opencode.zsh"
 
-# Zsh Codex Completion plugin (https://github.com/tom-doerr/zsh_codex)
-# zinit wait lucid light-mode depth=1 atload'bindkey '^X^E' create_completion' for @tom-doerr/zsh_codex
-
 # Load vivid utility with automatic fast, loading of color scheme
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/vivid/vivid.zsh"
 
@@ -129,7 +126,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
     blockf completions $__local_plugin_path/zsh-misc-completions
 
     # Import useful misc zsh functions
-    atload:"wrap_restore_cursor nvim yazi tmux; restore_cursor" $__local_plugin_path/zsh-misc-functions
+    atload:"wrap_restore_cursor nvim yazi tmux ipython; restore_cursor" $__local_plugin_path/zsh-misc-functions
   )
   zinit lucid wait light-mode for "${__local_plugins[@]}"
 }

@@ -57,7 +57,7 @@ c = get_config()  #noqa
 #  'gtk2', 'qt4').
 #  Choices: any of ['asyncio', 'glut', 'gtk', 'gtk2', 'gtk3', 'gtk4', 'osx', 'pyglet', 'qt', 'qt5', 'qt6', 'tk', 'wx', 'gtk2', 'qt4'] (case-insensitive) or None
 #  Default: None
-c.InteractiveShellApp.gui = 'osx'
+# c.InteractiveShellApp.gui = None
 
 ## Should variables loaded at startup (by startup files, exec_lines, etc.)
 #          be hidden from tools like %who?
@@ -419,8 +419,8 @@ c.InteractiveShellApp.gui = 'osx'
 # c.InteractiveShell.automagic = True
 
 ## The part of the banner to be printed before the profile
-#  Default: "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.0.2 -- An enhanced Interactive Python. Type '?' for help.\n"
-# c.InteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.0.2 -- An enhanced Interactive Python. Type '?' for help.\n"
+#  Default: "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.9.0 -- An enhanced Interactive Python. Type '?' for help.\n"
+# c.InteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.9.0 -- An enhanced Interactive Python. Type '?' for help.\n"
 
 ## The part of the banner to be printed after the profile
 #  Default: ''
@@ -437,7 +437,7 @@ c.InteractiveShellApp.gui = 'osx'
 
 ## Set the color scheme (nocolor, neutral, linux, lightbg).
 #  Default: 'neutral'
-c.InteractiveShell.colors = 'neutral'
+c.InteractiveShell.colors = 'linux'
 
 #  Default: False
 # c.InteractiveShell.debug = False
@@ -577,7 +577,7 @@ c.InteractiveShell.colors = 'neutral'
 
 ## The part of the banner to be printed before the profile
 #  See also: InteractiveShell.banner1
-# c.TerminalInteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.0.2 -- An enhanced Interactive Python. Type '?' for help.\n"
+# c.TerminalInteractiveShell.banner1 = "Python 3.13.1 (main, Jan  2 2025, 00:07:38) [Clang 16.0.0 (clang-1600.0.26.6)]\nType 'copyright', 'credits' or 'license' for more information\nIPython 9.9.0 -- An enhanced Interactive Python. Type '?' for help.\n"
 
 ## The part of the banner to be printed after the profile
 #  See also: InteractiveShell.banner2
@@ -589,13 +589,13 @@ c.InteractiveShell.colors = 'neutral'
 
 ## Set the color scheme (nocolor, neutral, linux, lightbg).
 #  See also: InteractiveShell.colors
-# c.TerminalInteractiveShell.colors = 'neutral'
+c.TerminalInteractiveShell.colors = 'linux'
 
 ## Set to confirm when you try to exit IPython with an EOF (Control-D in Unix,
 #  Control-Z/Enter in Windows). By typing 'exit' or 'quit', you can force a
 #  direct exit without any confirmation.
 #  Default: True
-# c.TerminalInteractiveShell.confirm_exit = True
+c.TerminalInteractiveShell.confirm_exit = False
 
 #  See also: InteractiveShell.debug
 # c.TerminalInteractiveShell.debug = False
@@ -620,8 +620,8 @@ c.InteractiveShell.colors = 'neutral'
 # c.TerminalInteractiveShell.editing_mode = 'emacs'
 
 ## Set the editor used by IPython (default to $EDITOR/vi/notepad).
-#  Default: 'subl'
-# c.TerminalInteractiveShell.editor = 'subl'
+#  Default: 'subl -nw'
+# c.TerminalInteractiveShell.editor = 'subl -nw'
 
 ## Add shortcuts from 'emacs' insert mode to 'vi' insert mode.
 #  Default: True
@@ -701,7 +701,7 @@ c.InteractiveShell.colors = 'neutral'
 # c.TerminalInteractiveShell.llm_prefix_from_history = 'input_history'
 
 ## Provisional:
-#      This is a provisinal API in IPython 8.32, before stabilisation
+#      This is a provisional API in IPython 8.32, before stabilisation
 #      in 9.0, it may change without warnings.
 #  
 #  class to use for the `NavigableAutoSuggestFromHistory` to request completions
@@ -920,7 +920,7 @@ c.InteractiveShell.colors = 'neutral'
 #  
 #              printf "\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n"
 #  Default: False
-# c.TerminalInteractiveShell.true_color = False
+c.TerminalInteractiveShell.true_color = True
 
 ## The time in milliseconds that is waited for a key code
 #         to complete.
@@ -1078,8 +1078,8 @@ c.InteractiveShell.colors = 'neutral'
 #  special print methods). The easiest way of using these dictionaries is through
 #  the :meth:`for_type` and :meth:`for_type_by_name` methods.
 #  
-#  If no function/callable is found to compute the format data, ``None`` is
-#  returned and this format type is not used.
+#  If no function/callable is found to compute the format data, :py:data:`None`
+#  is returned and this format type is not used.
 
 #  Default: {}
 # c.BaseFormatter.deferred_printers = {}
@@ -1159,6 +1159,18 @@ c.InteractiveShell.colors = 'neutral'
 #  Default: False
 # c.Completer.auto_close_dict_keys = False
 
+## Provisional:
+#        This is a provisional API in IPython 9.3, it may change without warnings.
+#  
+#  A fully qualified path to an auto-import method for use by completer. The
+#  function should take a single string and return `ModuleType` and can raise
+#  `ImportError` exception if module is not found.
+#  
+#  The default auto-import implementation does not populate the user namespace
+#  with the imported module.
+#  Default: 'importlib.import_module'
+# c.Completer.auto_import_method = 'importlib.import_module'
+
 ## Enable unicode completions, e.g. \alpha<tab> . Includes completion of latex
 #  commands, unicode names, and expanding unicode characters back to latex
 #  commands.
@@ -1182,15 +1194,18 @@ c.InteractiveShell.colors = 'neutral'
 #  
 #          - ``forbidden``: no evaluation of code is permitted,
 #          - ``minimal``: evaluation of literals and access to built-in namespace;
-#            no item/attribute evaluationm no access to locals/globals,
+#            no item/attribute evaluation, no access to locals/globals,
 #            no evaluation of any operations or comparisons.
 #          - ``limited``: access to all namespaces, evaluation of hard-coded methods
-#            (for example: :any:`dict.keys`, :any:`object.__getattr__`,
-#            :any:`object.__getitem__`) on allow-listed objects (for example:
-#            :any:`dict`, :any:`list`, :any:`tuple`, ``pandas.Series``),
+#            (for example: :py:meth:`dict.keys`, :py:meth:`object.__getattr__`,
+#            :py:meth:`object.__getitem__`) on allow-listed objects (for example:
+#            :py:class:`dict`, :py:class:`list`, :py:class:`tuple`, ``pandas.Series``),
 #          - ``unsafe``: evaluation of all methods and function calls but not of
 #            syntax with side-effects like `del x`,
-#          - ``dangerous``: completely arbitrary evaluation.
+#          - ``dangerous``: completely arbitrary evaluation; does not support auto-import.
+#  
+#          To override specific elements of the policy, you can use
+#  ``policy_overrides`` trait.
 #  Choices: any of ['forbidden', 'minimal', 'limited', 'unsafe', 'dangerous']
 #  Default: 'limited'
 # c.Completer.evaluation = 'limited'
@@ -1214,6 +1229,17 @@ c.InteractiveShell.colors = 'neutral'
 #  Default: 400
 # c.Completer.jedi_compute_type_timeout = 400
 
+## Overrides for policy evaluation.
+#  
+#          For example, to enable auto-import on completion specify:
+#  
+#          .. code-block::
+#  
+#              ipython --Completer.policy_overrides='{"allow_auto_import": True}'
+#  --Completer.use_jedi=False
+#  Default: {}
+# c.Completer.policy_overrides = {}
+
 ## Experimental: Use Jedi to generate autocompletions. Default to True if jedi is
 #  installed.
 #  Default: True
@@ -1227,6 +1253,10 @@ c.InteractiveShell.colors = 'neutral'
 ## 
 #  See also: Completer.auto_close_dict_keys
 # c.IPCompleter.auto_close_dict_keys = False
+
+## Provisional:
+#  See also: Completer.auto_import_method
+# c.IPCompleter.auto_import_method = 'importlib.import_module'
 
 ## Enable unicode completions, e.g. \alpha<tab> . Includes completion of latex
 #  commands, unicode names, and expanding unicode characters back to latex
@@ -1293,6 +1323,10 @@ c.InteractiveShell.colors = 'neutral'
 #  Choices: any of [0, 1, 2]
 #  Default: 2
 # c.IPCompleter.omit__names = 2
+
+## Overrides for policy evaluation.
+#  See also: Completer.policy_overrides
+# c.IPCompleter.policy_overrides = {}
 
 ## If True, emit profiling data for completion subsystem using cProfile.
 #  Default: False

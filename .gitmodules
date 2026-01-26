@@ -39,3 +39,6 @@
 [submodule ".config/yazi/plugins/faster-piper.yazi"]
 	path = .config/yazi/plugins/faster-piper.yazi
 	url = git@github.com:alberti42/faster-piper.yazi.git
+[submodule ".local/share/EXIF-Syntax"]
+	path = .local/share/EXIF-Syntax
+	url = git@github.com:alberti42/EXIF-Syntax.git
