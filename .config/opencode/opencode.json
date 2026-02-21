@@ -24,18 +24,23 @@
     "bash": {                    // running shell commands (matches parsed commands like git status --porcelain)
       "*": "ask",
       "git *": "ask",
-      "git checkout *": "allow",
-      "git clone *": "allow",
-      "git log *": "allow",
-      "git status *": "allow",
-      "git show *": "allow",
-      "git diff *": "allow",
+      "git checkout*": "allow",
+      "git clone*": "allow",
+      "git log*": "allow",
+      "git status*": "allow",
+      "git show*": "allow",
+      "git diff*": "allow",
       "npm *": "allow",
       "rm *": "deny",
       "grep *": "allow",
       "ls *": "allow",
       "cat *": "allow",
       "mkdir *": "allow",
+      "rg *": "allow",
+      "fd *": "allow",
+      "find *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
     },             
     "task": "allow",             // launching subagents (matches the subagent type)
     "skill": "ask",              // loading a skill (matches the skill name)
@@ -50,6 +55,7 @@
       "~/Downloads/*": "allow",
       "/tmp/*": "allow"
     },
+    "things_*": "allow",
     "doom_loop": "ask"           // triggered when the same tool call repeats 3 times with identical input
   },
   "agent": {
@@ -68,15 +74,60 @@
         "todowrite": "ask"       // writing the todo list
       }
     },
+    "build": {
+      "temperature":0.1
+    }
   },
   "mcp": {
+    "context7": {
+      "type": "local",
+      "command": ["npx", "-y", "@upstash/context7-mcp", "--api-key", "ctx7sk-98b20b8d-b532-4ee5-8e11-2079bf7a8f7e"],
+      "enabled": true
+    },
+    "things": {
+      "type": "local",
+      "command": ["uvx", "things-mcp"],
+      "enabled": true
+    },
+    /*
     "knuspr": {
-      "type": "remote",
-      "url": "https://mcp.knuspr.de/mcp/",
-      "enabled": true,
-      "headers": {
-        "rhl-email": "...",
-        "rhl-pass": "..."
+      "type": "local",
+      "command": [
+        "npx",
+        "mcp-remote",
+        "https://mcp.knuspr.de/mcp/",
+        "--header",
+        "rhl-email: {env:RHL_EMAIL}",
+        "--header",
+        "rhl-pass: {env:RHL_PASS}"
+      ],
+      "enabled": false
+    },
+    */
+    "strava": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@r-huijts/strava-mcp-server"
+      ],
+      "enabled": true
+    }
+  },
+  "plugin": [
+    "@mohak34/opencode-notifier@latest",
+    "opencode-anthropic-auth@latest",
+    // "opencode-gemini-auth@latest"
+  ],
+  "provider": {
+    "openai": {
+      "models": {
+        "gpt-mini": {
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          }
+        }
       }
     }
   }

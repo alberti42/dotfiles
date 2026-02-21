@@ -148,5 +148,9 @@
         "key": "cmd+alt+t",
         "command": "workbench.action.tasks.runTask",
         "args": "New Tmux Window + Focus WezTerm"
+    },
+    {
+        "key": "ctrl+shift+p",
+        "command": "editor.action.inspectTMScopes"
     }
 ]

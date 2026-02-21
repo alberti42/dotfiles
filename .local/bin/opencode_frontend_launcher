@@ -1,0 +1,19 @@
+#!/usr/bin/env -S zsh -fd
+
+set -euo pipefail
+set -o err_return
+trap 'cmd=${ZSH_DEBUG_CMD-<unknown>}; print -u2 -- "ERROR: ${0:t} line $LINENO: $cmd (exit $?)"; exit 1' ERR
+
+local launcher_dir=${0:A:h}
+
+local ROOT_DIR="$HOME/Documents/Programming/Third Party/fork-opencode"
+
+cd "${ROOT_DIR}"
+
+# Only needed if we want to rebuild the UI, e.g., after fetching new changes upstream
+# bun run --cwd packages/app build
+
+# Serve a static website on 4444
+exec "$launcher_dir/fast-launcher-with-pyenv.zsh" py313 bun run --cwd packages/app dev -- --port 4444
+
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

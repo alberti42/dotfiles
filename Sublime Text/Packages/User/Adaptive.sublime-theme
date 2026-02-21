@@ -3,8 +3,13 @@
   "variables":
   {
   },
-  "rules":
-  [
-    
+  "rules": [
+    // Only affects inactive sheets; active stays EXACT scheme background
+    // {
+    //   "class": "sheet_contents",
+    //   "settings": ["inactive_sheet_dimming"],
+    //   "attributes": ["!highlighted"],
+    //   "background_modifier": "blend(#000 80%)"
+    // }, 
   ]
 }

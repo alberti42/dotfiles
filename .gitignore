@@ -3,6 +3,8 @@
 Sublime Text/Packages/User/OverrideAudit.status
 Sublime Text/Packages/User/ApplySyntax.ext-list
 **/*.zwc
+**/*.elc
+**/*.pyc
 .local/share/tmux/resurrect/*
 .config/btop/btop.log
 .config/emacs/eln-cache/

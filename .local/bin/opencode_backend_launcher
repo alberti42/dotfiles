@@ -1,0 +1,24 @@
+#!/usr/bin/env -S zsh -fd
+
+set -euo pipefail
+set -o err_return
+trap 'cmd=${ZSH_DEBUG_CMD-<unknown>}; print -u2 -- "ERROR: ${0:t} line $LINENO: $cmd (exit $?)"; exit 1' ERR
+
+local launcher_dir=${0:A:h}
+
+# Move root (just to make it clear where start; this is already by default the current working directory)
+cd /
+
+# Check GitHub PR https://github.com/anomalyco/opencode/pull/9095 for when the bug is fixed
+# source "$HOME/.local/envs/opencode"
+
+# export OPENCODE_SERVER_USERNAME="$OPENCODE_SERVER_USERNAME"
+# export OPENCODE_SERVER_PASSWORD="$OPENCODE_SERVER_PASSWORD"
+
+# Source shell variable from interactive shell
+. "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/interactive-shell-env.sh"
+
+# Serve opencode backend
+exec opencode serve --port 4096
+
+# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

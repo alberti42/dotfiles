@@ -79,42 +79,44 @@ reload!() {
 # set the cursor style explictly
 restore_cursor() {
   emulate -LR zsh
+  # Blinking bar
   echo -ne '\e[5 q'
 }
 
-# launch a given utility with proper restoration of cursor after exiting
+# Wrapper functions to launch a given utility with proper restoration of cursor after exiting
 wrap_restore_cursor() {
   emulate -LR zsh
-  for cmd in "$@"; do
-    eval "
-${cmd}() {
-  command ${cmd} \"\$@\"
-  local rc=\$?
-  restore_cursor
-  return \$rc
-}
-"
-  done
-}
+  setopt localoptions no_aliases
 
-is_dark_appearance() {
-  emulate -LR zsh
-  local __is_dark="0"  # default answer
-  if [[ -n "$TMUX" ]]; then
-    __is_dark=$(tmux show-options -qv @dark_appearance)  
-    __is_dark="${__is_dark[1]:-0}" # select first character (1-based indexing)
-  else
-    if [[ $OSTYPE =~ 'darwin*' ]]; then
-      if [[ $(defaults read $HOME/Library/Preferences/.GlobalPreferences.plist AppleInterfaceStyle 2>/dev/null) = Dark ]]; then
-        __is_dark=1
-      else
-        __is_dark=0
-      fi
+  local cmd orig safe
+
+  for cmd in "$@"; do
+    # Make a safe backup function name (in case cmd has odd chars)
+    safe=${cmd//[^A-Za-z0-9_]/_}
+    orig="__restore_cursor_orig_${safe}"
+
+    if (( $+functions[$cmd] )); then
+      # It's a zsh function: copy it, so the wrapper can call the original
+      functions -c -- "$cmd" "$orig"
     else
-      # Linux
+      # Not a function: treat as command/builtin (also avoids aliases due to no_aliases)
+      if ! whence -w -- "$cmd" >/dev/null; then
+        print -u2 -- "wrap_restore_cursor: not found: $cmd"
+        continue
+      fi
+
+      # Create a small trampoline that dispatches via `command`
+      eval "function $orig() { command $cmd \"\$@\" }"
     fi
-  fi
-  printf "%s" $__is_dark
+
+    # Define the wrapper itself
+    eval "function $cmd() {
+      $orig \"\$@\"
+      local rc=\$?
+      restore_cursor
+      return \$rc
+    }"
+  done
 }
 
 pip_upgrade_outdated() {

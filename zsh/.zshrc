@@ -43,15 +43,18 @@ zinit light-mode lucid depth=1 for \
 # OMZ libs and plugins   #
 ##########################
 
-# Check https://github.com/ohmyzsh/ohmyzsh/tree/master/lib
-zinit wait lucid light-mode depth=1 for \
-    OMZL::clipboard.zsh \
-    OMZL::grep.zsh
-    # OMZL::completion.zsh \
-    # OMZL::correction.zsh \
-    # OMZL::spectrum.zsh \
-    # OMZL::history.zsh \
-    # OMZL::compfix.zsh
+# Check https://github.com/ohmyzsh/ohmyzsh
+
+declare -a OMZ_plugins=(
+  OMZL::clipboard.zsh
+  OMZL::grep.zsh
+  # OMZL::completion.zsh
+  # OMZL::correction.zsh
+  # OMZL::spectrum.zsh
+  # OMZL::history.zsh
+  # OMZL::compfix.zsh
+)
+zinit wait lucid light-mode depth=1 for $OMZ_plugins[@]
 
 # Plugin binding GNU coreutils to their default names
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/gnu-utils/gnu-utils.zsh"
@@ -125,11 +128,22 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
     # Import useful zsh completions
     blockf completions $__local_plugin_path/zsh-misc-completions
 
-    # Import useful misc zsh functions
-    atload:"wrap_restore_cursor nvim yazi tmux ipython; restore_cursor" $__local_plugin_path/zsh-misc-functions
+    # Import zsh-opencode-tab (make sure to import it after fzf-tab)
+    wait'0c' atinit'
+      export Z_OC_TAB_OPENCODE_MODEL="anthropic/claude-3-5-haiku-latest" \
+      Z_OC_TAB_OPENCODE_BACKEND_URL="http://localhost:4096" \
+      Z_OC_TAB_OPENCODE_RUN_MODE="attach" \
+      Z_OC_TAB_EXPLAIN_PRINT_CMD="bat --plain --color=always --decorations=always --language markdown --paging=never {}"' \
+      $__local_plugin_path/zsh-opencode-tab
+
+    # Import useful misc zsh functions (make sure to execute this wrapper after the other plugins have been loaded)
+    wait'0c' atload:"wrap_restore_cursor nvim yazi tmux ssh-tmux ipython opencode; restore_cursor" $__local_plugin_path/zsh-misc-functions
   )
   zinit lucid wait light-mode for "${__local_plugins[@]}"
 }
+
+# Import zsh-appearance-control
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zac/zac.zsh"
 
 # Wrapper snippet for astral-sh/uv
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/uv/uv.zsh"
@@ -146,6 +160,20 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/yazi/yazi.zsh"
 # Wrapper snippet for Tmux
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tmux/tmux.zsh"
 
+# Import zsh-opencode-tab
+# zinit lucid wait depth=1 from'gh' compile for \
+#   wait'0c' atinit'export Z_OC_TAB_OPENCODE_MODEL="anthropic/claude-3-5-haiku-latest" \
+#     Z_OC_TAB_SPINNER_BG_HEX="#24273A" \
+#     Z_OC_TAB_OPENCODE_BACKEND_URL="http://localhost:4096" \
+#     Z_OC_TAB_OPENCODE_RUN_MODE="cold" \
+#     Z_OC_TAB_EXPLAIN_PRINT_CMD="bat --plain --color=always --decorations=always --language markdown --paging=never {}"' \
+#   @alberti42/zsh-opencode-tab
+
+# Import zsh-indent-control
+zinit lucid wait'0c' depth=1 from'gh-r' extract'!' compile for \
+  wait'0c' atinit:"export ZLE_INDENT_WIDTH=2" \
+  @alberti42/zsh-indent-control
+
 # Import Tmux Plugins
 () {
   local __tmux_plugins=(
@@ -154,20 +182,23 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tmux/tmux.zsh"
     # @tmux-plugins/tmux-battery
     # id-as'tmux-plugins/tmux-tokyo-night' @janoamaral/tokyo-night-tmux
     # id-as'tmux-plugins/tmux-catppuccin' @catppuccin/tmux \
-    @tmux-plugins/tmux-yank
+    # @tmux-plugins/tmux-yank
     id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect
     id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend
     # id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus
-    depth='' id-as'tmux-plugins/tmux-fzf-links' @alberti42/tmux-fzf-links
+    from'gh-r' id-as'tmux-plugins/tmux-fzf-links' atclone'mv tmux-fzf-links-*/* . && rm -r tmux-fzf-links-[0-9]*' atpull'%atclone' @alberti42/tmux-fzf-links
   )
   zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for "${__tmux_plugins[@]}" 
 }
 
 # Import tig
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tig/tig.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tig/tig.zsh"
+
+# Import dash
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/gh-dash/gh-dash.zsh"
 
 # Import plugin to synchronize tmux window with ssh sessions 
-zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
+# zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
 
 # Import 7z
 zinit binary lucid wait light-mode depth=1 from'gh-r' lbin'7zz -> 7zz' for @ip7z/7zip  
@@ -188,13 +219,16 @@ zinit binary lucid light-mode wait from'gh-r' lbin'**/rg(.exe|) -> rg' cp"ripgre
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/btop/btop.zsh"
 
 # Import viu
-zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'viu* -> viu' for @atanunq/viu
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/lsp-ltex-plus/lsp-ltex-plus.zsh"
+
+# Import viu
+# zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'viu* -> viu' for @atanunq/viu
+
+# Import imgcat
+# zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'imgcat -> imgcat' for @danielgatis/imgcat 
 
 # Import neovim
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/neovim/neovim.zsh"
-
-# Import imgcat
-zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'imgcat -> imgcat' for @danielgatis/imgcat 
 
 # Import superfile
 zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'dist/superfile*/spf -> spf' for @yorukot/superfile
@@ -294,8 +328,8 @@ if [[ -n $SSH_CONNECTION ]]; then
   # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
   editor_cmd=(rsubl -w)
 else
-  # editor_app="emacsclient -a= -nw -c"  # Local emacs
-  editor_cmd=(subl -nw)
+  editor_cmd=(emacsclient '-a=' '-nw' '-c')  # Emacs
+  # editor_cmd=(subl -nw)
 fi
 
 # Check whether the editor is found in the path
@@ -354,7 +388,12 @@ alias 7='cd -7'
 alias 8='cd -8'
 alias 9='cd -9'
 
-alias e='emacsclient -a= -nw -c'
+alias e='emacsclient -a= -nw'     # opens terminal frame, blocking
+alias ew='emacsclient -a= -n -c'  # opens GUI frame, non-blocking
+alias emacs='emacs -nw'
+
+alias oc='EDITOR="emacsclient -a= -nw -c" opencode attach http://localhost:4096 --dir .'
+alias claude='EDITOR="emacsclient -a= -nw -c" claude'
 
 alias diff='diff --color=auto'
 
@@ -385,11 +424,12 @@ alias rsync='rsync -e "ssh -o RemoteCommand=None -o RequestTTY=no"'
 alias zip='zip --symlinks --exclude "**/.DS_Store"'
 alias rga='rg --no-ignore -aL.'
 alias fda='fd -HI'
+# alias opencode='opencode attach http://127.0.0.1:4096'
 # alias mc='mc --nosubshell'
 
 ##########################
 # Local customizations   #
 ##########################
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rc_local.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rc_local.zsh"
 
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

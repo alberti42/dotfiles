@@ -15,8 +15,9 @@ if [ -d "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password" ]; then
   export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 fi
 
-# You may need to manually set your language environment
+# Set the language environment
 export LANG=en_US.UTF-8
+export LC_TIME=en_GB.UTF-8  # How to check it: locale -k LC_TIME
 
 # Configure path
 if [[ "/usr/local/bin" ]]; then
@@ -113,6 +114,18 @@ fi
 path+=("$HOME/.cargo/bin")
 
 ###########################
+# JAVA SETUP              #
+###########################
+if [[ $OSTYPE == darwin* ]]; then
+  # macOS → JAVA_HOME="$(/usr/libexec/java_home)"
+  export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home"
+else
+  # Linux
+  # export JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+fi
+export PATH="$JAVA_HOME/bin:$PATH"
+
+###########################
 # os default paths        #
 ###########################
 
@@ -120,12 +133,12 @@ if [[ $OSTYPE == darwin* ]]; then
   # Execution time ~ 3m
   # eval $(/usr/libexec/path_helper -s)
 
-  local -a added_paths=( \
-    /usr/local/bin \
-    /usr/bin \
-    /bin \
-    /usr/sbin \
-    /sbin \
+  local -a added_paths=(
+    /usr/local/bin
+    /usr/bin
+    /bin
+    /usr/sbin
+    /sbin
   )  
   # append the dirs
   path+=(${^added_paths})

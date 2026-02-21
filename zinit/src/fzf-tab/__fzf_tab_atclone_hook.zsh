@@ -3,7 +3,6 @@
 function __fzf_tab_atclone_hook() {
   [[ -n ${commands[gsed]} ]] && local PREFIX=${${(M)OSTYPE##darwin}:+g}
   
-  : >! ./lib/zsh-ls-colors/ls-colors.zsh &&
   {
     for f in ./lib/*(.N); do
       IFS= read -r firstline < "$f" || continue

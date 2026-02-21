@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<false/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>Label</key>
+	<string>org.alberti42.opencode.frontend</string>
+	<key>LowPriorityIO</key>
+	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/andrea/google-drive/dotfiles/.local/bin/opencode_frontend_launcher</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>

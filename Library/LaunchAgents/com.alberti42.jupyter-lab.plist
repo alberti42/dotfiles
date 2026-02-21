@@ -14,7 +14,7 @@
 	<key>KeepAlive</key>
 	<true/>
 	<key>Label</key>
-	<string>org.alberti42.jupyter-lab</string>
+	<string>com.alberti42.jupyter-lab</string>
 	<key>LowPriorityIO</key>
 	<true/>
 	<key>ProgramArguments</key>

@@ -1,29 +1,4 @@
 --[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
-
-What is Kickstart?
-
-  Kickstart.nvim is *not* a distribution.
-
   Kickstart.nvim is a starting point for your own configuration.
     The goal is that you can read every line of code, top-to-bottom, understand
     what your configuration is doing, and modify it to suit your needs.
@@ -231,9 +206,15 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 -- Provide the path to python:
-vim.g.python3_host_prog = vim.fn.expand '~/.pyenv/versions/py313/bin/python3'
--- OR completely disable the provider:
--- vim.g.loaded_python3_provider = 0
+-- Disable all external language providers ("remote providers").
+-- This removes :checkhealth noise unless you actively use :python3, :node, etc.
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
+-- If you want to re-enable Python provider later, set python3_host_prog and remove the line above:
+-- vim.g.python3_host_prog = vim.fn.expand '~/.pyenv/versions/py313/bin/python3'
 -- then your usual lazy bootstrap + setup
 
 ---@type vim.Option
@@ -551,8 +532,8 @@ require('lazy').setup {
         -- Automatically install LSPs and related tools to stdpath for Neovim
         -- Mason must be loaded before its dependents so we need to set it up here.
         -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-        { 'mason-org/mason.nvim', opts = {} },
-        'mason-org/mason-lspconfig.nvim',
+        { 'williamboman/mason.nvim', opts = {} },
+        'williamboman/mason-lspconfig.nvim',
         'WhoIsSethDaniel/mason-tool-installer.nvim',
 
         -- Useful status updates for LSP.
@@ -1010,27 +991,24 @@ require('lazy').setup {
     { -- Highlight, edit, and navigate code
       'nvim-treesitter/nvim-treesitter',
       build = ':TSUpdate',
-      main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
       opts = {
         ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
-        -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = {
           enable = true,
-          -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-          --  If you are experiencing weird indenting issues, add the language to
-          --  the list of additional_vim_regex_highlighting and disabled languages for indent.
           additional_vim_regex_highlighting = { 'ruby' },
         },
         indent = { enable = true, disable = { 'ruby' } },
       },
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+      config = function(_, opts)
+        -- Your tree-sitter CLI rejects `--no-bindings`, so override what nvim-treesitter uses.
+        require('nvim-treesitter.install').ts_generate_args = {
+          'generate',
+          '--abi',
+          tostring(vim.treesitter.language_version),
+        }
+        require('nvim-treesitter.configs').setup(opts)
+      end,
     },
     { -- Install catppuccin for neovim
       'catppuccin/nvim',
@@ -1108,37 +1086,8 @@ require('lazy').setup {
       end,
     },
 
-    -- Auto-dark-mode plugin (see https://github.com/f-person/auto-dark-mode.nvim)
-    {
-      'alberti42/fork-auto-dark-mode.nvim',
-      branch = 'merged',
-      name = 'auto-dark-mode',
-      priority = 1000, -- make sure catppuccin loads before auto-dark-mode
-      -- Load only when a desktop/GUI is available.
-      -- Works on Linux/Wayland/X11 and on macOS local terminals (no DISPLAY),
-      -- but *skips* raw SSH TTY sessions unless a display is forwarded.
-      config = function()
-        local plugin = require 'auto-dark-mode'
-
-        plugin.setup {
-          fallback = 'dark',
-          update_interval = 3000,
-          sync_start = true,
-
-          set_dark_mode = function()
-            vim.g.current_appearance = 'dark'
-            -- vim.notify("[auto-dark-mode] detected: dark", vim.log.levels.INFO)
-            vim.cmd.colorscheme 'catppuccin-macchiato'
-          end,
-
-          set_light_mode = function()
-            vim.g.current_appearance = 'light'
-            -- vim.notify("[auto-dark-mode] detected: light", vim.log.levels.INFO)
-            vim.cmd.colorscheme 'catppuccin-frappe'
-          end,
-        }
-      end,
-    },
+    -- Appearance switching is now handled by a tiny file watcher.
+    -- See: colorscheme.lua (zsh-appearance-control integration).
 
     -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
     -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -1193,6 +1142,10 @@ require('lazy').setup {
     enabled = false, -- enable support for luarocks
   },
 }
+
+-- Load auto-color-scheme:
+-- watches ZAC_CACHE_DIR/appearance (0/1) and switches colorscheme live.
+dofile(vim.fn.stdpath 'config' .. '/auto-color-scheme.lua')
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

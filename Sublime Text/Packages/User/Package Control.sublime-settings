@@ -25,6 +25,7 @@
     "Fix Mac Path",
     "GenerateUUID",
     "GitGutter",
+    "GitSavvy",
     "Hosts",
     "HTML-CSS-JS Prettify",
     "Ipynb Preview as Markdown",
@@ -62,6 +63,7 @@
     "Package Reloader",
     "PackageDev",
     "PackageResourceViewer",
+    "PEG.js",
     "PlatformSettings",
     "plist",
     "Plist Binary",
@@ -87,7 +89,6 @@
     "VimModelines",
     "Wolfram Mathematica Notebook Viewer",
     "WolframLanguage",
-    "ZSH",
   ],
   "debug": false,
   "in_process_packages":

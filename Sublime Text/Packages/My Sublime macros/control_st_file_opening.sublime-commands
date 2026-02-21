@@ -1,0 +1,4 @@
+[
+	{ "caption": "File: New Scratch", "command": "new_scratch" },
+	{ "caption": "File: Close Without Saving", "command": "close_without_saving" },
+]

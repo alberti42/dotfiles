@@ -22,7 +22,7 @@ sort_dir_first = false
 sort_translit  = false
 
 # Line mode: show extra info on the right side of each file row (size/mtime/etc.)
-linemode       = "none"
+linemode       = "my_default"
 
 # Show hidden files
 show_hidden    = false

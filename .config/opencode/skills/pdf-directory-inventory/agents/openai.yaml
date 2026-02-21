@@ -1,0 +1,7 @@
+interface:
+  display_name: "PDF Directory Inventory"
+  short_description: "OCR + summarize PDFs into markdown index"
+  default_prompt: "Use $pdf-directory-inventory to inventory the PDFs in the current directory into pdf_inventory.md, OCRing scanned PDFs and moving files into pdf_inventory (attachments)."
+
+policy:
+  allow_implicit_invocation: true

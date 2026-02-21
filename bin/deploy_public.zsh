@@ -242,30 +242,6 @@ sanitize_sublime_ltex() {
     '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")\.\.\.(")'
 }
 
-sanitize_launchd_env() {
-  # 4) .local/bin/launchd-env.zsh
-  strict_redact_and_stage \
-    ".local/bin/launchd-env.zsh" \
-    '^(export[[:space:]]+OPENCODE_SERVER_PASSWORD[[:space:]]*=[[:space:]]*)"[^"]*"' \
-    's/^(export[[:space:]]+OPENCODE_SERVER_PASSWORD[[:space:]]*=[[:space:]]*)"[^"]*"/\1"..."/g' \
-    '^(export[[:space:]]+OPENCODE_SERVER_PASSWORD[[:space:]]*=[[:space:]]*)"\.\.\."'
-}
-
-sanitize_opencode_knuspr() {
-  # 5) .config/opencode/opencode.json
-  # Hide knuspr MCP credentials.
-  strict_redact_and_stage \
-    ".config/opencode/opencode.json" \
-    '("rhl-email"\s*:\s*")[^"]*(")' \
-    's/("rhl-email"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("rhl-email"\s*:\s*")\.\.\.(")'
-  strict_redact_and_stage \
-    ".config/opencode/opencode.json" \
-    '("rhl-pass"\s*:\s*")[^"]*(")' \
-    's/("rhl-pass"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("rhl-pass"\s*:\s*")\.\.\.(")'
-}
-
 drop_from_public() {
   # Fail-closed: if the file moved/renamed/untracked, abort.
   local file_to_be_dropped
@@ -316,19 +292,6 @@ verify_sanitization() {
     "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings" \
     || die "Redacted ltex.ltex-ls.languageToolOrgApiKey not found in Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings"
 
-  assert_file_exists ".local/bin/launchd-env.zsh"
-  sed_has_match '^(export[[:space:]]+OPENCODE_SERVER_PASSWORD[[:space:]]*=[[:space:]]*)"\.\.\."' \
-    ".local/bin/launchd-env.zsh" \
-    || die "Redacted OPENCODE_SERVER_PASSWORD not found in .local/bin/launchd-env.zsh"
-
-  assert_file_exists ".config/opencode/opencode.json"
-  sed_has_match '("rhl-email"\s*:\s*")\.\.\.(")' \
-    ".config/opencode/opencode.json" \
-    || die "Redacted rhl-email not found in .config/opencode/opencode.json"
-  sed_has_match '("rhl-pass"\s*:\s*")\.\.\.(")' \
-    ".config/opencode/opencode.json" \
-    || die "Redacted rhl-pass not found in .config/opencode/opencode.json"
-
   # Verify private-only paths are no longer tracked.
   if git ls-files --error-unmatch -- "Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json" >/dev/null 2>&1; then
     die "Private-only file is still tracked: Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
@@ -340,10 +303,8 @@ sanitize_all() {
   sanitize_sublime_sftp
   sanitize_vscode_settings
   sanitize_sublime_ltex
-  sanitize_launchd_env
-  sanitize_opencode_knuspr
-
-    # Files that must NEVER be published
+    
+  # Files that must NEVER be published
   local -a PRIVATE_ONLY_FILES=(
     "Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
   )

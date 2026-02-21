@@ -207,6 +207,53 @@ zle -N x-backward-kill-word
 zle -N x-kill-word
 zle -N x-backward-kill-word
 
+# Enable url-quote-magic: it replaces self-insert while editing the command line.
+# When you type a URL and you hit a character that the shell would normally treat
+# specially (?, &, #, ;, *, (, ), {}, |, <, >, etc), it auto-inserts a backslash
+# in front of it only if the current “word” looks like it has a URI scheme
+# (e.g. http://, https://, ftp://, file://) and the word isn’t already quoted.
+autoload -Uz url-quote-magic
+zle -N self-insert url-quote-magic
+
+bracketed-paste-fast-filter() {
+  local PASTED
+  zle .bracketed-paste PASTED || return
+  if (( ${+NUMERIC} )); then
+    case $NUMERIC in
+      (0)
+        # shell-escape as one word (usually backslashes; no surrounding quotes)
+        PASTED=${(q)PASTED}
+        ;;
+      (1)
+        # single-quoted string, including the surrounding quotes
+        PASTED=${(qq)PASTED}
+        ;;
+      (2)
+        # double-quoted string (escape the chars that are special inside "")
+        PASTED=${(qqq)PASTED}
+        ;;
+    esac
+  fi
+  LBUFFER+=$PASTED
+  zle -f yank
+}
+zle -N bracketed-paste bracketed-paste-fast-filter
+
+# Main utility of bracketed-paste (https://en.wikipedia.org/wiki/Bracketed-paste) is safety
+# It makes pasted text get inserted as literal text into the ZLE buffer, instead of being
+# "replayed" as a stream of keystrokes that can trigger editor widgets/bindings mid-paste.
+# 
+# This is relevant for:
+#
+# - Newlines in the paste: a naive paste can effectively "press Enter" and run partial
+#   commands as it arrives; bracketed paste keeps it as inserted text for the editor to
+#   accept as one paste (it still inserts newlines into the buffer, but zsh treats it as
+#   paste content rather than interactive typing).
+# - Control sequences / key bindings embedded in the paste (or timing issues): without
+#   bracketed paste, pasting could accidentally invoke widgets bound to those sequences.
+bindkey -M emacs $'\e[200~' bracketed-paste # binding for bracketed paste
+printf '\033[?2004h'   # enable bracketed paste mode in the terminal
+
 # Disable ZLE correction
 # We prefer zstyle ':completion:*' completer _complete _approximate
 unsetopt correct correctall

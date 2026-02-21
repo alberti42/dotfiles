@@ -42,3 +42,12 @@
 [submodule ".local/share/EXIF-Syntax"]
 	path = .local/share/EXIF-Syntax
 	url = git@github.com:alberti42/EXIF-Syntax.git
+[submodule "oh-my-zsh/custom/plugins/zsh-opencode-tab"]
+	path = oh-my-zsh/custom/plugins/zsh-opencode-tab
+	url = git@github.com:alberti42/zsh-opencode-tab.git
+[submodule "oh-my-zsh/custom/plugins/zsh-indent-control"]
+	path = oh-my-zsh/custom/plugins/zsh-indent-control
+	url = git@github.com:alberti42/zsh-indent-control
+[submodule "oh-my-zsh/custom/plugins/zsh-appearance-control"]
+	path = oh-my-zsh/custom/plugins/zsh-appearance-control
+	url = git@github.com:alberti42/zsh-appearance-control.git

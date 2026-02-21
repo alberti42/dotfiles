@@ -7,14 +7,12 @@
 	<key>KeepAlive</key>
 	<true/>
 	<key>Label</key>
-	<string>org.alberti42.opencode</string>
+	<string>com.alberti42.opencode.backend</string>
 	<key>LowPriorityIO</key>
 	<true/>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Users/andrea/google-drive/dotfiles/.local/bin/zsh_macos_arm_launcher</string>
-		<string>-fdc</string>
-		<string>source "$HOME/.config/dotfiles/.local/bin/launchd-env.zsh" &amp;&amp; pyenv activate py313 &amp;&amp; exec opencode serve --port 4096</string>
+		<string>/Users/andrea/google-drive/dotfiles/.local/bin/opencode_backend_launcher</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

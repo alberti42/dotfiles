@@ -1,4 +1,3 @@
-
 {
     // If you want exceptions reraised so you can see them in the console, change this to true.
     "reraise_exceptions": false,
@@ -17,8 +16,7 @@
         {
             "syntax": "SSH Config/syntax/SSH Config",
             "rules": [
-                {"file_path": ".*/\\.ssh/config(~|$)"},
-                {"file_path": ".*/ssh_config(~|$)"},
+                {"file_path": "\\.ssh/config(~|$)"},
             ],
         },
         {
@@ -31,6 +29,12 @@
             "syntax": "Git Formats/Git Config",
             "rules": [
                 {"file_path": ".*/git/config(~|$)"},
+            ],
+        },
+        {
+            "syntax": "YAML/YAML",
+            "rules": [
+                {"file_path": ".*.base"},
             ],
         }
     ],

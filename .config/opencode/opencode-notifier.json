@@ -1,0 +1,27 @@
+{
+  "sound": true,
+  "notification": false,
+  "timeout": 0,
+  "showProjectName": true,
+  "events": {
+    "permission": { "sound": true, "notification": false },
+    "complete": { "sound": true, "notification": false },
+    "subagent_complete": { "sound": false, "notification": false },
+    "error": { "sound": true, "notification": false },
+    "question": { "sound": true, "notification": false }
+  },
+  "messages": {
+    "permission": "Session needs permission",
+    "complete": "Session has finished",
+    "subagent_complete": "Subagent task completed",
+    "error": "Session encountered an error",
+    "question": "Session has a question"
+  },
+  "sounds": {
+    "permission": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/alert-01.aac",
+    "complete": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/staplebops-01.aac",
+    "subagent_complete": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/yup-01.aac",
+    "error": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/nope-01.aac",
+    "question": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/bip-bop-01.aac"
+  }
+}

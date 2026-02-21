@@ -71,7 +71,7 @@
         ]
     },
     {
-        "keys": ["super+l","p"],
+        "keys": ["super+l","super+p"],
         "command": "insert_snippet",
         "args": { "contents": "\\result[${1:1}]{${2:$SELECTION}}$0" },
         "context":

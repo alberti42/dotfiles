@@ -31,7 +31,7 @@ function __fzf_tab_init_hook() {
   zstyle ':fzf-tab:complete:*:options' fzf-preview ''
 
   # underline the active group label
-  zstyle ':fzf-tab:*' active-group-style underline,bold
+  zstyle ':fzf-tab:*' active-group-style underline bold
 
   # no preview for subcommands
   # zstyle ':fzf-tab:complete:*:argument-1' fzf-preview ''

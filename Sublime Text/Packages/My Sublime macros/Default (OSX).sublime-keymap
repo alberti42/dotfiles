@@ -1,0 +1,4 @@
+[
+    // Override Cmd+W to use smart close
+    { "keys": ["super+w"], "command": "smart_close" }
+]

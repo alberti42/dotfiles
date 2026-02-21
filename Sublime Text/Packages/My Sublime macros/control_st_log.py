@@ -31,3 +31,5 @@ class ToggleInputLoggingCommand(sublime_plugin.ApplicationCommand):
         else:
             sublime.log_input(False)  # Disable input logging too
             sublime.status_message("Stopped logging input.")
+
+# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 :

@@ -23,25 +23,21 @@ wezterm.on("gui-startup", function(cmd)
   }
 
   window:gui_window():set_inner_size(width_pt, height_pt)
+	window:gui_window():toggle_fullscreen()
 end)
 
-function get_appearance()
-  local appearance = wezterm.gui.get_appearance()
-  if appearance:find "Dark" then
-    return "1"
-  else
-    return "0"
-  end
-end
-
 function scheme_for_appearance(appearance)
-	local tmux_bin = home .. "/.local/share/zinit/polaris/bin/tmux"
+  local tmux_dir = home .. "/.local/share/zinit/polaris/bin"
+  local zac_dispatcher = home .. "/.config/dotfiles/oh-my-zsh/custom/plugins/zsh-appearance-control/bin/appearance-dispatch"
+  local is_dark = (appearance:find("Dark") ~= nil)
+  local dark = is_dark and "1" or "0"
 
-  if appearance:find "Dark" then
-  	pcall(wezterm.run_child_process, { tmux_bin, "set-option", "-q", "@dark_appearance", "1" })
+  wezterm.run_child_process({ "env", "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"), zac_dispatcher, "tmux", dark })
+
+  -- Return the wezterm color scheme
+  if is_dark then
     return "Catppuccin Macchiato Custom"
   else
-  	pcall(wezterm.run_child_process, { tmux_bin, "set-option", "-q", "@dark_appearance", "0" })
     return "Catppuccin Frappe Custom"
   end
 end
@@ -157,7 +153,7 @@ config.color_schemes = {
 config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
 
 -- Cursor style
-config.default_cursor_style = 'SteadyBar'
+config.default_cursor_style = 'BlinkingBar'
 config.cursor_blink_rate = 250
 
 -- Scrollback
@@ -182,7 +178,7 @@ config.default_workspace = "home"
 config.audible_bell = "Disabled"
 
 -- Tmux
-config.default_prog = { home .. "/.config/dotfiles/.local/bin/tmux_launcher", "-l", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-q", "@dark_appearance", get_appearance() }
+config.default_prog = { home .. "/.config/dotfiles/.local/bin/tmux_launcher", "-l", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-q", "@dark_appearance", (wezterm.gui.get_appearance():find("Dark") ~= nil) and "1" or "0" }
 
 -- Mouse configuration
 config.alternate_buffer_wheel_scroll_speed = 1
@@ -206,7 +202,7 @@ config.keys = {
 
   { key = '[', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02p') }, -- Cmd + Shift + [ -> Move to previous tmux pane
   { key = ']', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02n') }, -- Cmd + Shift + ] -> Move to next tmux pane
-  
+
   -- { key = '[', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02p' } }, -- Cmd + Shift + [ -> Move to previous tmux pane
   -- { key = ']', mods = 'ALT|SUPER', action = wezterm.action { SendString = '\x02n' } }, -- Cmd + Shift + ] -> Move to next tmux pane
 
@@ -227,7 +223,8 @@ config.keys = {
 
   { key = 'Enter', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment }, -- Disable Alt + Enter (fullscreen toggle)
 
-  
+  { key = 'Enter', mods = 'SHIFT', action = wezterm.action.SendKey { key = "Enter", mods = "ALT" } }, -- Remap Shift+Enter to Alt+Enter
+
   { key = 'c', mods = 'SUPER', action = wezterm.action { CopyTo="Clipboard" } },
   { key = 'v', mods = 'SUPER', action = wezterm.action { PasteFrom="Clipboard" } },
   -- { key = 'f', mods = 'SUPER', action = wezterm.action.Search { CaseInSensitiveString = "" } },

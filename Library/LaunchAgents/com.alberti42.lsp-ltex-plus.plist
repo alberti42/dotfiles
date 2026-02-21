@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Disabled</key>
+	<true/>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>JAVA_OPTS</key>
+		<string>-Xmx1024m</string>
+	</dict>
+	<key>KeepAlive</key>
+	<false/>
+	<key>Label</key>
+	<string>com.alberti42.lsp-ltex-plus</string>
+	<key>LowPriorityIO</key>
+	<true/>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/andrea/.local/share/zinit/polaris/bin/ltex-ls-plus</string>
+		<string>--server-type=TcpSocket</string>
+		<string>--host=127.0.0.1</string>
+		<string>--port=38080</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/Users/andrea/Library/Logs/lsp-ltex/err.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/andrea/Library/Logs/lsp-ltex/out.log</string>
+</dict>
+</plist>

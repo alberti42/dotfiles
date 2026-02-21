@@ -22,8 +22,6 @@
                     "venvStrategies": [
                         "env_var_virtual_env"
                     ],
-                    "venv": "",
-                    "venvPath": "",
                     "python.pythonPath": "~/.pyenv/versions/3.8.20/envs/ST4/bin/python",
                     "basedpyright.analysis.extraPaths": [
                         "/Applications/Sublime Text.app/Contents/MacOS/Lib/python3.8.zip",

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.alberti42.gen-interactive-zsh-shell-env</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/usr/bin/python3</string>
+      <string>/Users/andrea/.config/dotfiles/.local/bin/gen-interactive-shell-env.py</string>
+      <string>--shell</string>
+      <string>/bin/zsh</string>
+      <string>--quiet</string>
+      <string>--output</string>
+      <string>/Users/andrea/.cache/zsh/interactive-shell-env.sh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StartInterval</key>
+    <integer>900</integer>
+  </dict>
+</plist>

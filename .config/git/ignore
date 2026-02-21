@@ -28,3 +28,9 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Node modules files
+node_modules.nosync
+
+# Claude file
+**/.claude/settings.local.json

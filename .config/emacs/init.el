@@ -1,117 +1,267 @@
+;;; init.el -*- lexical-binding: t; -*-
+
 (setq backup-inhibited t) ; disable backup
 (setq make-backup-files nil) ; stop creating ~ files
 (setq auto-save-default nil) ; disable auto-save completely (no #…# files)
 (setq create-lockfiles nil) ; stop lock files (.#filename)
+
+;; UI chrome
+;; Keep window UI minimal and consistent across GUI/TTY.
+(setq ring-bell-function 'ignore) ; disable all bells
 (menu-bar-mode -1) ; turn off menu bar
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1)) ; turn off tool bar icons
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1)) ; turn off scroll bars
+(when (fboundp 'tooltip-mode)
+  (tooltip-mode -1)) ; turn off tooltips
+
+;; Window dividers (GUI)
+;; The vertical divider between treemacs and the buffer is drawn by Emacs's
+;; window-divider-mode (right side).  Enable bottom-only dividers to get a
+;; matching 2px bar between the mode-line and the minibuffer.
+(setq window-divider-default-places 'bottom-only)
+(setq window-divider-default-bottom-width 2)
+(window-divider-mode 1)
+
+;; TTY mode-line separator
+;; Emacs fills the trailing space of the TTY mode-line via mode-line-end-spaces,
+;; which defaults to "%-" (fill with -).  Replace it with ─ (U+2500) by
+;; overriding that single variable after all themes have loaded.
+;; The :eval guard keeps GUI frames unaffected when running as a daemon.
+(defun emacs-config--tty-mode-line-separator ()
+  (setq-default mode-line-end-spaces
+                '(:eval (unless (display-graphic-p) (make-string 500 ?─)))))
+(add-hook 'after-init-hook #'emacs-config--tty-mode-line-separator)
+
+;; Frame chrome
+(cond
+ ((eq system-type 'darwin)
+  ;; On macOS, use a transparent titlebar for a more modern look.
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+ (t
+  ;; On other GUI builds, fall back to a frameless (undecorated) window.
+  (add-to-list 'default-frame-alist '(undecorated . t))
+  (add-to-list 'default-frame-alist '(internal-border-width . 10))))
+
+;; Default frame size; TTY frames ignore these.
+(add-to-list 'default-frame-alist '(width . 160))
+(add-to-list 'default-frame-alist '(height . 100))
+
+;; Per-frame GUI setup: fonts and centering.
+;; Hooked to both emacs-startup-hook (direct GUI launch) and
+;; after-make-frame-functions (daemon/emacsclient GUI frame).
+(defun emacs-config-center-frame (&optional frame)
+  "Center FRAME on its current monitor (GUI only)."
+  (when (display-graphic-p)
+    (let* ((frame (or frame (selected-frame)))
+           (wa (and (fboundp 'frame-monitor-workarea)
+                    (frame-monitor-workarea frame))))
+      (when (and wa (fboundp 'frame-outer-width) (fboundp 'frame-outer-height))
+        (let* ((mx (nth 0 wa))
+               (my (nth 1 wa))
+               (mw (nth 2 wa))
+               (mh (nth 3 wa))
+               (fw (frame-outer-width frame))
+               (fh (frame-outer-height frame)))
+          (set-frame-position frame
+                              (+ mx (/ (- mw fw) 2))
+                              (+ my (/ (- mh fh) 2))))))))
+
+(defun emacs-config-setup-gui-frame (&optional frame)
+  "Apply GUI-only settings (fonts, centering) to FRAME."
+  (with-selected-frame (or frame (selected-frame))
+    (when (display-graphic-p)
+      (set-face-attribute 'default nil :font "MesloLGS NF" :height 160)
+      (set-face-attribute 'mode-line nil :font "MesloLGS NF" :height 160 :weight 'bold)
+      (set-face-attribute 'mode-line-inactive nil :font "MesloLGS NF" :height 160)
+      (run-at-time 0 nil #'emacs-config-center-frame (selected-frame)))))
+
+(add-hook 'emacs-startup-hook #'emacs-config-setup-gui-frame)
+(add-hook 'after-make-frame-functions #'emacs-config-setup-gui-frame)
+
 (setq vc-follow-symlinks t) ; do not ask confirmation before following symbolic links
 
-;; Packages: straight.el + use-package
-;; straight is not on MELPA; it bootstraps itself from GitHub.
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; Bootstrap
+;; Keep init.el compact; details live in emacs-config-core.el.
+(let ((init-path (or load-file-name
+                     user-init-file
+                     (expand-file-name "init.el" user-emacs-directory))))
+  (load (expand-file-name
+         "emacs-config-core"
+         (file-name-directory (file-truename init-path)))
+        nil 'nomessage))
 
-;; Install and configure use-package via straight
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+;; Built-ins
+;; cl-lib: Common Lisp compatibility helpers used by many packages.
+(use-package cl-lib
+  :straight nil) ; use built-in cl-lib (Emacs 24+), don't fetch via straight
 
-;; Install packages (straight will install them if missing)
-(use-package magit)
-(use-package catppuccin-theme)
-(use-package lua-mode)
-(use-package ssh-config-mode)
-(use-package pbcopy)
-(use-package xclip)
+;; UI & Convenience
+;; which-key: display available keybindings in popup.
+(use-package which-key
+  :straight nil  ; use built-in which-key (Emacs 30+), don't fetch via straight
+  :config
+  (which-key-mode 1))
 
-;; Example for a GitHub-only package (uncomment if needed):
-;; (use-package vim-modeline
-;;   :straight (vim-modeline :type git :host github :repo "cinsk/emacs-vim-modeline"))
+;; Save minibuffer history
+(savehist-mode 1)
 
+;; Minibuffer completion UI
+(emacs-config-load-module
+ 'completion
+ "Could not load completion.el; using default minibuffer completion.")
+
+;; In-buffer completion UI
+(emacs-config-load-module
+ 'corfu-config
+ "Could not load corfu-config.el; Corfu is disabled.")
+
+;; CAPF sources
+(emacs-config-load-module
+ 'cape-config
+ "Could not load cape-config.el; Cape is disabled.")
+
+;; Nerd icons (Nerd Fonts)
+(emacs-config-load-module
+ 'nerd-icons-config
+ "Could not load nerd-icons-config.el; nerd icons are disabled.")
+
+;; Line numbers
+(setq display-line-numbers-type 'relative)
+;; Keep current line absolute while others are relative.
+(setq display-line-numbers-current-absolute t)
+(global-display-line-numbers-mode 1)
+
+;; Editing Defaults
+;; Use spaces for indentation (never literal \t)
+(setq-default indent-tabs-mode nil)
+;; Configure indentation defaults
+(setq-default tab-width 4)
+(setq-default standard-indent 4)
+;; Indent/unindent region by tab-width (like Sublime's option-[ / option-])
+(defun emacs-config-indent-left ()
+  "Shift selected lines (or current line) left by `tab-width' columns."
+  (interactive)
+  (let ((beg (if (use-region-p) (region-beginning) (line-beginning-position)))
+        (end (if (use-region-p) (region-end) (line-end-position))))
+    (indent-rigidly beg end (- tab-width))
+    (setq deactivate-mark nil)))
+
+(defun emacs-config-indent-right ()
+  "Shift selected lines (or current line) right by `tab-width' columns."
+  (interactive)
+  (let ((beg (if (use-region-p) (region-beginning) (line-beginning-position)))
+        (end (if (use-region-p) (region-end) (line-end-position))))
+    (indent-rigidly beg end tab-width)
+    (setq deactivate-mark nil)))
+
+(bind-key* "C-," #'emacs-config-indent-left)
+(bind-key* "C-." #'emacs-config-indent-right)
+
+;; Terminal key decoding (CSI u).
+(emacs-config-load-module
+ 'csi-u-keys
+ "Could not load csi-u-keys.el; CSI-u key decoding is disabled.")
+
+;; vim-file-locals: parse Vim modelines/file-local settings in files.
 (use-package vim-file-locals
   :straight (vim-file-locals
              :type git
              :host github
              :repo "abougouffa/emacs-vim-file-locals")
-  :config
-  (vim-file-locals-mode 1))
+  ;; Enable globally after startup; it adds `vim-file-locals-apply` to
+  ;; `find-file-hook` for newly opened files.
+  :hook (after-init . vim-file-locals-mode))
 
-;; Configure TAB character’s length
-(setq-default tab-width 4)
-
-;; Save minibuffer history
-(savehist-mode 1)
-
-;; Catppuccin for Emacs https://github.com/catppuccin/emacs
-(setq catppuccin-flavor 'frappe) ; 'frappe, 'latte, 'macchiato. or 'mocha
-(load-theme 'catppuccin :no-confirm)
-(set-face-attribute 'default nil :background "unspecified-bg")
-(set-face-attribute 'mode-line nil :background "unspecified-bg")
-(set-face-attribute 'mode-line-inactive nil :background "unspecified-bg")
-
-;; Set default font for Emacs
-(set-face-attribute 'default nil :font "MesloLGS NF" :height 120)
-
-;; Customize the mode line font
-(set-face-attribute 'mode-line nil :font "MesloLGS NF" :height 120 :weight 'bold)
-(set-face-attribute 'mode-line-inactive nil :font "MesloLGS NF" :height 120)
-
-;; Set syntax for ssh config file
-; (add-to-list 'auto-mode-alist '("/.ssh/config" . ssh-config-mode))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
+;; Clipboard
 ;; Always sync kill ring <-> system clipboard
 (setq select-enable-clipboard t)
 (setq select-enable-primary t)   ; use the X11 primary selection too (Linux/Unix)
-(cond
- ;; macOS: use pbcopy in terminal
- ((eq system-type 'darwin)
-  (use-package pbcopy
-    :ensure t
-    :config
-    (turn-on-pbcopy)))
 
- ;; GNU/Linux: use xclip in terminal
- ((eq system-type 'gnu/linux)
-  (use-package xclip
-    :ensure t
-    :config
-    (xclip-mode 1))))
+;; pbcopy: sync clipboard in terminal on macOS.
+;; Only needed when running Emacs in a terminal on macOS.
+(use-package pbcopy
+  :if (and (eq system-type 'darwin) (not window-system))
+  :config
+  (turn-on-pbcopy))
 
-;; Enable mouse support
-(unless window-system
-  (require 'mouse)
+;; xclip: sync clipboard in terminal on Linux.
+;; Only needed when running Emacs in a terminal on Linux.
+(use-package xclip
+  :if (and (eq system-type 'gnu/linux) (not window-system))
+  :config
+  (xclip-mode 1))
+
+;; Development
+;; magit: Git porcelain inside Emacs.
+(use-package magit)
+
+;; Project tree (TTY-friendly)
+(emacs-config-load-module
+ 'treemacs-config
+ "Could not load treemacs-config.el; Treemacs is disabled.")
+
+;; LSP modules
+(emacs-config-load-module
+ 'lsp-core
+ "Could not load lsp-core.el; LSP is disabled.")
+
+(emacs-config-load-module
+ 'lsp-python
+ "Could not load lsp-python.el; Python LSP is disabled.")
+
+(emacs-config-load-module
+ 'lsp-web
+ "Could not load lsp-web.el; TypeScript/JavaScript LSP is disabled.")
+
+(emacs-config-load-module
+ 'lsp-ltex-plus-config
+ "Could not load lsp-ltex-plus-config.el; LTEX+ is disabled.")
+
+;; VCS gutter (TTY)
+(emacs-config-load-module
+ 'git-gutter-tty
+ "Could not load git-gutter-tty.el; VCS gutter is disabled.")
+
+;; Languages
+;; lua-mode: major mode for editing Lua.
+(use-package lua-mode)
+
+;; ssh-config-mode: major mode for ~/.ssh/config.
+(use-package ssh-config-mode)
+
+;; Theme
+;; catppuccin-theme: Catppuccin theme collection.
+(use-package catppuccin-theme)
+
+;; Theme auto-detection via zsh-appearance-control.
+(emacs-config-load-module
+ 'zac-theme-autodetection
+ "Could not load zac-theme-autodetection.el; theme auto-switching is disabled.")
+
+;; Terminal UX
+;; Mouse support in terminal Emacs.
+;; `xterm-mouse-mode` enables mouse events in terminal emulators that support it.
+(use-package mouse
+  :straight nil
+  :if (not window-system)
+  :preface
+  (defun emacs-config--scroll-down-1 ()
+    (interactive)
+    (scroll-down 1))
+
+  (defun emacs-config--scroll-up-1 ()
+    (interactive)
+    (scroll-up 1))
+  :config
   (xterm-mouse-mode 1)
-  (global-set-key [wheel-up] (lambda ()
-                               (interactive)
-                               (scroll-down 1)))
-  (global-set-key [wheel-down] (lambda ()
-                                 (interactive)
-                                 (scroll-up 1)))
-  ;; Optional: support shift/ctrl modifiers
-  (global-set-key [double-wheel-up] 'scroll-down-command)
-  (global-set-key [double-wheel-down] 'scroll-up-command)
-  (defun track-mouse (e))
-  (setq mouse-sel-mode t))
+  ;; Wheel events in terminals are usually mouse-4/mouse-5.
+  ;; Keep wheel-up/wheel-down bindings too (some builds/terminals use them).
+  (global-set-key [mouse-4] #'emacs-config--scroll-down-1)
+  (global-set-key [mouse-5] #'emacs-config--scroll-up-1)
+  (global-set-key [wheel-up] #'emacs-config--scroll-down-1)
+  (global-set-key [wheel-down] #'emacs-config--scroll-up-1))
 
 ;; Prevent sudden recentering / keep point away from window edges
 (setq scroll-margin 2)
@@ -121,5 +271,15 @@
 ;; Smoother horizontal scrolling too
 (setq hscroll-margin 2)
 (setq hscroll-step 1)
+
+;; Pixel-precise scrolling (Emacs 29+); improves trackpad momentum on macOS.
+(when (>= emacs-major-version 29)
+  (pixel-scroll-precision-mode 1))
+
+;; Disable ctrl+scroll zoom (too fast; use keyboard to change font size instead).
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
+(global-set-key (kbd "<C-mouse-4>") 'ignore)
+(global-set-key (kbd "<C-mouse-5>") 'ignore)
 
 ;; vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

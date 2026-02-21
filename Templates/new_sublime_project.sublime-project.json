@@ -1,0 +1,55 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "folder_exclude_patterns": [
+        "__pycache__",
+        ".ipynb_checkpoints",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".ruff_cache",
+        ".venv",
+        "venv",
+        "build",
+        "dist",
+      ],
+      "file_exclude_patterns": [
+        "*.pyc",
+        "*.zwc",
+      ]
+    }
+  ],
+  "settings": {
+    "tab_size": 4,
+    "translate_tabs_to_spaces": true,
+    "LSP": {
+      "LSP-basedpyright": {
+        "settings": {
+          "python.pythonPath": "~/.pyenv/versions/py313/bin/python",
+          "basedpyright.analysis.typeCheckingMode": "basic",
+          "basedpyright.analysis.diagnosticSeverityOverrides": {
+            "reportOptionalSubscript": "error"
+          },
+        }
+      }
+    }
+  },
+  "build_systems": [
+    {
+      "name": "Run make (default)",
+      "cmd": ["make"],
+      "working_dir": "${project_path}",
+      "selector": "source.python",
+      "variants": [
+        {
+          "name": "Run make (variant)",
+          "cmd": ["make", "variant"],
+          "working_dir": "${project_path}",
+          "selector": "source.python",
+        },
+      ]
+    }
+  ]
+}
+
+// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

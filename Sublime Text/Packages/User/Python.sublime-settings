@@ -1,5 +1,5 @@
-{
-	"tab_size": 4,
+{ 
+	"tab_size": 4, // PEP 8 recommends 4 spaces for Python code
   	"translate_tabs_to_spaces": true,
   	"detect_indentation": false, 	
 	"extensions":

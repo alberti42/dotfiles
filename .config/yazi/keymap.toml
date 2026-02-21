@@ -84,6 +84,34 @@ run  = "arrow bot"
 desc = "Move the cursor to the bottom"
 
 [[mgr.prepend_keymap]]
+on   = [ "g", "r" ]
+run  = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
+desc = "Go to the root of the git repository"
+
+[[mgr.prepend_keymap]]
+on   = [ "m", "d" ]
+run  = [
+  "linemode my_default",
+  ]
+desc = "Linemode: my own default"
+
+[[mgr.prepend_keymap]]
+on   = [ ",", "n" ]
+run  = [
+  "sort natural --reverse=no",
+  "linemode my_default"
+  ]
+desc = "Sort naturally"
+
+[[mgr.prepend_keymap]]
+on   = [ ",", "N" ]
+run  = [
+  "sort natural --reverse=yes",
+  "linemode my_default"
+  ]
+desc = "Sort naturally (reverse)"
+
+[[mgr.prepend_keymap]]
 on   = "C"
 run  = '''
 shell -- zsh --no-rcs --no-global-rcs -c '

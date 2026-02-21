@@ -1,9 +1,17 @@
 [user]
 	name = Andrea Alberti
 	email = a.alberti82@gmail.com
+	signingkey = /Users/andrea/.ssh/git_sign_Ed25519
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[gpg "ssh"]
+    allowedSignersFile = ~/.config/git/allowed_signers
 [core]
 	attributesfile = ~/.config/git/attributes
 	editor = ~/.config/dotfiles/.local/bin/git_editor_launcher
+	pager = 
 [push]
 	default = simple
 [filter "media"]
@@ -58,3 +66,5 @@
     reflog = %C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)
 [credential]
 	helper = store
+[init]
+	defaultBranch = main
