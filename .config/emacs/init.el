@@ -5,6 +5,8 @@
 (setq auto-save-default nil) ; disable auto-save completely (no #…# files)
 (setq create-lockfiles nil) ; stop lock files (.#filename)
 
+(setq vc-follow-symlinks t) ; do not ask confirmation before following symbolic links
+
 ;; UI chrome
 ;; Keep window UI minimal and consistent across GUI/TTY.
 (setq ring-bell-function 'ignore) ; disable all bells
@@ -80,8 +82,6 @@
 (add-hook 'emacs-startup-hook #'emacs-config-setup-gui-frame)
 (add-hook 'after-make-frame-functions #'emacs-config-setup-gui-frame)
 
-(setq vc-follow-symlinks t) ; do not ask confirmation before following symbolic links
-
 ;; Bootstrap
 ;; Keep init.el compact; details live in emacs-config-core.el.
 (let ((init-path (or load-file-name
@@ -107,10 +107,15 @@
 ;; Save minibuffer history
 (savehist-mode 1)
 
-;; Minibuffer completion UI
+;; Recently visited files
+(emacs-config-load-module
+ 'recentf-config
+ "Could not load recentf-config.el; recent files list is disabled.")
+
+;; Completion system (minibuffer + in-buffer)
 (emacs-config-load-module
  'completion
- "Could not load completion.el; using default minibuffer completion.")
+ "Could not load completion.el; using default completion behavior.")
 
 ;; Nerd icons (Nerd Fonts)
 (emacs-config-load-module

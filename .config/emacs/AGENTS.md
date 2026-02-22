@@ -47,9 +47,8 @@ Key files:
 
 Local modules loaded from `init.el` (via `emacs-config-load-module`):
 
-- `completion.el`: minibuffer completion UI (Fido vertical / icomplete).
-- `corfu-config.el`: in-buffer completion UI (Corfu popup).
-- `cape-config.el`: extra CAPF sources via Cape (file, dabbrev, etc.).
+- `completion.el`: completion orchestration (styles + minibuffer UI + in-buffer completion).
+- `search-config.el`: prefer ripgrep for project/xref search.
 - `nerd-icons-config.el`: Nerd Fonts icon integrations (used by Corfu kind-icon, Treemacs, etc.).
 - `treemacs-config.el`: project file tree (Treemacs), TTY-friendly.
 - `csi-u-keys.el`: terminal key decoding for CSI-u sequences.
@@ -59,6 +58,25 @@ Local modules loaded from `init.el` (via `emacs-config-load-module`):
 - `lsp-web.el`: JS/TS LSP (`typescript-mode`, built-in `js`).
 - `lsp-ltex-plus-config.el`: LTEX+ grammar/spell checks via `lsp-ltex-plus` (Markdown, LaTeX, plain text, Org, reStructuredText).
 - `zac-theme-autodetection.el`: theme auto-switch based on external appearance.
+
+Completion submodules (loaded by `completion.el`):
+
+- `completions/styles.el`: baseline completion styles and category overrides.
+- `completions/orderless.el`: Orderless matching (command-palette style).
+- `completions/minibuffer-vertico.el`: Vertico minibuffer UI (preferred).
+- `completions/minibuffer-icomplete.el`: Icomplete/Fido minibuffer UI (fallback).
+- `completions/corfu.el`: Corfu in-buffer completion UI (with TTY support).
+- `completions/cape.el`: extra CAPF sources via Cape.
+- `completions/marginalia.el`: minibuffer annotations.
+- `completions/consult.el`: Consult commands + xref UI.
+
+Notes:
+
+- `corfu-config.el` and `cape-config.el` remain as compatibility shims; `init.el`
+  no longer loads them directly.
+- `completion.el` exposes toggles you can set before it loads:
+  - `emacs-config-completions-enable-marginalia`
+  - `emacs-config-completions-enable-consult`
 
 ## Boot Sequence (Mental Model)
 
@@ -136,6 +154,12 @@ When adding or editing modules, match the existing style:
 `emacs-config-load-module` expects a file named after the module symbol, e.g.:
 
 - `(emacs-config-load-module 'completion "...")` loads `completion.el`.
+
+It also accepts a string path relative to `emacs-config-dir`, which allows
+subdirectories:
+
+- `(emacs-config-load-module "completions/minibuffer-vertico" "...")` loads
+  `completions/minibuffer-vertico.el`.
 
 ## Platform / Frame-Type Specific Behavior
 

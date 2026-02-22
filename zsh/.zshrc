@@ -417,6 +417,7 @@ alias zshenv="${editor_cmd[1]} $HOME/.zshenv"
 alias sshconf="${editor_cmd[1]} ~/.ssh/config"
 alias tmuxconf="${editor_cmd[1]} $HOME/.config/tmux/tmux.conf"
 alias weztermconf="${editor_cmd[1]} $HOME/.config/wezterm/wezterm.lua"
+alias emacsconf="${editor_cmd[1]} $HOME/.config/emacs/init.el"
 alias nvimconf="nvim $HOME/.config/nvim/init.lua"
 
 # Misc

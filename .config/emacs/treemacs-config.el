@@ -9,6 +9,11 @@
   :bind (("C-c t t" . treemacs)
          ("C-c t s" . treemacs-select-window)
          ("C-c t f" . treemacs-find-file))
+  :init
+  ;; Persist workspaces/projects under XDG cache.
+  (let ((cache (or (getenv "XDG_CACHE_HOME") (expand-file-name "~/.cache"))))
+    (setq treemacs-persist-file (expand-file-name "emacs/treemacs-persist" cache)
+          treemacs-last-error-persist-file (expand-file-name "emacs/treemacs-persist-at-last-error" cache)))
   :config
   ;; Keep this light; avoid enabling optional modes by default.
   (setq treemacs-width 35)
