@@ -159,6 +159,27 @@
 (bind-key* "C-," #'emacs-config-indent-left)
 (bind-key* "C-." #'emacs-config-indent-right)
 
+;; External file change detection
+;; When Emacs regains focus, check all file-visiting buffers for external
+;; modifications and prompt whether to reload each one.
+;; revert-buffer adapts its prompt to the buffer state:
+;;   clean buffer → "Revert buffer from file foo? (y or n)"
+;;   dirty buffer → "Buffer foo modified; revert anyway? (y or n)"
+(defun emacs-config--handle-external-changes ()
+  "On focus, prompt to reload any file-visiting buffer changed on disk."
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (and buffer-file-name
+                 (file-exists-p buffer-file-name)
+                 (not (verify-visited-file-modtime buf)))
+        (revert-buffer :ignore-auto)
+        ;; Whether the user accepted or declined, record the current disk
+        ;; modtime so we don't re-prompt on every subsequent focus event.
+        (set-visited-file-modtime)))))
+
+(add-function :after after-focus-change-function
+              #'emacs-config--handle-external-changes)
+
 ;; Terminal key decoding (CSI u).
 (emacs-config-load-module
  'csi-u-keys
