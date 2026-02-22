@@ -18,6 +18,8 @@ cd /
 # Source shell variable from interactive shell
 . "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/interactive-shell-env.sh"
 
+. "${XDG_DATA_HOME:-$HOME}/../envs/nvidia.sh"
+
 # Serve opencode backend
 exec opencode serve --port 4096
 

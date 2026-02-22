@@ -112,16 +112,6 @@
  'completion
  "Could not load completion.el; using default minibuffer completion.")
 
-;; In-buffer completion UI
-(emacs-config-load-module
- 'corfu-config
- "Could not load corfu-config.el; Corfu is disabled.")
-
-;; CAPF sources
-(emacs-config-load-module
- 'cape-config
- "Could not load cape-config.el; Cape is disabled.")
-
 ;; Nerd icons (Nerd Fonts)
 (emacs-config-load-module
  'nerd-icons-config
@@ -217,6 +207,11 @@
 ;; Development
 ;; magit: Git porcelain inside Emacs.
 (use-package magit)
+
+;; Fast project search (prefer ripgrep)
+(emacs-config-load-module
+ 'search-config
+ "Could not load search-config.el; using default project search backend.")
 
 ;; Project tree (TTY-friendly)
 (emacs-config-load-module
