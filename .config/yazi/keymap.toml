@@ -89,6 +89,11 @@ run  = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
 desc = "Go to the root of the git repository"
 
 [[mgr.prepend_keymap]]
+on   = [ "g", "." ]
+run  = 'shell -- ya emit cd /Users/andrea/.config/dotfiles'
+desc = "Go to the root of the git repository"
+
+[[mgr.prepend_keymap]]
 on   = [ "m", "d" ]
 run  = [
   "linemode my_default",

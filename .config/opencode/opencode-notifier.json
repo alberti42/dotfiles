@@ -18,10 +18,10 @@
     "question": "Session has a question"
   },
   "sounds": {
-    "permission": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/alert-01.aac",
-    "complete": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/staplebops-01.aac",
-    "subagent_complete": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/yup-01.aac",
-    "error": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/nope-01.aac",
-    "question": "/Users/andrea/Documents/Programming/Third Party/fork-opencode/packages/ui/src/assets/audio/bip-bop-01.aac"
+    "permission": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/alert-01.aac",
+    "complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/staplebops-01.aac",
+    "subagent_complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/yup-01.aac",
+    "error": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/nope-01.aac",
+    "question": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac"
   }
 }

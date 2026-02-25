@@ -1,0 +1,33 @@
+{
+  "sound": true,
+  "notification": false,
+  "timeout": 0,
+  "showProjectName": true,
+  "events": {
+    "permission_prompt": { "sound": true, "notification": false },
+    "idle_prompt": { "sound": true, "notification": false },
+    "elicitation_dialog": { "sound": true, "notification": false },
+    "auth_success": { "sound": false, "notification": false },
+    "complete": { "sound": true, "notification": false },
+    "error": { "sound": true, "notification": false },
+    "subagent_complete": { "sound": false, "notification": false }
+  },
+  "messages": {
+    "permission_prompt": "Claude Code needs permission",
+    "idle_prompt": "Claude Code is waiting",
+    "elicitation_dialog": "Claude Code has a question",
+    "auth_success": "Claude Code authenticated",
+    "complete": "Claude Code session ended",
+    "error": "Claude Code encountered an error",
+    "subagent_complete": "Claude Code subagent completed"
+  },
+  "sounds": {
+    "permission_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/alert-01.aac",
+    "idle_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac",
+    "elicitation_dialog": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac",
+    "auth_success": "/System/Library/Sounds/Hero.aiff",
+    "complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/staplebops-01.aac",
+    "subagent_complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/yup-01.aac",
+    "error": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/nope-01.aac"
+  }
+}

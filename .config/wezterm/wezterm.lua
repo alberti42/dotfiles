@@ -28,13 +28,16 @@ wezterm.on("gui-startup", function(cmd)
 end)
 
 function scheme_for_appearance(appearance)
+  -- tmux_dir must be on PATH explicitly: WezTerm is a GUI app and does not
+  -- inherit the shell PATH, so system tmux (or Homebrew/zinit-installed tmux)
+  -- would not be found otherwise.
   local tmux_dir = home .. "/.local/share/zinit/polaris/bin"
   local zac_dispatcher = home .. "/.config/dotfiles/oh-my-zsh/custom/plugins/zsh-appearance-control/bin/appearance-dispatch"
   local is_dark = (appearance:find("Dark") ~= nil)
   local dark = is_dark and "1" or "0"
 
-  wezterm.run_child_process({ "env", "PATH=" .. os.getenv("PATH"), zac_dispatcher, "tmux",  dark })
-	wezterm.run_child_process({ "env", "PATH=" .. os.getenv("PATH"), zac_dispatcher, "cache", dark })
+  wezterm.run_child_process({ "env", "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"), zac_dispatcher, "tmux", dark })
+  wezterm.run_child_process({ "env", "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"), zac_dispatcher, "cache", dark })
 
   -- Return the wezterm color scheme
   if is_dark then
