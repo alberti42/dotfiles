@@ -26,7 +26,7 @@
     "idle_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac",
     "elicitation_dialog": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac",
     "auth_success": "/System/Library/Sounds/Hero.aiff",
-    "complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/staplebops-01.aac",
+    "complete": "/System/Library/Sounds/Bottle.aiff",
     "subagent_complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/yup-01.aac",
     "error": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/nope-01.aac"
   }
