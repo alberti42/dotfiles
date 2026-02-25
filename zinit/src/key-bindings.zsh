@@ -143,7 +143,7 @@ bindkey -r '^S'
 bindkey -M emacs "^g" emacs-cancel-mark
 
 # Copy the current zsh region to the macOS clipboard
-__copy_to_clipboard() {
+function __copy_to_clipboard() {
   if command -v pbcopy &>/dev/null; then
     # macOS
     print -rn -- "$1" | pbcopy
@@ -152,7 +152,7 @@ __copy_to_clipboard() {
     print -rn -- "$1" xclip -selection clipboard
   fi
 }
-__paste_from_clipboard() {
+function __paste_from_clipboard() {
   if command -v pbpaste &>/dev/null; then
     # macOS
     pbpaste
@@ -161,39 +161,49 @@ __paste_from_clipboard() {
     xclip -selection clipboard -o
   fi
 }
-x-kill-region() {
+function x-kill-region() {
   zle kill-region
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-copy-region-as-kill() {
+function x-copy-region-as-kill() {
   zle copy-region-as-kill
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-yank () {
-  CUTBUFFER=$(__paste_from_clipboard)
-  zle yank
+function x-yank() {
+  local start=$CURSOR
+  CUTBUFFER=$(__paste_from_clipboard) || return 1
+  [[ -n $CUTBUFFER ]] || return 0
+  zle .yank
+  local end=$CURSOR
+  (( end > start )) || return 0
+  # Refresh FSH syntax highlight (if loaded)
+  (( $+functions[_zsh_highlight] )) && _zsh_highlight
+  # Apply the uniform "paste" highlight over the inserted range
+  (( $+functions[_zsh_highlight_apply_zle_highlight] )) && \
+    _zsh_highlight_apply_zle_highlight paste standout $start $end
+  zle -R
 }
-x-kill-line() {
+function x-kill-line() {
   zle kill-line
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-kill-whole-line() {
+function x-kill-whole-line() {
   zle kill-whole-line
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-kill-buffer() {
+function x-kill-buffer() {
   zle kill-buffer
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-backward-kill-word() {
+function x-backward-kill-word() {
   zle backward-kill-word
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-kill-word() {
+function x-kill-word() {
   zle kill-word
   __copy_to_clipboard "$CUTBUFFER"
 }
-x-backward-kill-word() {
+function x-backward-kill-word() {
   zle backward-kill-word
   __copy_to_clipboard "$CUTBUFFER"
 }
@@ -215,27 +225,25 @@ zle -N x-backward-kill-word
 autoload -Uz url-quote-magic
 zle -N self-insert url-quote-magic
 
-bracketed-paste-fast-filter() {
+function bracketed-paste-fast-filter() {
   local PASTED
   zle .bracketed-paste PASTED || return
   if (( ${+NUMERIC} )); then
     case $NUMERIC in
-      (0)
-        # shell-escape as one word (usually backslashes; no surrounding quotes)
-        PASTED=${(q)PASTED}
-        ;;
-      (1)
-        # single-quoted string, including the surrounding quotes
-        PASTED=${(qq)PASTED}
-        ;;
-      (2)
-        # double-quoted string (escape the chars that are special inside "")
-        PASTED=${(qqq)PASTED}
-        ;;
+      (0) PASTED=${(q)PASTED}   ;; # shell-escape as one word (usually backslashes; no surrounding quotes)
+      (1) PASTED=${(qq)PASTED}  ;; # single-quoted string, including the surrounding quotes
+      (2) PASTED=${(qqq)PASTED} ;; # double-quoted string (escape the chars that are special inside "")
     esac
   fi
+  integer paste_start=$CURSOR
   LBUFFER+=$PASTED
   zle -f yank
+  # Run first so _ZSH_HIGHLIGHT_PRIOR_BUFFER is updated — FSH's deferred
+  # call will then see no buffer change and skip the region_highlight reset
+  (( ${+functions[_zsh_highlight]} )) && _zsh_highlight
+  # Now safely append paste styling on top
+  (( ${+functions[_zsh_highlight_apply_zle_highlight]} )) && \
+    _zsh_highlight_apply_zle_highlight paste standout "$paste_start" "$CURSOR"
 }
 zle -N bracketed-paste bracketed-paste-fast-filter
 

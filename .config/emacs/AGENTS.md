@@ -53,11 +53,29 @@ Local modules loaded from `init.el` (via `emacs-config-load-module`):
 - `treemacs-config.el`: project file tree (Treemacs), TTY-friendly.
 - `csi-u-keys.el`: terminal key decoding for CSI-u sequences.
 - `git-gutter-tty.el`: VCS gutter indicators in terminal frames.
+- `wrap.el`: soft-wrap helpers (visual only) used by text/Markdown configs.
+- `syntaxes.el`: loads per-major-mode settings from `syntaxes/`.
 - `lsp-core.el`: shared LSP configuration (`lsp-mode`, `lsp-ui`).
 - `lsp-python.el`: Python LSP via `lsp-pyright` (configured for basedpyright).
 - `lsp-web.el`: JS/TS LSP (`typescript-mode`, built-in `js`).
 - `lsp-ltex-plus-config.el`: LTEX+ grammar/spell checks via `lsp-ltex-plus` (Markdown, LaTeX, plain text, Org, reStructuredText).
 - `zac-theme-autodetection.el`: theme auto-switch based on external appearance.
+
+Per-major-mode settings (`syntaxes/`):
+
+- `syntaxes.el` loads every `*.el` file in the `syntaxes/` directory.
+- Each file should be small and self-contained (typically one hook form).
+- Each file may be toggled by setting a single variable at the top of the file,
+  e.g. `emacs-config-syntaxes-enable-markdown`.
+- Syntax toggles default to enabled (`t`). To disable a syntax module, set its
+  `emacs-config-syntaxes-enable-...` variable to `nil` in that syntax file.
+
+Wrapping:
+
+- `wrap.el` provides `emacs-config-soft-wrap-enable` / `...-disable` /
+  `...-toggle` for visual-only wrapping.
+- Visual wrap-at-column uses `visual-fill-column` (no newlines inserted).
+- Markdown list wrap alignment uses `adaptive-wrap`.
 
 Completion submodules (loaded by `completion.el`):
 

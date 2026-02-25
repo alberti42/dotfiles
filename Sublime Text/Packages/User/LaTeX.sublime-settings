@@ -29,8 +29,6 @@
 	// Set to false to hide the gutter altogether
 	"gutter": true,
 
-  "show_minimap": false,
-
   "word_wrap": "true",
   
   "wrap_width": 120,

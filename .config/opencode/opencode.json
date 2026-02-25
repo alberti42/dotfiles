@@ -1,27 +1,31 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": {               // documentation of tools → https://github.com/anomalyco/opencode/tree/dev/packages/opencode/src/tool
-    "*": "ask",                 // fallback case
-    "read": {                   // reading a file (matches the file path)
+  "permission": {
+    // documentation of tools → https://github.com/anomalyco/opencode/tree/dev/packages/opencode/src/tool
+    "*": "ask", // fallback case
+    "read": {
+      // reading a file (matches the file path)
       "*": "allow",
       "*.env": "deny",
       "*.env.*": "deny",
       "*.env.example": "allow",
-      "~/.ssh/*": "deny",
+      "~/.ssh/*": "deny"
     },
-    "edit": {                   // all file modifications (covers edit, write, patch, multiedit)
+    "edit": {
+      // all file modifications (covers edit, write, patch, multiedit)
       "*": "allow",
       "*.env": "deny",
       "*.env.*": "deny",
       "*.env.example": "allow",
       "~/.ssh/*": "deny",
       "/etc/": "ask",
-      "/opt/homebrew/etc/": "ask",
-    },             
-    "glob": "allow",             // file globbing (matches the glob pattern)
-    "grep": "allow",             // content search (matches the regex pattern)
-    "list": "allow",             // listing files in a directory (matches the directory path)
-    "bash": {                    // running shell commands (matches parsed commands like git status --porcelain)
+      "/opt/homebrew/etc/": "ask"
+    },        
+    "glob": "allow", // file globbing (matches the glob pattern)
+    "grep": "allow", // content search (matches the regex pattern)
+    "list": "allow", // listing files in a directory (matches the directory path)
+    "bash": {
+      // running shell commands (matches parsed commands like git status --porcelain)
       "*": "ask",
       "git *": "ask",
       "git checkout*": "allow",
@@ -40,56 +44,63 @@
       "fd *": "allow",
       "find *": "allow",
       "head *": "allow",
-      "tail *": "allow",
-    },             
-    "task": "allow",             // launching subagents (matches the subagent type)
-    "skill": "ask",              // loading a skill (matches the skill name)
-    "lsp": "allow",              // running LSP queries (currently non-granular)
-    "todoread": "allow",         // reading the todo list
-    "todowrite": "allow",        // writing the todo list
-    "webfetch": "allow",         // fetching a URL (matches the URL)
-    "websearch": "allow",        // web search (matches the query)
-    "codesearch": "allow",       // code search (matches the query)
-    "external_directory": {      // triggered when a tool touches paths outside the project working directory
+      "tail *": "allow"
+    },
+    "task": "allow", // launching subagents (matches the subagent type)
+    "skill": "ask", // loading a skill (matches the skill name)
+    "lsp": "allow", // running LSP queries (currently non-granular)
+    "todoread": "allow", // reading the todo list
+    "todowrite": "allow", // writing the todo list
+    "webfetch": "allow", // fetching a URL (matches the URL)
+    "websearch": "allow", // web search (matches the query)
+    "codesearch": "allow", // code search (matches the query)
+    "external_directory": {
+      // triggered when a tool touches paths outside the project working directory
       "*": "ask",
       "~/Downloads/*": "allow",
       "/tmp/*": "allow"
     },
     "things_*": "allow",
-    "doom_loop": "ask"           // triggered when the same tool call repeats 3 times with identical input
+    "doom_loop": "ask" // triggered when the same tool call repeats 3 times with identical input
   },
   "agent": {
     "plan": {
-      "permission": { 
+      "permission": {
         "edit": "deny",
-        "bash": {                // running shell commands (matches parsed commands like git status --porcelain)
+        "bash": {
+          // running shell commands (matches parsed commands like git status --porcelain)
           "*": "deny",
           "git log *": "allow",
           "git status *": "allow",
           "grep *": "allow",
           "ls *": "allow",
-          "cat *": "allow",
+          "cat *": "allow"
         },
-        "task": "ask",           // launching subagents (matches the subagent type)
-        "todowrite": "ask"       // writing the todo list
+        "task": "ask", // launching subagents (matches the subagent type)
+        "todowrite": "ask" // writing the todo list
       }
     },
     "build": {
-      "temperature":0.1
+      "temperature": 0.1
     }
   },
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp", "--api-key", "ctx7sk-98b20b8d-b532-4ee5-8e11-2079bf7a8f7e"],
+      "command": [
+        "npx",
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "ctx7sk-98b20b8d-b532-4ee5-8e11-2079bf7a8f7e"
+      ],
       "enabled": true
     },
     "things": {
       "type": "local",
       "command": ["uvx", "things-mcp"],
-      "enabled": true
+      "enabled": false
     },
-    /*
     "knuspr": {
       "type": "local",
       "command": [
@@ -103,20 +114,15 @@
       ],
       "enabled": false
     },
-    */
     "strava": {
       "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@r-huijts/strava-mcp-server"
-      ],
-      "enabled": true
+      "command": ["npx", "-y", "@r-huijts/strava-mcp-server"],
+      "enabled": false
     }
   },
   "plugin": [
     "@mohak34/opencode-notifier@latest",
-    "opencode-anthropic-auth@latest",
+    "opencode-anthropic-auth@latest"
     // "opencode-gemini-auth@latest"
   ],
   "provider": {

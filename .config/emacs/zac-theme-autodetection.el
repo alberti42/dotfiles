@@ -45,6 +45,11 @@
        (insert-file-contents (zac--appearance-file))
        (buffer-string)))))
 
+(defun zac--apply-cursor-color ()
+  "Set cursor color for GUI frames. Safe to call from hooks."
+  (when (display-graphic-p)
+    (set-cursor-color "#cad3f5")))
+
 (defun zac--apply-appearance ()
   (let* ((v (zac--read-appearance))
          (flavor (if (string= v "1") 'macchiato 'frappe)))
@@ -53,12 +58,16 @@
       (setq catppuccin-flavor flavor)
       (mapc #'disable-theme custom-enabled-themes)
       (load-theme 'catppuccin t)
-       ;; Keep background transparent/unspecified for terminal + GUI consistency.
-       ;; IMPORTANT: use the symbol `unspecified` (not the string "unspecified-bg").
-       ;; In GUI frames the string is treated as a color name and errors.
-       (set-face-attribute 'default nil :background 'unspecified)
-       (set-face-attribute 'mode-line nil :background 'unspecified)
-       (set-face-attribute 'mode-line-inactive nil :background 'unspecified))))
+
+      ;; Cursor color override (GUI only).
+      (zac--apply-cursor-color)
+
+      ;; Keep background transparent/unspecified for terminal + GUI consistency.
+      ;; IMPORTANT: use the symbol `unspecified` (not the string "unspecified-bg").
+      ;; In GUI frames the string is treated as a color name and errors.
+      (set-face-attribute 'default nil :background 'unspecified)
+      (set-face-attribute 'mode-line nil :background 'unspecified)
+      (set-face-attribute 'mode-line-inactive nil :background 'unspecified))))
 
 (defun zac-watch-start ()
   "Start watching zsh-appearance-control's appearance file."
@@ -68,8 +77,16 @@
     (setq zac--watch nil)
     (zac--apply-appearance)
     nil)
-
   (zac--apply-appearance)
+  ;; Re-apply cursor color after the initial frame is fully set up (GUI
+  ;; startup: display-graphic-p may be nil or frame parameters not yet
+  ;; final when init.el runs).
+  (add-hook 'window-setup-hook #'zac--apply-cursor-color)
+  ;; Re-apply cursor color for any new frame (emacsclient / daemon mode).
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (with-selected-frame frame
+                (zac--apply-cursor-color))))
   (when (fboundp 'file-notify-add-watch)
     (unless zac--watch
       (setq zac--watch

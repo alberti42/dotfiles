@@ -328,7 +328,7 @@ if [[ -n $SSH_CONNECTION ]]; then
   # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
   editor_cmd=(rsubl -w)
 else
-  editor_cmd=(emacsclient '-a=' '-nw' '-c')  # Emacs
+  editor_cmd=(emacsclient '-nw' '-c')  # Emacs
   # editor_cmd=(subl -nw)
 fi
 
@@ -388,12 +388,13 @@ alias 7='cd -7'
 alias 8='cd -8'
 alias 9='cd -9'
 
-alias e='emacsclient -a= -nw'     # opens terminal frame, blocking
-alias ew='emacsclient -a= -n -c'  # opens GUI frame, non-blocking
+alias e='emacsclient -nw'     # opens terminal frame, blocking
+alias ew='emacsclient -n -c'  # opens GUI frame, non-blocking
+# alias ew='open -b org.gnu.Emacs'
 alias emacs='emacs -nw'
 
-alias oc='EDITOR="emacsclient -a= -nw -c" opencode attach http://localhost:4096 --dir .'
-alias claude='EDITOR="emacsclient -a= -nw -c" claude'
+alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'
+alias claude='EDITOR="emacsclient -nw -c" claude'
 
 alias diff='diff --color=auto'
 
@@ -411,14 +412,14 @@ alias dotfiles="cd $DOTFILES_DIR"
 # alias dk="docker-compose"
 # alias dkpurge="docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker rmi $(docker images -q)"
 
-# Configuration files
-alias zshrc="${editor_cmd[1]} $HOME/.zshrc"
-alias zshenv="${editor_cmd[1]} $HOME/.zshenv"
-alias sshconf="${editor_cmd[1]} ~/.ssh/config"
-alias tmuxconf="${editor_cmd[1]} $HOME/.config/tmux/tmux.conf"
-alias weztermconf="${editor_cmd[1]} $HOME/.config/wezterm/wezterm.lua"
-alias emacsconf="${editor_cmd[1]} $HOME/.config/emacs/init.el"
-alias nvimconf="nvim $HOME/.config/nvim/init.lua"
+# Global aliases expand anywhere on the line
+alias -g ZSHRC="$HOME/.zshrc"
+alias -g ZSHENV="$HOME/.zshenv"
+alias -g SSHCONF="$HOME/.ssh/config"
+alias -g TMUXCONF="$HOME/.config/tmux/tmux.conf"
+alias -g WEZTERMCONF="$HOME/.config/wezterm/wezterm.lua"
+alias -g EMACSCONF="$HOME/.config/emacs/init.el"
+alias -g NVIMCONF="$HOME/.config/nvim/init.lua"
 
 # Misc
 alias rsync='rsync -e "ssh -o RemoteCommand=None -o RequestTTY=no"'

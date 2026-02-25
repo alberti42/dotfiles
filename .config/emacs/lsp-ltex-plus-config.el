@@ -174,18 +174,26 @@ ATTEMPTS controls how many times we retry while waiting for LSP."
     (my--lsp-ltex-plus--schedule-check (current-buffer))))
 
 (defun my--lsp-ltex-plus--server-maybe-check ()
-  "When using emacsclient, ensure LTEX+ diagnostics are refreshed." 
+  "When using emacsclient, ensure LTEX+ diagnostics are refreshed."
   (when (my--lsp-ltex-plus--eligible-buffer-p)
     (require 'lsp-ltex-plus)
+    (setq-local lsp-auto-guess-root t)
+    (setq-local lsp-enable-file-watchers nil)
     (lsp-deferred)
     (my--lsp-ltex-plus--schedule-check (current-buffer))))
 
 (defun my--lsp-ltex-plus-enable ()
-  "Enable LTEX+ in the current buffer." 
+  "Enable LTEX+ in the current buffer."
   (require 'lsp-ltex-plus)
   ;; LTEX+ with `ltex.checkFrequency=edit` may not publish diagnostics until the
   ;; first change. Trigger a first pass explicitly on open.
   (add-hook 'lsp-after-open-hook #'my--lsp-ltex-plus--check-document-once nil t)
+  ;; LTEX+ is a grammar/spell checker — project discovery is meaningless for it.
+  ;; Silence the "not part of any project" prompt by auto-accepting the detected
+  ;; root, and disable file watching so lsp-mode never scans a large directory
+  ;; tree (e.g. $HOME for a loose file sitting there).
+  (setq-local lsp-auto-guess-root t)
+  (setq-local lsp-enable-file-watchers nil)
   (lsp-deferred))
 
 (use-package lsp-ltex-plus

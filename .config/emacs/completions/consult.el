@@ -16,7 +16,9 @@
          ("C-c s r" . consult-ripgrep)
          ("C-c s i" . consult-imenu)
          ("C-c s m" . consult-mark)
-         ("C-c s k" . consult-keep-lines))
+         ("C-c s k" . consult-keep-lines)
+         ;; Replace project-find-file with fd-backed consult-fd.
+         ("C-x p f" . consult-fd))
   :init
   ;; Use Consult for xref UI when available.
   (setq xref-show-xrefs-function #'consult-xref

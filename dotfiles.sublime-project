@@ -7,7 +7,7 @@
       /*"file_exclude_patterns": ["*"],*/
       /*"folder_exclude_patterns": [
       ],*/
-      "file_exclude_patterns": ["*.zwc"]
+      "file_exclude_patterns": ["*.zwc"],
   }
 ],
   "build_systems":
@@ -24,13 +24,20 @@
     "tab_size": 2,
     "translate_tabs_to_spaces": true,
     "LSP": {
-      "LSP-basedpyright": {
-        "settings": {
-          "python.pythonPath": "~/.pyenv/versions/py313/bin/python",
-          "basedpyright.analysis.typeCheckingMode": "basic",
-          "basedpyright.analysis.reportOptionalSubscript": "error"
-        }
-      }
+        "LSP-basedpyright": {
+            "settings": {
+                "python.pythonPath": "~/.pyenv/versions/py313/bin/python",
+                "basedpyright.analysis.typeCheckingMode": "basic",
+                "basedpyright.analysis.reportOptionalSubscript": "error",
+            },
+        },
+        "LSP-lua": {
+            "settings": {
+                "Lua.diagnostics.disable": [
+                    "lowercase-global"
+                ]
+            }
+        },
     },
     "default_encoding": "UTF-8",
     "ensure_newline_at_eof_on_save": true,

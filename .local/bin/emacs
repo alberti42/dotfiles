@@ -1,0 +1,3 @@
+#!/bin/zsh -f
+cd "/Applications/Emacs.app" || exit 1
+exec "./Contents/MacOS/Emacs" "$@"

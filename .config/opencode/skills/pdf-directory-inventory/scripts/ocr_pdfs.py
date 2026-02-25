@@ -21,7 +21,7 @@ import tempfile
 from pathlib import Path
 
 
-ATTACHMENTS_DIRNAME = "pdf_inventory (attachments)"
+DEFAULT_ATTACHMENTS_DIRNAME = "pdf_inventory (attachments)"
 
 
 def _run(cmd: list[str], *, quiet: bool = False) -> subprocess.CompletedProcess[str]:
@@ -137,6 +137,14 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default=".", help="Directory containing PDFs (default: .)")
     ap.add_argument(
+        "--attachments-dirname",
+        default=DEFAULT_ATTACHMENTS_DIRNAME,
+        help=(
+            "Name of attachments directory to ignore (default: "
+            f"{DEFAULT_ATTACHMENTS_DIRNAME!r})"
+        ),
+    )
+    ap.add_argument(
         "--inplace", action="store_true", help="OCR in-place (default behavior)"
     )
     ap.add_argument(
@@ -150,12 +158,19 @@ def main(argv: list[str]) -> int:
     )
     ns = ap.parse_args(argv)
 
+    if not str(ns.attachments_dirname).strip():
+        print("--attachments-dirname must be non-empty", file=sys.stderr)
+        return 2
+
     root = Path(ns.dir).resolve()
     if not root.exists() or not root.is_dir():
         print(f"Not a directory: {root}", file=sys.stderr)
         return 2
 
-    pdfs = [p for p in _iter_pdfs(root) if p.parent.name != ATTACHMENTS_DIRNAME]
+    # Note: _iter_pdfs() is top-level only; this is an additional safeguard if the
+    # attachments folder is passed via --dir.
+    attachments_dirname = str(ns.attachments_dirname)
+    pdfs = [p for p in _iter_pdfs(root) if p.parent.name != attachments_dirname]
     if not pdfs:
         print(f"No PDFs found in: {root}")
         return 0

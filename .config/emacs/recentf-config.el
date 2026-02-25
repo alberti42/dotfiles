@@ -22,6 +22,7 @@
   (setq recentf-max-saved-items 200
         recentf-max-menu-items 50
         recentf-auto-cleanup 'mode)
+  :bind ("C-c r" . recentf-open)
   :config
   (recentf-mode 1))
 

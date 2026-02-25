@@ -24,6 +24,22 @@
 		<key>executable</key>
 		<false/>
 		<key>filePath</key>
+		<string>TextFile.md</string>
+		<key>prefix</key>
+		<string>New MarkDown File</string>
+		<key>suffix</key>
+		<string>md</string>
+		<key>title</key>
+		<string>Markdown</string>
+		<key>uuid</key>
+		<string>8A45553E-0BFF-47CD-84A6-5EC9903B98A3</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<true/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
 		<string>new_sublime_project.sublime-project.json</string>
 		<key>prefix</key>
 		<string>new_sublime_project</string>

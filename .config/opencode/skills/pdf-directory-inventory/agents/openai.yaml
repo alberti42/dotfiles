@@ -1,7 +1,7 @@
 interface:
   display_name: "PDF Directory Inventory"
   short_description: "OCR + summarize PDFs into markdown index"
-  default_prompt: "Use $pdf-directory-inventory to inventory the PDFs in the current directory into pdf_inventory.md, OCRing scanned PDFs and moving files into pdf_inventory (attachments)."
+  default_prompt: "Use $pdf-directory-inventory to inventory the PDFs in the current directory. REQUIRE the user to specify NOTE_NAME='...'; if missing, stop and ask. Write {{NOTE_NAME}}.md, create _pdf_probe.md mechanically, OCR scanned PDFs, and move PDFs into {{NOTE_NAME}} (attachments)."
 
 policy:
   allow_implicit_invocation: true

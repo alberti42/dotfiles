@@ -1,6 +1,7 @@
 -- ~/config/wezterm/wezterm.lua
 local wezterm = require 'wezterm'
-local home = os.getenv("HOME")
+
+local home    = os.getenv('HOME')
 
 wezterm.on("gui-startup", function(cmd)
   local screen = wezterm.gui.screens().active
@@ -32,7 +33,8 @@ function scheme_for_appearance(appearance)
   local is_dark = (appearance:find("Dark") ~= nil)
   local dark = is_dark and "1" or "0"
 
-  wezterm.run_child_process({ "env", "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"), zac_dispatcher, "tmux", dark })
+  wezterm.run_child_process({ "env", "PATH=" .. os.getenv("PATH"), zac_dispatcher, "tmux",  dark })
+	wezterm.run_child_process({ "env", "PATH=" .. os.getenv("PATH"), zac_dispatcher, "cache", dark })
 
   -- Return the wezterm color scheme
   if is_dark then
@@ -142,11 +144,29 @@ config.colors = {
 
 -- Extend it with your overrides
 config.color_schemes = {
+  ["Catppuccin Mocha Custom"] = extend_scheme("Catppuccin Mocha", {
+  	-- background = 'white'
+  	cursor_bg = "#cad3f5",
+	  cursor_fg = "#cad3f5",
+	  cursor_border = "#cad3f5",
+  }),
   ["Catppuccin Macchiato Custom"] = extend_scheme("Catppuccin Macchiato", {
   	-- background = 'white'
+  	cursor_bg = "#cad3f5",
+	  cursor_fg = "#cad3f5",
+	  cursor_border = "#cad3f5",
   }),
   ["Catppuccin Frappe Custom"] = extend_scheme("Catppuccin Frappe", {
   	-- background = 'white'
+  	cursor_bg = "#cad3f5",
+	  cursor_fg = "#cad3f5",
+	  cursor_border = "#cad3f5",
+  }),
+  ["Catppuccin Latte Custom"] = extend_scheme("Catppuccin Latte", {
+  	-- background = 'white',
+  	cursor_bg = "#cad3f5",
+	  cursor_fg = "#cad3f5",
+	  cursor_border = "#cad3f5",
   }),
 }
 -- Catppuccin color scheme https://github.com/catppuccin/wezter
@@ -178,7 +198,8 @@ config.default_workspace = "home"
 config.audible_bell = "Disabled"
 
 -- Tmux
-config.default_prog = { home .. "/.config/dotfiles/.local/bin/tmux_launcher", "-l", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-q", "@dark_appearance", (wezterm.gui.get_appearance():find("Dark") ~= nil) and "1" or "0" }
+config.term = "xterm-256color"
+config.default_prog = { "/usr/bin/env", "PATH=" .. home .. "/.local/share/zinit/polaris/bin:/usr/bin:/bin", "TERM=" .. config.term, "tmux", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-q", "@dark_appearance", (wezterm.gui.get_appearance():find("Dark") ~= nil) and "1" or "0" }
 
 -- Mouse configuration
 config.alternate_buffer_wheel_scroll_speed = 1

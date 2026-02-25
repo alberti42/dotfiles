@@ -31,7 +31,8 @@
 
 ;; TTY support for Corfu.
 (use-package corfu-terminal
-  :if (not window-system)
+  :if (and (not window-system)
+           (< emacs-major-version 31))
   :after corfu
   :config
   (corfu-terminal-mode 1))
