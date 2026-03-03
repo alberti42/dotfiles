@@ -12,6 +12,11 @@
 __zcompile_if_needed "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
 builtin source "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
 
+## For running tests to zinit
+# zinit for \
+#     as"program" pick"revolver" @molovo/revolver \
+#     as"completion" atclone"./build.zsh" sbin"zunit" @zunit-zsh/zunit
+
 ###########################
 # INSTANT PROMPT          #
 ###########################
@@ -186,7 +191,8 @@ zinit lucid wait'0c' depth=1 from'gh-r' extract'!' compile for \
     id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect
     id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend
     # id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus
-    from'gh-r' id-as'tmux-plugins/tmux-fzf-links' atclone'mv tmux-fzf-links-*/* . && rm -r tmux-fzf-links-[0-9]*' atpull'%atclone' @alberti42/tmux-fzf-links
+    from'gh-r' id-as'tmux-plugins/tmux-fzf-links' extract'!' atpull'%atclone' @alberti42/tmux-fzf-links
+    id-as'tmux-plugins/tmux-ssh-syncing' @alberti42/tmux-ssh-syncing
   )
   zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for "${__tmux_plugins[@]}" 
 }
@@ -198,7 +204,7 @@ zinit lucid wait'0c' depth=1 from'gh-r' extract'!' compile for \
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/gh-dash/gh-dash.zsh"
 
 # Import plugin to synchronize tmux window with ssh sessions 
-# zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
+zinit depth=1 lucid wait light-mode for @alberti42/tmux-ssh-syncing
 
 # Import 7z
 zinit binary lucid wait light-mode depth=1 from'gh-r' lbin'7zz -> 7zz' for @ip7z/7zip  
@@ -388,9 +394,9 @@ alias 7='cd -7'
 alias 8='cd -8'
 alias 9='cd -9'
 
-alias e='emacsclient -nw'     # opens terminal frame, blocking
-alias ew='emacsclient -n -c'  # opens GUI frame, non-blocking
-# alias ew='open -b org.gnu.Emacs'
+alias e='emacsclient -nw'         # opens terminal frame, blocking
+alias ew='emacsclient -n -c'    # opens GUI frame, non-blocking
+# alias ew='open -b org.gnu.Emacs'  # opens GUI frame, non-blocking
 alias emacs='emacs -nw'
 
 alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'

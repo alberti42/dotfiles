@@ -10,7 +10,7 @@ local launcher_dir=${0:A:h}
 cd /
 
 # Check GitHub PR https://github.com/anomalyco/opencode/pull/9095 for when the bug is fixed
-# source "$HOME/.local/envs/opencode"
+# source "$HOME/.config/envs/opencode"
 
 # export OPENCODE_SERVER_USERNAME="$OPENCODE_SERVER_USERNAME"
 # export OPENCODE_SERVER_PASSWORD="$OPENCODE_SERVER_PASSWORD"
@@ -18,7 +18,7 @@ cd /
 # Source shell variable from interactive shell
 . "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/interactive-shell-env.sh"
 
-. "${XDG_DATA_HOME:-$HOME}/../envs/nvidia.sh"
+. "${XDG_CONFIG_HOME:-$HOME/.config}/envs/nvidia.sh"
 
 # Serve opencode backend
 exec opencode serve --port 4096

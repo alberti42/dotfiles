@@ -63,7 +63,7 @@
   // specific settings file, for example, "Preferences (Linux).sublime-settings".
   // Because of this, setting them here will have no effect: you must set them
   // in your User File Preferences.
-  "font_face": "MesloLGS NF",
+  "font_face": "JetBrainsMonoNL Nerd Font Mono",
   "font_size": 17,
   // "font-options": [],
 

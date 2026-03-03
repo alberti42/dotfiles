@@ -5,6 +5,7 @@
 # With -d, zsh will read user login files (e.g. ~/.zprofile) but not /etc/zprofile.
 
 . "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/interactive-shell-env.sh"
+. "${XDG_CONFIG_HOME:-$HOME/.config}/envs/LanguageTools.sh"
 export TERM=xterm-256color
 export COLORTERM=truecolor
 exec emacs --fg-daemon

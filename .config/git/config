@@ -1,7 +1,7 @@
 [user]
 	name = Andrea Alberti
 	email = a.alberti82@gmail.com
-	signingkey = /Users/andrea/.ssh/git_sign_Ed25519
+	signingkey = ~/.ssh/git_sign_Ed25519
 [gpg]
 	format = ssh
 [commit]

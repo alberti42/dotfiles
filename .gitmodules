@@ -51,3 +51,6 @@
 [submodule "oh-my-zsh/custom/plugins/zsh-appearance-control"]
 	path = oh-my-zsh/custom/plugins/zsh-appearance-control
 	url = git@github.com:alberti42/zsh-appearance-control.git
+[submodule "oh-my-zsh/custom/plugins/tmux-fzf-links"]
+	path = oh-my-zsh/custom/plugins/tmux-fzf-links
+	url = git@github.com:alberti42/tmux-fzf-links.git

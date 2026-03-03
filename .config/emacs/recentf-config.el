@@ -24,7 +24,11 @@
         recentf-auto-cleanup 'mode)
   :bind ("C-c r" . recentf-open)
   :config
-  (recentf-mode 1))
+  (recentf-mode 1)
+  ;; Forces saving recentf cache file every 5 minutes
+  ;; Otherwise, it would only save after 'kill-emacs
+  ;; (run-at-time nil (* 5 60) #'recentf-save-list)
+  )
 
 (provide 'recentf-config)
 ;;; recentf-config.el ends here

@@ -66,10 +66,10 @@ zinit ice wait'0b' light-mode lucid \
   atclone"source '${${(%):-%x}:a:h}/__fzf_tab_atclone_hook.zsh'" \
   atinit'_safe_one_off_load __fzf_tab_init_hook' \
   ver'integrated' \
+  depth 1 \
   id-as'Aloxaf/fzf-tab'
-zinit light alberti42/fzf-tab-fork
+zinit light Aloxaf/fzf-tab
 
-# zinit light Aloxaf/fzf-tab
-# depth 1
 # latest-release
+
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

@@ -22,7 +22,9 @@
   :init
   ;; Use Consult for xref UI when available.
   (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref))
+        xref-show-definitions-function #'consult-xref)
+  ;; Include hidden directories in fd search, but exclude .git.
+  (setq consult-fd-args '("fd" "--hidden" "--exclude" ".git" "--color=never" "--full-path")))
 
 (provide 'completions-consult)
 ;;; consult.el ends here

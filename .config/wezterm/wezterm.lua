@@ -106,7 +106,7 @@ config.check_for_updates_interval_seconds = 86400
   
 -- Font configuration
 config.adjust_window_size_when_changing_font_size = false
-config.font = wezterm.font('MesloLGS NF', { weight = 'Regular' })
+config.font = wezterm.font('JetBrainsMonoNL Nerd Font Mono', { weight = 'Regular' })
 if is_mac() then
 	config.font_size = 17.0
 elseif is_linux() then
