@@ -184,20 +184,17 @@ ATTEMPTS controls how many times we retry while waiting for LSP."
 
 (defun my--lsp-ltex-plus-enable ()
   "Enable LTEX+ in the current buffer."
-  ;; Skip ephemeral buffers opened non-interactively (e.g. dired-preview), which
-  ;; set `non-essential' to t while calling `find-file-noselect'.
-  (unless non-essential
-    (require 'lsp-ltex-plus)
-    ;; LTEX+ with `ltex.checkFrequency=edit` may not publish diagnostics until the
-    ;; first change. Trigger a first pass explicitly on open.
-    (add-hook 'lsp-after-open-hook #'my--lsp-ltex-plus--check-document-once nil t)
-    ;; LTEX+ is a grammar/spell checker — project discovery is meaningless for it.
-    ;; Silence the "not part of any project" prompt by auto-accepting the detected
-    ;; root, and disable file watching so lsp-mode never scans a large directory
-    ;; tree (e.g. $HOME for a loose file sitting there).
-    (setq-local lsp-auto-guess-root t)
-    (setq-local lsp-enable-file-watchers nil)
-    (lsp-deferred)))
+  (require 'lsp-ltex-plus)
+  ;; LTEX+ with `ltex.checkFrequency=edit` may not publish diagnostics until the
+  ;; first change. Trigger a first pass explicitly on open.
+  (add-hook 'lsp-after-open-hook #'my--lsp-ltex-plus--check-document-once nil t)
+  ;; LTEX+ is a grammar/spell checker — project discovery is meaningless for it.
+  ;; Silence the "not part of any project" prompt by auto-accepting the detected
+  ;; root, and disable file watching so lsp-mode never scans a large directory
+  ;; tree (e.g. $HOME for a loose file sitting there).
+  (setq-local lsp-auto-guess-root t)
+  (setq-local lsp-enable-file-watchers nil)
+  (lsp-deferred))
 
 (use-package lsp-ltex-plus
   :straight (lsp-ltex-plus
