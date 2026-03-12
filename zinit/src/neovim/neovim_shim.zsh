@@ -15,7 +15,7 @@ main() {
 
   local this_pane=$(tmux display-message -p "#{pane_id}")
 
-  local server_dir="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-tmux"
+  local server_dir="${XDG_CACHE_HOME:-$HOME/.cache}/nvim/tmux-openfile"
   mkdir -p "$server_dir"
 
   local server="$server_dir/${session_window}.sock"
@@ -47,7 +47,6 @@ main() {
   else
     # Start a new server in this pane
     rm -f "$server"
-    export NVIM_LISTEN_ADDRESS="$server"
     # Record this pane as the Neovim owner for this window
     tmux set-option -w @nvim_pane "$this_pane"
 

@@ -84,7 +84,37 @@ require_private_ref_in_sync() {
 
 switch_to_public_tip() {
   log "Switching to $WORK_BRANCH at $PUBLIC_REMOTE/$PUBLIC_BRANCH…"
-  run "git switch -C '$WORK_BRANCH' '$PUBLIC_REMOTE/$PUBLIC_BRANCH'"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    print -r -- "+ git switch -C '$WORK_BRANCH' '$PUBLIC_REMOTE/$PUBLIC_BRANCH'"
+    return 0
+  fi
+
+  # Capture stdout+stderr in the if-condition so set -e doesn't fire on failure.
+  local switch_out
+  if switch_out="$(git switch -C "$WORK_BRANCH" "$PUBLIC_REMOTE/$PUBLIC_BRANCH" 2>&1)"; then
+    return 0
+  fi
+
+  # git refuses to overwrite files that are untracked in the current branch but
+  # tracked in the target (e.g. gitignored files, submodule content). Since
+  # require_clean_tree already confirmed the working tree is clean, these are
+  # safe to remove.
+  local conflicts
+  conflicts="$(awk '/would be overwritten/{found=1;next} /Please move/{found=0} found{gsub(/^[[:space:]]+/,"");print}' \
+    <<< "$switch_out")"
+
+  [[ -n "$conflicts" ]] || die "git switch failed for an unexpected reason:\n$switch_out"
+
+  log "Removing conflicting untracked files before switch…"
+  local f
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    log "  removing: $f"
+    rm -rf -- "$f"
+  done <<< "$conflicts"
+
+  git switch -C "$WORK_BRANCH" "$PUBLIC_REMOTE/$PUBLIC_BRANCH" \
+    || die "git switch failed even after removing conflicting files."
 }
 
 # Reset every submodule to the exact commit recorded by the superproject

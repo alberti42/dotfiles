@@ -1,8 +1,6 @@
 # Andrea Alberti, 2025
 
 function __neovim_atclone_hook() {
-  command mv nvim-*/* . &&
-  command rm -r nvim-* &&
   command find . -type f -perm -111 -exec chmod a-x {} + &&
   command chmod u+x bin/nvim &&
   command cp "${${(%):-%x}:h}/neovim_shim.zsh" bin/ &&

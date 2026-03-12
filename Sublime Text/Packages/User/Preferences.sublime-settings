@@ -237,9 +237,10 @@
   // Sets the colors used within the text area.
   // The value "auto" will switch between the "light_color_scheme" and
   // "dark_color_scheme" based on the operating system appearance.
-  "color_scheme": "auto",
-
+  
   // Controls the "color_scheme" when set to "auto"
+  // "color_scheme": "Packages/MasmAssembly/Classic.tmTheme",
+  "color_scheme": "auto",
   "light_color_scheme": "Catppuccin Frappe.sublime-color-scheme",
   "dark_color_scheme": "Catppuccin Macchiato.sublime-color-scheme",
 

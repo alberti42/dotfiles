@@ -26,6 +26,7 @@ zinit ice \
   atpull'%atclone' \
   depth=1 \
   lucid \
+  extract'!' \
   from'gh-r' \
   nocompletions \
   nocompile

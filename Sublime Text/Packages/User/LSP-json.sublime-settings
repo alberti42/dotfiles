@@ -1,0 +1,22 @@
+// Settings in here override those in "LSP-json/LSP-json.sublime-settings"
+
+{
+  "settings": {
+    "jsonc.patterns": [
+      "buffer://*",
+      ".babelrc",
+      ".eslintrc",
+      ".eslintrc.json",
+      ".hintrc",
+      ".jsfmtrc",
+      ".jshintrc",
+      ".jsonc",
+      ".swcrc",
+      "/.ember-cli",
+      "/.vscode/*.json",
+      "/babel.config.json",
+      "/bun.lock",
+      "Code/settings.json"
+    ],
+  },
+}

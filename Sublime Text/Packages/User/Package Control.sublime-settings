@@ -43,6 +43,7 @@
     "LSP-eslint",
     "LSP-file-watcher-chokidar",
     "LSP-gopls",
+    "LSP-json",
     "LSP-julia",
     "LSP-ltex-ls",
     "LSP-lua",

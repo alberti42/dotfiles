@@ -191,11 +191,16 @@ zinit lucid wait'0c' depth=1 from'gh-r' extract'!' compile for \
     id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect
     id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend
     # id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus
-    from'gh-r' id-as'tmux-plugins/tmux-fzf-links' extract'!' atpull'%atclone' @alberti42/tmux-fzf-links
+    from'gh-r' id-as'tmux-plugins/tmux-fzf-links' extract'!' @alberti42/tmux-fzf-links
     id-as'tmux-plugins/tmux-ssh-syncing' @alberti42/tmux-ssh-syncing
   )
   zinit lucid wait depth=1 as'null' from'gh' nocompile'!' for "${__tmux_plugins[@]}" 
 }
+
+# Import tmux-emacs-tandem
+zinit lucid wait depth=1 from'gh-r' compile'**/*.zsh' \
+      id-as'tmux-plugins/emacs-tmux-tandem' bpick'et-zsh-*' \
+      atinit:'export ETO_CMD_NAME=et' for @alberti42/emacs-tmux-tandem
 
 # Import tig
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tig/tig.zsh"
@@ -269,8 +274,8 @@ zinit is-snippet wait'0a' lucid light-mode nocompile link id-as'local/key-bindin
 #####################
 [ -z "$HISTFILE" ] && HISTFILE="$HOME/.zsh_history"
 
-[ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
-[ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
+HISTSIZE=20000                      # how many entries zsh keeps in memory during a session
+SAVEHIST=20000                      # how many entries are written to disk ($HISTFILE) when the session ends
 
 # https://www.zsh.org/mla/users/2014/msg00715.html
 # zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
@@ -281,7 +286,7 @@ zinit is-snippet wait'0a' lucid light-mode nocompile link id-as'local/key-bindin
 # man zshoptions
 setopt APPEND_HISTORY               # append history list to the history file rather than replacing it
 setopt SHARE_HISTORY                # share history across all zsh sessions at the same time
-# setopt EXTENDED_HISTORY           # record timestamp of command in HISTFILE
+setopt EXTENDED_HISTORY             # record timestamp of command in HISTFILE
 setopt HIST_IGNORE_DUPS             # Do not enter command lines into the history list if they are duplicates
 setopt HIST_IGNORE_ALL_DUPS         # If a new command line being added to the history list duplicates an older one, the older command is removed from the list
 setopt HIST_SAVE_NO_DUPS            # When writing out the history file, older commands that duplicate newer ones are omitted
@@ -360,6 +365,10 @@ fi
 
 # Configure PAGER to display 5 lines before search results (https://stackoverflow.com/a/14964428/4216175),
 # to support the mouse, and support ANSI escape codes for colors (-R)
+# -F (--quit-if-one-screen): exit immediately if content fits on one screen
+# -R (--RAW-CONTROL-CHARS): pass ANSI color/formatting escape sequences through raw
+# -X (--no-init): don't send terminal init/deinit sequences (smcup/rmcup) → disables the alternate screen buffer entirely, so output stays in the scrollback after quitting
+# -s (--squeeze-blank-lines): causes consecutive blank lines to be squeezed into a single blank line
 export LESS="-sR -j5 --mouse"
 
 # Configure pager that is used by bat, git, and other utilities
@@ -395,8 +404,8 @@ alias 8='cd -8'
 alias 9='cd -9'
 
 alias e='emacsclient -nw'         # opens terminal frame, blocking
-alias ew='emacsclient -n -c'    # opens GUI frame, non-blocking
-# alias ew='open -b org.gnu.Emacs'  # opens GUI frame, non-blocking
+alias eg='emacsclient -n -c'    # opens GUI frame, non-blocking
+# alias eg='open -b org.gnu.Emacs'  # opens GUI frame, non-blocking
 alias emacs='emacs -nw'
 
 alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'
@@ -432,8 +441,13 @@ alias rsync='rsync -e "ssh -o RemoteCommand=None -o RequestTTY=no"'
 alias zip='zip --symlinks --exclude "**/.DS_Store"'
 alias rga='rg --no-ignore -aL.'
 alias fda='fd -HI'
-# alias opencode='opencode attach http://127.0.0.1:4096'
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  alias obsidian="/Applications/Obsidian.app/Contents/MacOS/Obsidian"
+fi
 # alias mc='mc --nosubshell'
+
+# Git
+alias gitP='git -P'
 
 ##########################
 # Local customizations   #

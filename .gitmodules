@@ -54,3 +54,9 @@
 [submodule "oh-my-zsh/custom/plugins/tmux-fzf-links"]
 	path = oh-my-zsh/custom/plugins/tmux-fzf-links
 	url = git@github.com:alberti42/tmux-fzf-links.git
+[submodule ".config/emacs"]
+	path = .config/emacs
+	url = git@github.com:alberti42/emacs-config.git
+[submodule ".config/yazi/plugins/fzf-plus.yazi"]
+	path = .config/yazi/plugins/fzf-plus.yazi
+	url = git@github.com:alberti42/fzf-plus.yazi.git

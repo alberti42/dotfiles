@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json",
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "general": {
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    },
+    "preferredEditor": "emacsclient",
+    "defaultApprovalMode": "auto_edit",
+    "enableNotifications": true
+  },
+  "ui": {
+    "terminalBackgroundPollingInterval": 60,
+    "inlineThinkingMode": "full",
+    "dynamicWindowTitle": true,
+    "footer": {
+      "hideContextPercentage": false
+    },
+    "showLineNumbers": false,
+    "useAlternateBuffer": false
+  }
+}

@@ -1,203 +1,188 @@
 {
-    // window
-    "window.newWindowDimensions": "inherit",
-    "window.autoDetectColorScheme": true,
+  // window
+  "window.newWindowDimensions": "inherit",
+  "window.autoDetectColorScheme": true,
 
-    // workbench
-    "workbench.fontAliasing": "auto",
-    "workbench.editor.empty.hint": "hidden",
-    "workbench.startupEditor": "none",
-    "workbench.localHistory.maxFileEntries": 500,
-    "workbench.preferredLightColorTheme": "Catppuccin Frappé",
-    "workbench.preferredDarkColorTheme": "Catppuccin Macchiato",
-    "workbench.tree.indent": 25,
-    "workbench.settings.editor": "json",
-    "workbench.colorCustomizations": {
-        "[Dracula Theme]": {
-            "editorStickyScroll.border": "#6a798d",
-            "editorStickyScroll.background": "#292f36",
-            // selections
-            "editor.selectionHighlightBackground": "#989898e3",
-            "editor.selectionHighlightBorder": "#838ba7",
-            // symbol under cursor
-            "editor.wordHighlightBackground": "#00000000",
-            "editor.wordHighlightBorder": "#00000000",
-        },
-        "[Catppuccin Frappé]": {
-            "editorStickyScroll.border": "#6a798d",
-            "editorStickyScroll.background": "#292f36",
-            // selections
-            "editor.selectionHighlightBackground": "#00000000",
-            "editor.selectionHighlightBorder": "#838ba7",
-            // symbol under cursor
-            "editor.wordHighlightBackground": "#00000000",
-            "editor.wordHighlightBorder": "#00000000",
-        },
-        "[Catppuccin Macchiato]": {
-            "editorStickyScroll.border": "#6a798d",
-            "editorStickyScroll.background": "#292f36",
-            // selections
-            "editor.selectionHighlightBackground": "#00000000",
-            "editor.selectionHighlightBorder": "#838ba7",
-            // symbol under cursor
-            "editor.wordHighlightBackground": "#00000000",
-            "editor.wordHighlightBorder": "#00000000",
-        },
-        "[Catppuccin Latte]": {
-            "editorStickyScroll.border": "#adadad",
-            "editorStickyScroll.background": "#e4e6eb",
-            // selections
-            "editor.selectionHighlightBackground": "#00000000",
-            "editor.selectionHighlightBorder": "#838ba7",
-            // symbol under cursor
-            "editor.wordHighlightBackground": "#00000000",
-            "editor.wordHighlightBorder": "#00000000",
-        }
+  // workbench
+  "workbench.fontAliasing": "auto",
+  "workbench.editor.empty.hint": "hidden",
+  "workbench.startupEditor": "none",
+  "workbench.localHistory.maxFileEntries": 500,
+  "workbench.preferredLightColorTheme": "Catppuccin Frappé",
+  "workbench.preferredDarkColorTheme": "Catppuccin Macchiato",
+  "workbench.tree.indent": 25,
+  "workbench.settings.editor": "json",
+  "workbench.colorCustomizations": {
+    "[Dracula Theme]": {
+      "editorStickyScroll.border": "#6a798d",
+      "editorStickyScroll.background": "#292f36",
+      // selections
+      "editor.selectionHighlightBackground": "#989898e3",
+      "editor.selectionHighlightBorder": "#838ba7",
+      // symbol under cursor
+      "editor.wordHighlightBackground": "#00000000",
+      "editor.wordHighlightBorder": "#00000000"
     },
-
-    "jupyter.widgetScriptSources": [
-        "jsdelivr.com",
-        "unpkg.com"
-    ],
-
-    "cSpell.customDictionaries": {
-        "custom-dictionary-user": {
-            "name": "custom-dictionary-user",
-            "path": "~/.cspell/custom-dictionary-user.txt",
-            "addWords": true,
-            "scope": "user"
-        }
+    "[Catppuccin Frappé]": {
+      "editorStickyScroll.border": "#6a798d",
+      "editorStickyScroll.background": "#292f36",
+      // selections
+      "editor.selectionHighlightBackground": "#00000000",
+      "editor.selectionHighlightBorder": "#838ba7",
+      // symbol under cursor
+      "editor.wordHighlightBackground": "#00000000",
+      "editor.wordHighlightBorder": "#00000000"
     },
-    "cSpell.languageSettings": [
-        // This one works with Python
-        {
-            "languageId": "python",
-            "includeRegExpList": [
-                "/#.*/",
-                "/('''|\"\"\")[^\\1]+?\\1/g",
-                "strings"
-            ]
-        },
-        // This one works with JavaScript, Typescript, etc
-        {
-            "languageId": "javascript,typescript",
-            "includeRegExpList": [
-                "CStyleComment",
-                "strings"
-            ]
-        },
-        // Use with cpp or c files
-        {
-            "languageId": "cpp,c",
-            // Turn off compound words, because it is only checking strings.
-            "allowCompoundWords": false,
-            // Only check comments and strings
-            "includeRegExpList": [
-                "CStyleComment",
-                "string"
-            ],
-            // Exclude includes, because they are also strings.
-            "ignoreRegExpList": [
-                "/#include.*/"
-            ]
-        }
-    ],
-    
-    // Security
-    "security.workspace.trust.enabled": false,
-    "security.workspace.trust.startupPrompt": "never",
-    "security.workspace.trust.untrustedFiles": "open",
-    "security.workspace.trust.emptyWindow": true,
-    "security.workspace.trust.banner": "never",
-    "security.promptForLocalFileProtocolHandling": false,
-    
-    // Files
-    "files.autoGuessEncoding":true,
-
-    // Editor
-    "editor.fontSize": 16,
-    "editor.fontFamily": "MesloLGS NF",
-    "editor.accessibilitySupport": "off",
-    "editor.insertSpaces": true,
-    "editor.minimap.showSlider": "always",
-    "editor.minimap.enabled": false,
-    "editor.hover.enabled": "on",
-    "editor.hover.delay": 500,
-    "editor.semanticTokenColorCustomizations": {
-        // "[Catppuccin Frappé]": {
-        //     "rules": {
-        //     "variable": "#f2d5cf"
-        //     }
-        // }
+    "[Catppuccin Macchiato]": {
+      "editorStickyScroll.border": "#6a798d",
+      "editorStickyScroll.background": "#292f36",
+      // selections
+      "editor.selectionHighlightBackground": "#00000000",
+      "editor.selectionHighlightBorder": "#838ba7",
+      // symbol under cursor
+      "editor.wordHighlightBackground": "#00000000",
+      "editor.wordHighlightBorder": "#00000000"
     },
-    
-    // cSpell
-    "cSpell.enabled": false,
-    "cSpell.enabledFileTypes": {
-        "*": true
+    "[Catppuccin Latte]": {
+      "editorStickyScroll.border": "#adadad",
+      "editorStickyScroll.background": "#e4e6eb",
+      // selections
+      "editor.selectionHighlightBackground": "#00000000",
+      "editor.selectionHighlightBorder": "#838ba7",
+      // symbol under cursor
+      "editor.wordHighlightBackground": "#00000000",
+      "editor.wordHighlightBorder": "#00000000"
+    }
+  },
+
+  "jupyter.widgetScriptSources": ["jsdelivr.com", "unpkg.com"],
+
+  "cSpell.customDictionaries": {
+    "custom-dictionary-user": {
+      "name": "custom-dictionary-user",
+      "path": "~/.cspell/custom-dictionary-user.txt",
+      "addWords": true,
+      "scope": "user"
+    }
+  },
+  "cSpell.languageSettings": [
+    // This one works with Python
+    {
+      "languageId": "python",
+      "includeRegExpList": ["/#.*/", "/('''|\"\"\")[^\\1]+?\\1/g", "strings"]
     },
-
-    // Terminal
-    "terminal.integrated.macOptionIsMeta": true,
-    "terminal.integrated.commandsToSkipShell": [
-        "matlab.interrupt",
-        "language-julia.interrupt"
-    ],
-    "terminal.integrated.fontSize": 16,
-
-    // LTeX
-    "ltex.languageToolOrg.username": "...",
-    "ltex.languageToolOrg.apiKey": "...",
-    "ltex.language": "auto",
-    // "ltex.language": "de-DE",
-    // "ltex.language": "en-US",
-    
-    // git
-    "git.confirmSync": false,
-    "git.openRepositoryInParentFolders": "always",
-    "git.autofetch": true,
-    
-    // Python
-    "python.venvPath": "~/.virtualenvs",
-    "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/py313/bin/python",
-    "python.languageServer": "Pylance",
-    "python.analysis.typeCheckingMode": "basic",
-
-    // Julia
-    "julia.symbolCacheDownload": true,
-    "julia.enableTelemetry": true,
-    
-    // MATLAB
-    "MATLAB.installPath": "/Applications/MATLAB.app",
-    
-    // Explorer
-    "explorer.confirmDelete": false,
-
-    // Latex Workshop
-    "latex-workshop.latex.outDir": "%DIR%/._aux",
-    "latex-workshop.latex.autoBuild.run": "never",
-    "latex-workshop.latex.recipe.default": "lastUsed",
-    "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
-    "latex-workshop.synctex.afterBuild.enabled": true,
-    "latex-workshop.view.pdf.invert": 0,
-
-    // Sublime Merge
-    "vscsm.smergeExecutablePath": "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge",
-    "editor.detectIndentation": false,
-    
-    // Latex files
-    "[latex]": {
-        "editor.wordWrap": "on",
-        "editor.tabSize": 2
+    // This one works with JavaScript, Typescript, etc
+    {
+      "languageId": "javascript,typescript",
+      "includeRegExpList": ["CStyleComment", "strings"]
     },
+    // Use with cpp or c files
+    {
+      "languageId": "cpp,c",
+      // Turn off compound words, because it is only checking strings.
+      "allowCompoundWords": false,
+      // Only check comments and strings
+      "includeRegExpList": ["CStyleComment", "string"],
+      // Exclude includes, because they are also strings.
+      "ignoreRegExpList": ["/#include.*/"]
+    }
+  ],
 
-    // TeX files
-    "[tex]": {
-        "editor.tabSize": 2
-    },
+  // Security
+  "security.workspace.trust.enabled": false,
+  "security.workspace.trust.startupPrompt": "never",
+  "security.workspace.trust.untrustedFiles": "open",
+  "security.workspace.trust.emptyWindow": true,
+  "security.workspace.trust.banner": "never",
+  "security.promptForLocalFileProtocolHandling": false,
 
-    // Shell scripts
-    "[shellscript]": {
-        "editor.tabSize": 2
-    },
+  // Files
+  "files.autoGuessEncoding": true,
+
+  // Editor
+  "editor.fontSize": 16,
+  "editor.fontFamily": "MesloLGS NF",
+  "editor.accessibilitySupport": "off",
+  "editor.insertSpaces": true,
+  "editor.minimap.showSlider": "always",
+  "editor.minimap.enabled": false,
+  "editor.hover.enabled": "on",
+  "editor.hover.delay": 500,
+  "editor.semanticTokenColorCustomizations": {
+    // "[Catppuccin Frappé]": {
+    //     "rules": {
+    //     "variable": "#f2d5cf"
+    //     }
+    // }
+  },
+
+  // cSpell
+  "cSpell.enabled": false,
+  "cSpell.enabledFileTypes": {
+    "*": true
+  },
+
+  // Terminal
+  "terminal.integrated.macOptionIsMeta": true,
+  "terminal.integrated.commandsToSkipShell": [
+    "matlab.interrupt",
+    "language-julia.interrupt"
+  ],
+  "terminal.integrated.fontSize": 16,
+
+  // LTeX
+  "ltex.languageToolOrg.username": "...",
+  "ltex.languageToolOrg.apiKey": "...",
+  "ltex.language": "auto",
+  // "ltex.language": "de-DE",
+  // "ltex.language": "en-US",
+
+  // git
+  "git.confirmSync": false,
+  "git.openRepositoryInParentFolders": "always",
+  "git.autofetch": true,
+
+  // Python
+  "python.venvPath": "~/.virtualenvs",
+  "python.defaultInterpreterPath": "${env:HOME}/.pyenv/versions/py313/bin/python",
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+
+  // Julia
+  "julia.symbolCacheDownload": true,
+  "julia.enableTelemetry": true,
+
+  // MATLAB
+  "MATLAB.installPath": "/Applications/MATLAB.app",
+
+  // Explorer
+  "explorer.confirmDelete": false,
+
+  // Latex Workshop
+  "latex-workshop.latex.outDir": "%DIR%/._aux",
+  "latex-workshop.latex.autoBuild.run": "never",
+  "latex-workshop.latex.recipe.default": "lastUsed",
+  "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
+  "latex-workshop.synctex.afterBuild.enabled": true,
+  "latex-workshop.view.pdf.invert": 0,
+
+  // Sublime Merge
+  "vscsm.smergeExecutablePath": "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge",
+  "editor.detectIndentation": false,
+
+  // Latex files
+  "[latex]": {
+    "editor.wordWrap": "on",
+    "editor.tabSize": 2
+  },
+
+  // TeX files
+  "[tex]": {
+    "editor.tabSize": 2
+  },
+
+  // Shell scripts
+  "[shellscript]": {
+    "editor.tabSize": 2
+  }
 }

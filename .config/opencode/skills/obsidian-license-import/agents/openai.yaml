@@ -1,0 +1,8 @@
+display_name: Obsidian License Import
+short_description: Import a software license purchase bundle into Obsidian
+default_prompt: |
+  Import a new software license purchase from IMPORT_DIR into /Users/andrea/Obsidian/Work/12 Software licenses.
+  Hard-stop if IMPORT_DIR is missing.
+  If NOTE_NAME is missing, propose 3-6 NOTE_NAME options from user hints + extracted docs and ask the user to choose via an interactive choice prompt (free-text allowed).
+  Extract purchase_date from the documents; if missing/ambiguous, ask the user for PURCHASE_DATE.
+  Do not put license keys in YAML; store them only in a [!secret] callout in the note body.

@@ -1,7 +1,7 @@
 // These settings override both User and Default settings for the JSON syntax
 {
 	"translate_tabs_to_spaces": true,
-	"tab_size": 4,
+	"tab_size": 2,
 	"extensions":
 	[
 		".jshintrc",
