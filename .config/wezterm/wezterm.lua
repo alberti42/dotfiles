@@ -41,9 +41,10 @@ function scheme_for_appearance(appearance)
 
   -- Return the wezterm color scheme
   if is_dark then
-    return "Catppuccin Macchiato Custom"
+  	return "Catppuccin Frappe Custom"
+    -- return "Catppuccin Macchiato Custom"
   else
-    return "Catppuccin Frappe Custom"
+    return "Catppuccin Latte Custom"
   end
 end
 

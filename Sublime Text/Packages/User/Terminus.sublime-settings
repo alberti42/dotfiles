@@ -1,11 +1,16 @@
 {
   "theme": "adaptive",
   "brighten_bold_text": false,
+  "default_config": {
+    "osx": "Zsh",
+    "linux": "Zsh",
+    "windows": "Command Prompt"
+  },
   "shell_configs": [
     {
       "name": "Zsh",
       "cmd": ["zsh", "-i", "-l"],
-      "env": {},
+      "env": {"COLORTERM": "truecolor"},
       "enable": true,
       "platforms": ["linux", "osx"],
     },

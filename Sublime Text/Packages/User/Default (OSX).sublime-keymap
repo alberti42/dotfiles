@@ -199,6 +199,13 @@
   
   // TERMINUS {{{
     {
+      "keys": ["super+n"],
+      "command": "terminus_open_new_tab",
+      "context": [
+        { "key": "setting.terminus_view", "operator": "equal", "operand": true },
+      ],
+    },
+    {
       "keys": ["alt+`"],
       "command": "toggle_terminus_panel",
       "args": {

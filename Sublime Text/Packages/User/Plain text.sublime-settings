@@ -1,0 +1,4 @@
+// These settings override both User and Default settings for the Plain text syntax
+{
+  "ensure_newline_at_eof_on_save": false
+}

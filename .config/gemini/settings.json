@@ -8,8 +8,7 @@
   "general": {
     "sessionRetention": {
       "enabled": true,
-      "maxAge": "30d",
-      "warningAcknowledged": true
+      "maxAge": "30d"
     },
     "preferredEditor": "emacsclient",
     "defaultApprovalMode": "auto_edit",
@@ -23,6 +22,19 @@
       "hideContextPercentage": false
     },
     "showLineNumbers": false,
-    "useAlternateBuffer": false
+    "useAlternateBuffer": false,
+    "theme": "Default"
+  },
+  "mcp": {
+    "excluded": []
+  },
+  "mcpServers": {
+    "context7": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "test -f \"$HOME/.config/envs/context7.sh\" && source \"$HOME/.config/envs/context7.sh\" && exec npx -y @upstash/context7-mcp"
+      ]
+    }
   }
 }

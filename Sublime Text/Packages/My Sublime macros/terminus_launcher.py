@@ -148,6 +148,7 @@ class _TerminusOpenOrFocusBase(sublime_plugin.WindowCommand):  # type: ignore[mi
         return {
             "cmd": self._cmd(),
             "cwd": _resolve_cwd(self.window),
+            "env": {"COLORTERM": "truecolor"},
             "post_view_hooks": [
                 ["terminus_launcher_move_to_rightmost_group", {"focus": True}],
             ],
@@ -232,3 +233,44 @@ class LoginShellTerminusOpenOrFocusCommand(_TerminusOpenOrFocusBase):  # type: i
 
     def _cmd(self):
         return _login_shell_cmd()
+
+
+class TerminusOpenNewTabCommand(sublime_plugin.WindowCommand):  # type: ignore[misc]
+    """Open a new Terminus tab of the same type as the currently active terminus view.
+
+    Detects whether the active view is a login shell or an IPython session (and
+    which virtualenv) by inspecting the view settings written by the open-or-focus
+    commands, then opens a fresh tab of the same kind.
+    """
+
+    def run(self):
+        view = self.window.active_view()
+        if not view:
+            return
+        s = view.settings()
+        cwd = _resolve_cwd(self.window)
+
+        if s.get(IPY_VIEW_MARKER_KEY):
+            virtualenv = s.get(IPY_VIEW_VENV_KEY)
+            cmd = [LAUNCHER, virtualenv, IPYTHON_EXE]
+            view_settings = {IPY_VIEW_MARKER_KEY: True, IPY_VIEW_VENV_KEY: virtualenv}
+        else:
+            cmd = _login_shell_cmd()
+            view_settings = {SHELL_VIEW_MARKER_KEY: True}
+
+        self.window.run_command("terminus_open", {
+            "cmd": cmd,
+            "cwd": cwd,
+            "env": {"COLORTERM": "truecolor"},
+            "post_view_hooks": [
+                ["terminus_launcher_move_to_rightmost_group", {"focus": True}],
+            ],
+            "view_settings": view_settings,
+        })
+
+    def is_enabled(self):
+        view = self.window.active_view()
+        if not view:
+            return False
+        s = view.settings()
+        return bool(s.get("terminus_view") and not s.get("terminus_view.finished"))

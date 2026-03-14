@@ -1,1 +1,1 @@
---color=always --plain --number --theme="Catppuccin Frappe" --map-syntax "*.backup.log":Duplicacy\ Backup\ Log
+--color=always --plain --number --theme="Catppuccin Latte" --theme-light="Catppuccin Latte" --theme-dark="Catppuccin Frappe" --map-syntax "*.backup.log":Duplicacy\ Backup\ Log

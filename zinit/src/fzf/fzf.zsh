@@ -78,7 +78,7 @@
       ${fzf_base_url}/man/man1/fzf-tmux.1;
     " \
     atclone'_safe_one_off_load __fzf_atclone_hook' \
-    atpull'_safe_one_off_load __fzf_atclone_hook' \
+    atpull"%atclone" \
     lbin"fzf -> fzf; fzf-tmux -> fzf-tmux; fzf-preview.sh -> fzf-preview;" \
     atinit'_safe_one_off_load __fzf_init_hook' \
     null lucid wait

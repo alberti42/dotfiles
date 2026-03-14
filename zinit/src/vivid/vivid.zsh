@@ -15,6 +15,7 @@ __my_vivid_load_hook() {
 
 zinit ice depth=1 wait'0b' lucid \
   from:'gh-r' \
+  extract'!' \
   lbin:'vivid -> vivid' \
-  atload'_safe_one_off_load __my_vivid_load_hook; unset ls_color_theme force_generation_color_scheme ls_colors_file'
+  atload'_safe_one_off_load __my_vivid_load_hook; unset ls_color_theme force_generation_color_scheme src_ls_colors_file'
 zinit light @sharkdp/vivid

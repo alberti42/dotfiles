@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "test -f \"$HOME/.config/envs/context7.sh\" && source \"$HOME/.config/envs/context7.sh\" && exec npx -y @upstash/context7-mcp"
+      ]
+    }
+  }
+}

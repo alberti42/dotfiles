@@ -1,5 +1,6 @@
 // These settings override both User and Default settings for the JSON syntax
 {
+  "ensure_newline_at_eof_on_save": false,
 	"translate_tabs_to_spaces": true,
 	"tab_size": 2,
 	"extensions":

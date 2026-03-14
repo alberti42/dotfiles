@@ -88,11 +88,9 @@
     "context7": {
       "type": "local",
       "command": [
-        "npx",
-        "-y",
-        "@upstash/context7-mcp",
-        "--api-key",
-        "ctx7sk-98b20b8d-b532-4ee5-8e11-2079bf7a8f7e"
+        "bash",
+        "-c",
+        "test -f \"$HOME/.config/envs/context7.sh\" && source \"$HOME/.config/envs/context7.sh\" && exec npx -y @upstash/context7-mcp"
       ],
       "enabled": true
     },

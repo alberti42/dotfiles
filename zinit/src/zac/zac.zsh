@@ -7,11 +7,17 @@ function __my_dark_mode_setter() {
     # fzf plugin
     export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS_CATPPUCCIN[macchiato]"
 
+    # bat
+    export BAT_CONFIG_PATH="$DOTFILES_DIR/.config/bat/config-dark"
+
     # zsh-opencode-tab plugin
     _zsh_opencode_tab[spinner.bg_hex]="#24273A"
   else
     # fzf plugin
     export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS_CATPPUCCIN[frappe]"
+
+    # bat
+    export BAT_CONFIG_PATH="$DOTFILES_DIR/.config/bat/config-light"
 
     # zsh-opencode-tab plugin
     _zsh_opencode_tab[spinner.bg_hex]="#303446"

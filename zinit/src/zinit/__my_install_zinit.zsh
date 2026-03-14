@@ -8,7 +8,8 @@ function __my_install_zinit() {
   command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
 
   # Clone the Zinit repository
-  command git clone --depth=1 --branch integrated https://github.com/alberti42/zinit "$HOME/.local/share/zinit/zinit.git" && \
+  # --depth=1
+  command git clone --branch integrated https://github.com/alberti42/zinit "$HOME/.local/share/zinit/zinit.git" && \
       print -P "%F{33} %F{34}Installation successful.%f%b" || \
       print -P "%F{160} The clone has failed.%f%b"
 }

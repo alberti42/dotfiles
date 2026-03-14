@@ -46,8 +46,8 @@ path=(
   "$HOME/.juliaup/bin"
   "$HOME/.cargo/bin"
 )
-
-source "$HOME/.local/share/zinit/plugins/pyenv---pyenv/zi_pyenv_init.zsh"
+ 
+source "$HOME/.config/dotfiles/zinit/src/pyenv/zi_pyenv_init.zsh"
 
 # Activate pyenv
 pyenv activate "$pyenv_environment"
