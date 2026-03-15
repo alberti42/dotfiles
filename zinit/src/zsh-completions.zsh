@@ -126,21 +126,6 @@ function __my_completions_atinit_hook() {
   setopt ALWAYS_TO_END     # if a completion is performed with the cursor within a word, and a full completion is inserted, the cursor is moved to the end of the word
   setopt CASE_GLOB         # if set, make globbing (filename generation) sensitive to case; unset makes globbing insensitive to case 
   WORDCHARS=''             # Characters to be considered part of a word; by default: *?_-.[]~=/&;!#$%^(){}<>
-
-  # Check if LS_COLORS is defined
-  if (( ${+LS_COLORS} )); then
-    # General completion colors
-    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-
-    # Default list colors + highlight the matched substring/item with gray-blue background, normal foreground
-    # This configuration is only relevant for `menu select` and not relevant for fzf-tab
-    zstyle ':completion:*:default' list-colors \
-      "${(s.:.)LS_COLORS}" \
-      'ma=48;2;60;70;90'
-  else
-    [[ ${ZINIT[MUTE_WARNINGS]} != (1|true|on|yes) && $quiet != -q ]] && \
-      +zi-log "{u-warn}Warning{b-warn}: zsh-completions cannot use LS_COLORS."
-  fi
   
   # Choose menu select UI - it is superseded by fzf-tab
   zstyle ':completion:*:*:*:*:*' menu select

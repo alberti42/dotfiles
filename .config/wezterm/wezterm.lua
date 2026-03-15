@@ -203,7 +203,7 @@ config.audible_bell = "Disabled"
 
 -- Tmux
 config.term = "xterm-256color"
-config.default_prog = { "/usr/bin/env", "PATH=" .. home .. "/.local/share/zinit/polaris/bin:/usr/bin:/bin", "TERM=" .. config.term, "tmux", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-q", "@dark_appearance", (wezterm.gui.get_appearance():find("Dark") ~= nil) and "1" or "0" }
+config.default_prog = { "/usr/bin/env", "PATH=" .. home .. "/.local/share/zinit/polaris/bin:/usr/bin:/bin", "TERM=" .. config.term, "tmux", "new-session", "-A", "-D", "-s", "main", ";", "set-option", "-g", "@dark_appearance", (wezterm.gui.get_appearance():find("Dark") ~= nil) and "1" or "0" }
 
 -- Mouse configuration
 config.alternate_buffer_wheel_scroll_speed = 1

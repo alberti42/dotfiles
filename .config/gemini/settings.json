@@ -15,7 +15,6 @@
     "enableNotifications": true
   },
   "ui": {
-    "terminalBackgroundPollingInterval": 60,
     "inlineThinkingMode": "full",
     "dynamicWindowTitle": true,
     "footer": {
@@ -23,7 +22,9 @@
     },
     "showLineNumbers": false,
     "useAlternateBuffer": false,
-    "theme": "Default"
+    "autoThemeSwitching": false,
+    "terminalBackgroundPollingInterval": 60,
+    "theme": "Default Light"
   },
   "mcp": {
     "excluded": []
