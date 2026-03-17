@@ -7,5 +7,8 @@
 . "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/interactive-shell-env.sh"
 . "${XDG_CONFIG_HOME:-$HOME/.config}/envs/LanguageTools.sh"
 export TERM=xterm-256color
+# COLORTERM must be set explicitly here: the daemon is launched by launchd,
+# not from a terminal, so it does not inherit the COLORTERM=truecolor that
+# WezTerm normally injects into interactive shell sessions.
 export COLORTERM=truecolor
 exec emacs --fg-daemon

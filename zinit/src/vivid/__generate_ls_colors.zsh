@@ -19,12 +19,8 @@ function __generate_ls_colors_for_theme() {
   
   if [[ $retval -eq 0 ]]; then
     {
-      echo -n "local LS_COLORS='"
       echo "$ls_colors" | tr -d "\n"
-      echo "'"
-      echo "export LS_COLORS"
     } > "$target_file"
-    zcompile -Uz -- "$target_file"
     (( ${+ICE[silent]} == 0 )) && \
       echo "Vivid: Generated color scheme ($theme): $ZINIT[col-happy]$theme$ZINIT[col-rst]"
     return 0

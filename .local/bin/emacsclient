@@ -1,4 +1,4 @@
 #!/bin/zsh -fd
 export TERM=xterm-emacs
 path=(${path:#${0:h}})
-exec emacs "$@"
+exec emacsclient "$@"

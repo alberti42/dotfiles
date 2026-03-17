@@ -232,7 +232,8 @@ function bracketed-paste-fast-filter() {
     case $NUMERIC in
       (0) PASTED=${(q)PASTED}   ;; # shell-escape as one word (usually backslashes; no surrounding quotes)
       (1) PASTED=${(qq)PASTED}  ;; # single-quoted string, including the surrounding quotes
-      (2) PASTED=${(qqq)PASTED} ;; # double-quoted string (escape the chars that are special inside "")
+      (2) [[ $PASTED[1,2] == '~/' ]] && PASTED="${HOME}${PASTED[2,-1]}"
+          PASTED=${(qqq)PASTED} ;; # double-quoted string (escape the chars that are special inside "")
     esac
   fi
   integer paste_start=$CURSOR

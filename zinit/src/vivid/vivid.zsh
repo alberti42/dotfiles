@@ -9,8 +9,8 @@ typeset -g VIVID_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/vivid"
 [[ -d "$VIVID_CACHE_DIR" ]] || mkdir -p "$VIVID_CACHE_DIR"
 
 typeset -gA LS_COLORS_FILES
-LS_COLORS_FILES[dark]="$VIVID_CACHE_DIR/ls_colors_dark.zsh"
-LS_COLORS_FILES[light]="$VIVID_CACHE_DIR/ls_colors_light.zsh"
+LS_COLORS_FILES[dark]="$VIVID_CACHE_DIR/ls_colors_dark"
+LS_COLORS_FILES[light]="$VIVID_CACHE_DIR/ls_colors_light"
 
 typeset -g LS_COLORS_THEMES_CACHE="$VIVID_CACHE_DIR/themes.zsh"
 

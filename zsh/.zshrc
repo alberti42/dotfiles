@@ -93,7 +93,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzy/fzy.zsh"
 # source "$DOTFILES_DIR/zinit/src/zcolors/zcolors.zsh"
 
 # Load history substring search https://github.com/zsh-users/zsh-history-substring-search
-zinit wait lucid depth=1 light-mode for @zsh-users/zsh-history-substring-search
+# zinit wait wait'0' lucid depth=1 light-mode for @zsh-users/zsh-history-substring-search
 
 # Wrapper snippet for zsh-users/zsh-autosuggestions
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zsh-autosuggestions.zsh"
@@ -147,9 +147,6 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
   zinit lucid wait light-mode for "${__local_plugins[@]}"
 }
 
-# Import zsh-appearance-control
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zac/zac.zsh"
-
 # Wrapper snippet for astral-sh/uv
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/uv/uv.zsh"
 
@@ -158,6 +155,13 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzf/fzf.zsh"
 
 # Wrapper snippet for fzf-tab
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzf-tab/fzf-tab.zsh"
+
+# Install fzf-recent-dirs
+zinit lucid wait from'gh-r' extract'!' light-mode atload"bindkey $'\e\C-d' fzf-recent-dirs" \
+  for @alberti42/fzf-recent-dirs
+
+# Import zsh-appearance-control
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zac/zac.zsh"
 
 # Wrapper snippet for yazi
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/yazi/yazi.zsh"
@@ -175,9 +179,9 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tmux/tmux.zsh"
 #   @alberti42/zsh-opencode-tab
 
 # Import zsh-indent-control
-zinit lucid wait'0c' depth=1 from'gh-r' extract'!' compile for \
-  wait'0c' atinit:"export ZLE_INDENT_WIDTH=2" \
-  @alberti42/zsh-indent-control
+zinit lucid wait'0c' from'gh-r' extract'!' light-mode \
+  atinit:"export ZLE_INDENT_WIDTH=2" compile \
+  for @alberti42/zsh-indent-control
 
 # Import Tmux Plugins
 () {
@@ -308,14 +312,11 @@ setopt IGNORE_EOF                   # prevent Ctrl-D from exiting the shell; 10 
 setopt COMPLETE_ALIASES             # prevents aliases on the command line from being internally substituted before completion is attempted
 setopt INTERACTIVE_COMMENTS         # allow comments even in interactive shells
 # setopt GLOB_DOTS                  # do not require a leading `.' in a filename to be matched explicitly
-# setopt PUSHD_SILENT               # do not print the directory stack after pushd or popd
-
-# Changing/making/removing directory
-# After: after https://github.com/ohmyzsh/ohmyzsh/blob/f733dc340b2a1c5b2e61a4da7de790b2f557175f/lib/directories.zsh
-setopt AUTO_CD                     # Navigate directories without needing "cd" command.
-setopt AUTO_PUSHD                  # Make cd push the old directory onto the directory stack.
-setopt PUSHD_IGNORE_DUPS           # Don't push multiple copies of the same directory onto the directory stack.
-setopt PUSHD_MINUS                 # Exchanges the meanings of `+' and `-' when used with a number to specify a directory in the stack.
+setopt AUTO_CD                      # navigate directories without needing "cd" command.
+setopt AUTO_PUSHD                   # make cd push the old directory onto the directory stack.
+setopt PUSHD_SILENT                 # do not print the directory stack after pushd or popd
+setopt PUSHD_IGNORE_DUPS            # don't push multiple copies of the same directory onto the directory stack.
+setopt PUSHD_MINUS                  # exchanges the meanings of `+' and `-' when used with a number to specify a directory in the stack.
 
 #####################
 # ENV VARIABLE      #
@@ -393,16 +394,16 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
 alias d='dirs -v'
-alias -- -='cd -'
-alias 1='cd -1'
-alias 2='cd -2'
-alias 3='cd -3'
-alias 4='cd -4'
-alias 5='cd -5'
-alias 6='cd -6'
-alias 7='cd -7'
-alias 8='cd -8'
-alias 9='cd -9'
+alias -- -='cd - >/dev/null'
+alias 1='cd -1 >/dev/null'
+alias 2='cd -2 >/dev/null'
+alias 3='cd -3 >/dev/null'
+alias 4='cd -4 >/dev/null'
+alias 5='cd -5 >/dev/null'
+alias 6='cd -6 >/dev/null'
+alias 7='cd -7 >/dev/null'
+alias 8='cd -8 >/dev/null'
+alias 9='cd -9 >/dev/null'
 
 alias e='emacsclient -nw'         # opens terminal frame, blocking
 alias eg='emacsclient -n -c'    # opens GUI frame, non-blocking

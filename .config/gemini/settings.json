@@ -10,7 +10,6 @@
       "enabled": true,
       "maxAge": "30d"
     },
-    "preferredEditor": "emacsclient",
     "defaultApprovalMode": "auto_edit",
     "enableNotifications": true
   },

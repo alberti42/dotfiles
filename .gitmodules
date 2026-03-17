@@ -60,3 +60,6 @@
 [submodule ".config/yazi/plugins/fzf-plus.yazi"]
 	path = .config/yazi/plugins/fzf-plus.yazi
 	url = git@github.com:alberti42/fzf-plus.yazi.git
+[submodule "oh-my-zsh/custom/plugins/fzf-recent-dirs"]
+	path = oh-my-zsh/custom/plugins/fzf-recent-dirs
+	url = git@github.com:alberti42/fzf-recent-dirs.git

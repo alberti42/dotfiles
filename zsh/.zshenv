@@ -19,29 +19,18 @@ fi
 export LANG=en_US.UTF-8
 export LC_TIME=en_GB.UTF-8  # How to check it: locale -k LC_TIME
 
-# Configure path
-if [[ "/usr/local/bin" ]]; then
-  path=("/usr/local/bin" $path)
-fi
-if [[ -d "$HOME/bin" ]]; then
-  path=("$HOME/bin" $path)
-fi
-if [[ -d "$HOME/.local/bin" ]]; then
-  path=("$HOME/.local/bin" $path)
-fi
-
-# Latex path
-if [[ -d "/Library/TeX/texbin" ]]; then
-  path=("/Library/TeX/texbin" $path)
-fi
-
 # Location of dotfiles
 DOTFILES_DIR=$HOME/.config/dotfiles
+
+#########################
+# XDG PATHS             #
+#########################
 
 # This can be useful to some POSIX applications
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
+export XDG_STATE_HOME=$HOME/.local/state
 
 # Ubuntu calls compinit in /etc/zshrc. To avoid the slowdown from this call and if the user loads any
 # completion-equipped plugins, add the following lines to ~/.zshenv:
@@ -179,3 +168,22 @@ builtin source "$DOTFILES_DIR/zinit/src/zinit/__zcompile_if_needed_and_source.zs
 # Source (and compile if needed) _safe_one_off_load function
 __zcompile_if_needed "$DOTFILES_DIR/zinit/src/zinit/__safe_one_off_load.zsh"
 builtin source "$DOTFILES_DIR/zinit/src/zinit/__safe_one_off_load.zsh"
+
+#########################
+# USER PATH            #
+#########################
+
+if [[ "/usr/local/bin" ]]; then
+  path=("/usr/local/bin" $path)
+fi
+if [[ -d "$HOME/bin" ]]; then
+  path=("$HOME/bin" $path)
+fi
+if [[ -d "$HOME/.local/bin" ]]; then
+  path=("$HOME/.local/bin" $path)
+fi
+
+# Latex path
+if [[ -d "/Library/TeX/texbin" ]]; then
+  path=("/Library/TeX/texbin" $path)
+fi

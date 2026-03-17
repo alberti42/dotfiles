@@ -1,0 +1,20 @@
+[
+  {
+    "caption": "Commit: Copy Short Hash",
+    "command": "copy_to_clipboard",
+    "args": { "text": "$short_commit" }
+  },
+  {
+    "caption": "Rebase onto commit…",
+    "command": "git",
+    "args": {
+      "argv": [
+        "rebase",
+        "--onto",
+        "$select_commit",
+        "$select_commit",
+        "$select_commit"
+      ]
+    }
+  }
+]

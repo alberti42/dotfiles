@@ -24,7 +24,7 @@ wezterm.on("gui-startup", function(cmd)
   }
 
   window:gui_window():set_inner_size(width_pt, height_pt)
-	window:gui_window():toggle_fullscreen()
+  window:gui_window():toggle_fullscreen()
 end)
 
 function scheme_for_appearance(appearance)
@@ -32,17 +32,22 @@ function scheme_for_appearance(appearance)
   -- inherit the shell PATH, so system tmux (or Homebrew/zinit-installed tmux)
   -- would not be found otherwise.
   local tmux_dir = home .. "/.local/share/zinit/polaris/bin"
-  local zac_dispatcher = home .. "/.config/dotfiles/oh-my-zsh/custom/plugins/zsh-appearance-control/bin/appearance-dispatch"
+  local dotfiles_dir = home .. "/.config/dotfiles"
+  local zac_dispatcher = dotfiles_dir .. "/oh-my-zsh/custom/plugins/zsh-appearance-control/bin/appearance-dispatch"
+  local zac_io_cmd = dotfiles_dir .. "/zinit/src/zac/zac-io-cmd.zsh"
   local is_dark = (appearance:find("Dark") ~= nil)
   local dark = is_dark and "1" or "0"
 
-  wezterm.run_child_process({ "env", "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"), zac_dispatcher, "tmux", dark })
-  wezterm.run_child_process({ "env", "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"), zac_dispatcher, "cache", dark })
+  wezterm.run_child_process({
+    'env',
+    "PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"),
+    'ZAC_IO_CMD=' .. zac_io_cmd,
+    zac_dispatcher, 'dispatch', dark,
+  })
 
   -- Return the wezterm color scheme
   if is_dark then
-  	return "Catppuccin Frappe Custom"
-    -- return "Catppuccin Macchiato Custom"
+    return "Catppuccin Frappe Custom"
   else
     return "Catppuccin Latte Custom"
   end
@@ -80,23 +85,23 @@ end
 
 local platform
 if string.find(wezterm.target_triple, "darwin") then
-	platform = "darwin"
+  platform = "darwin"
 elseif string.find(wezterm.target_triple, "windows") then
-	platform = "win"
+  platform = "win"
 else
-	platform = "linux"
+  platform = "linux"
 end
 
 local is_linux = function()
-	return platform == "linux"
+  return platform == "linux"
 end
 
 local is_mac = function()
-	return platform == "darwin"
+  return platform == "darwin"
 end
 
 local is_win = function()
-	return platform == "win"
+  return platform == "win"
 end
 
 config = {}
@@ -109,21 +114,21 @@ config.check_for_updates_interval_seconds = 86400
 config.adjust_window_size_when_changing_font_size = false
 config.font = wezterm.font('JetBrainsMonoNL Nerd Font Mono', { weight = 'Regular' })
 if is_mac() then
-	config.font_size = 17.0
+  config.font_size = 17.0
 elseif is_linux() then
-	config.font_size = 12.0
+  config.font_size = 12.0
 end
 
 -- Colors
 --[[
 config.colors = {
-	foreground = '#ffffff',
-	background = '#111111',
-	cursor_bg = '#ffffff',
-	cursor_fg = '#000000',
-	cursor_border = '#ffffff',
+  foreground = '#ffffff',
+  background = '#111111',
+  cursor_bg = '#ffffff',
+  cursor_fg = '#000000',
+  cursor_border = '#ffffff',
 
-	ansi = {
+  ansi = {
     '#000000', -- black
     '#c91b00', -- red
     '#00c300', -- green
@@ -133,7 +138,7 @@ config.colors = {
     '#00c5c8', -- cyan
     '#c7c7c7', -- white
   },
-	brights = {
+  brights = {
     '#686868', -- bright black
     '#ff6e68', -- bright red
     '#60fa67', -- bright green
@@ -149,28 +154,28 @@ config.colors = {
 -- Extend it with your overrides
 config.color_schemes = {
   ["Catppuccin Mocha Custom"] = extend_scheme("Catppuccin Mocha", {
-  	-- background = 'white'
-  	cursor_bg = "#cad3f5",
-	  cursor_fg = "#cad3f5",
-	  cursor_border = "#cad3f5",
+    -- background = 'white'
+    cursor_bg = "#cad3f5",
+    cursor_fg = "#cad3f5",
+    cursor_border = "#cad3f5",
   }),
   ["Catppuccin Macchiato Custom"] = extend_scheme("Catppuccin Macchiato", {
-  	-- background = 'white'
-  	cursor_bg = "#cad3f5",
-	  cursor_fg = "#cad3f5",
-	  cursor_border = "#cad3f5",
+    -- background = 'white'
+    cursor_bg = "#cad3f5",
+    cursor_fg = "#cad3f5",
+    cursor_border = "#cad3f5",
   }),
   ["Catppuccin Frappe Custom"] = extend_scheme("Catppuccin Frappe", {
-  	-- background = 'white'
-  	cursor_bg = "#cad3f5",
-	  cursor_fg = "#cad3f5",
-	  cursor_border = "#cad3f5",
+    -- background = 'white'
+    cursor_bg = "#cad3f5",
+    cursor_fg = "#cad3f5",
+    cursor_border = "#cad3f5",
   }),
   ["Catppuccin Latte Custom"] = extend_scheme("Catppuccin Latte", {
-  	-- background = 'white',
-  	cursor_bg = "#cad3f5",
-	  cursor_fg = "#cad3f5",
-	  cursor_border = "#cad3f5",
+    -- background = 'white',
+    cursor_bg = "#cad3f5",
+    cursor_fg = "#cad3f5",
+    cursor_border = "#cad3f5",
   }),
 }
 -- Catppuccin color scheme https://github.com/catppuccin/wezter
@@ -178,6 +183,7 @@ config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
 
 -- Cursor style
 config.default_cursor_style = 'BlinkingBar'
+config.cursor_thickness = "150%"
 config.cursor_blink_rate = 250
 
 -- Scrollback
@@ -194,7 +200,7 @@ elseif is_linux() then
 elseif is_win() then
   config.front_end = "OpenGL"
 end
-	
+  
 -- Workspace
 config.default_workspace = "home"
 

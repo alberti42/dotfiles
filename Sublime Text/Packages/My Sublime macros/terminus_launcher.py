@@ -274,3 +274,46 @@ class TerminusOpenNewTabCommand(sublime_plugin.WindowCommand):  # type: ignore[m
             return False
         s = view.settings()
         return bool(s.get("terminus_view") and not s.get("terminus_view.finished"))
+
+
+# ---------------------------------------------------------------------------
+# Appearance-change listener: regenerate Terminus theme when the color scheme
+# or UI theme changes (e.g. switching between light and dark mode).
+# ---------------------------------------------------------------------------
+
+_last_appearance: Dict[str, Any] = {}
+
+
+def _current_appearance() -> Dict[str, Any]:
+    if sublime is None:
+        return {}
+    return sublime.ui_info()
+
+
+def _on_appearance_change() -> None:
+    global _last_appearance
+    if sublime is None:
+        return
+    current = _current_appearance()
+    if current == _last_appearance:
+        return
+    _last_appearance = current
+    for window in sublime.windows():
+        window.run_command("terminus_generate_theme", {"force": True})
+
+
+def plugin_loaded() -> None:
+    global _last_appearance
+    if sublime is None:
+        return
+    _last_appearance = _current_appearance()
+    prefs = sublime.load_settings("Preferences.sublime-settings")
+    prefs.add_on_change("terminus_launcher_appearance", _on_appearance_change)
+
+
+def plugin_unloaded() -> None:
+    if sublime is None:
+        return
+    sublime.load_settings("Preferences.sublime-settings").clear_on_change(
+        "terminus_launcher_appearance"
+    )

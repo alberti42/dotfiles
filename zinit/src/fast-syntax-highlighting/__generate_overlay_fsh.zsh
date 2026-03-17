@@ -1,39 +1,76 @@
 #!/hint/zsh
 
-function __generate_overlay_fsh() {
-  # $overlay_ini was modified more recently than $overlay_zsh, or $overlay_zsh does not exist
-  # Update $overlay_zsh to reflect changes in overlay_ini
-  local retval msg err err_file
-  err_file=$(mktemp) # Create a temporary file for capturing stderr
+function __generate_fsh_theme() {
+  local mode="$1"
+  local base_theme overlay_ini target_file
 
-  # Capture stdout and stderr separately
-  msg=$(fast-theme "$overlay_ini" 2>"$err_file")
-  retval=$?
-
-  # Read the captured stderr
-  err=$(<"$err_file")
-  rm -f "$err_file" # Clean up the temporary file
-  
-  if (( retval )); then
-      # Log failure
-      if [[ ${ZINIT[MUTE_WARNINGS]} != (1|true|on|yes) && $quiet != -q ]]; then
-          +zi-log "${ZINIT[col-error]}Error: Fast Syntax Highlighting: overlay.ini not processed correctly:${ZINIT[col-rst]} ${err}"
-      fi
-      return 1
+  if [[ "$mode" = "dark" ]]; then
+    base_theme="$FSH_THEME_DARK"
+    overlay_ini="${FSH_OVERLAY_FILES[dark]}"
+    target_file="${FSH_CACHE_FILES[dark]}"
   else
-      # Log success
-      if [[ ${ZINIT[MUTE_WARNINGS]} != (1|true|on|yes) && $quiet != -q ]]; then
-          +zi-log "Fast Syntax Highlighting: ${ZINIT[col-data]}overlay.ini${ZINIT[col-rst]} processed correcty."
-      fi
-      if [[ -f "$overlay_zsh" ]]; then
-        source "$overlay_zsh"
-      else
-        # When overlay.ini contains no configuration, no file is created
-        # To avoid processing overlay.ini every new shell, we create an empty overlay.zsh
-        touch "$overlay_zsh"
-      fi
-      return 0
+    base_theme="$FSH_THEME_LIGHT"
+    overlay_ini="${FSH_OVERLAY_FILES[light]}"
+    target_file="${FSH_CACHE_FILES[light]}"
   fi
+
+  local err_file=$(mktemp)
+
+  if [[ -o zle ]]; then zle -I; fi
+
+  # Set base theme
+  fast-theme "$base_theme" 2>"$err_file"
+  local retval=$?
+  local err=$(<"$err_file")
+
+  if (( retval )); then
+    rm -f "$err_file"
+    (( ${+ICE[silent]} == 0 )) && \
+      echo "FSH: Failed setting base theme ($base_theme): $err"
+    return 1
+  fi
+
+  # Apply overlay if it exists and is non-empty
+  if [[ -f "$overlay_ini" && -s "$overlay_ini" ]]; then
+    fast-theme "$overlay_ini" 2>"$err_file"
+    retval=$?
+    err=$(<"$err_file")
+
+    if (( retval )); then
+      rm -f "$err_file"
+      (( ${+ICE[silent]} == 0 )) && \
+        echo "FSH: Failed applying overlay ($overlay_ini): $err"
+      return 1
+    fi
+  fi
+
+  rm -f "$err_file"
+
+  # Dump FAST_HIGHLIGHT_STYLES to cache file
+  {
+    echo "typeset -gA FAST_HIGHLIGHT_STYLES"
+    local key val
+    for key val in "${(kv@)FAST_HIGHLIGHT_STYLES}"; do
+      printf "FAST_HIGHLIGHT_STYLES[%s]=%s\n" "${(q)key}" "${(q)val}"
+    done
+  } > "$target_file"
+  zcompile -Uz -- "$target_file"
+
+  (( ${+ICE[silent]} == 0 )) && \
+    echo "FSH: Generated $mode theme ($base_theme + overlay)"
   return 0
 }
-_safe_one_off_load __generate_overlay_fsh
+
+function __generate_fsh_themes() {
+  __generate_fsh_theme "dark"
+  __generate_fsh_theme "light"
+
+  # Update themes cache with currently generated theme names
+  {
+    echo "typeset -gA FSH_BASE_THEME"
+    echo "FSH_BASE_THEME[dark]=\"$FSH_THEME_DARK\""
+    echo "FSH_BASE_THEME[light]=\"$FSH_THEME_LIGHT\""
+  } > "$FSH_THEMES_CACHE"
+}
+
+_safe_one_off_load __generate_fsh_themes

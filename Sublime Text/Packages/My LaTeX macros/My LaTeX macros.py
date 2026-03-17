@@ -1,6 +1,7 @@
 import sublime, sublime_plugin
 import os
 import subprocess
+import re
 
 class OpenTerminalInTmuxCommand(sublime_plugin.WindowCommand):
     def run(self):
@@ -28,7 +29,6 @@ class OpenTerminalInTmuxCommand(sublime_plugin.WindowCommand):
             ["/bin/sh", "-c",
              "/usr/bin/osascript -e 'tell application id \"com.github.wez.wezterm\" to activate' 2>/dev/null"]
         )
-import re
 
 class EncapsulateInEnvironmentCommand(sublime_plugin.TextCommand):
     def run(self, edit, **params):

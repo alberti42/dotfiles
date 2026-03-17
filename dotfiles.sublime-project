@@ -28,7 +28,6 @@
             "settings": {
                 "python.pythonPath": "~/.pyenv/versions/py313/bin/python",
                 "basedpyright.analysis.typeCheckingMode": "basic",
-                "basedpyright.analysis.reportOptionalSubscript": "error",
             },
         },
         "LSP-lua": {

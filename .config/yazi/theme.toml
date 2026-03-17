@@ -1,5 +1,6 @@
 [flavor]
-dark = "catppuccin-frappe"
+dark  = "catppuccin-frappe"
+light = "catppuccin-latte"
 
 [indicator]
 current = { reversed = true }

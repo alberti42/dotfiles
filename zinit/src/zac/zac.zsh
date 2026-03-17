@@ -1,39 +1,45 @@
 #!/hint/zsh
 
-function __my_dark_mode_setter() {
-  local is_dark=$1  
-  
+function __my_appearance_immediate() {
+  local is_dark=$1
+
   # Prevent execution if called without argument
-  [[ ! -z "$is_dark" ]] || return
-  
+  [[ $is_dark == (0|1) ]] || return
+
   if (( is_dark )); then
-    # Keep track of the background color
     local BACKGROUND_COLOR="#303446"
 
     # LS_COLORS
-    source "$LS_COLORS_FILES[dark]"
+    IFS= read -r LS_COLORS < "$LS_COLORS_FILES[dark]" && export LS_COLORS
 
     # fzf plugin
     export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS_CATPPUCCIN[frappe]"
 
     # bat
     export BAT_CONFIG_PATH="$DOTFILES_DIR/.config/bat/config-dark"
+
+    # fast-syntax-highlighting
+    source "$FSH_CACHE_FILES[dark]"
+    typeset -ga zle_highlight=('paste:fg=#00E5FF,bg=#002B36')
   else
-    # Keep track of the background color
     local BACKGROUND_COLOR="#EFF1F5"
 
     # LS_COLORS
-    source "$LS_COLORS_FILES[light]"
+    IFS= read -r LS_COLORS < "$LS_COLORS_FILES[light]" && export LS_COLORS
 
     # fzf plugin
     export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS_CATPPUCCIN[latte]"
 
     # bat
     export BAT_CONFIG_PATH="$DOTFILES_DIR/.config/bat/config-light"
+
+    # fast-syntax-highlighting
+    source "$FSH_CACHE_FILES[light]"
+    typeset -ga zle_highlight=('paste:fg=#00B3FF,bg=#DDECF9')
   fi
 
   # zsh-opencode-tab plugin
-  if (( ${+_zsh_opencode_tab[spinner.bg_hex]} )); then
+  if (( ${+_zsh_opencode_tab} )); then
     _zsh_opencode_tab[spinner.bg_hex]=$BACKGROUND_COLOR
   else
     export Z_OC_TAB_SPINNER_BG_HEX=$BACKGROUND_COLOR
@@ -57,9 +63,9 @@ function __my_dark_mode_setter() {
 
 () {
   local __local_plugin_path="$DOTFILES_DIR/oh-my-zsh/custom/plugins"
-
   zinit lucid wait light-mode for \
-      wait'0c' atinit"export ZAC_CALLBACK_FNC=__my_dark_mode_setter" \
-      atload"zac sync && __my_dark_mode_setter $REPLY" \
+      wait'0' \
+      atinit"export ZAC_IMMEDIATE_CALLBACK_FNC=__my_appearance_immediate" \
+      atload'zac sync && __my_appearance_immediate "$REPLY"' \
       $__local_plugin_path/zsh-appearance-control
 }
