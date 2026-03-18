@@ -24,21 +24,61 @@ _subl_main() {
     fi
   done
 
-  # Resolve all positional arguments to their real paths
-  local resolved_args arg
-  typeset -a resolved_args
+  # Resolve all positional arguments to their real paths.
+  # Also track which resolved args are regular files (for left-pane placement),
+  # excluding project/workspace files and values consumed by --project/--command.
+  local resolved_args file_args arg
+  typeset -a resolved_args file_args
+  local skip_next=0 has_command=0
   for arg in "$@"; do
-    if [[ -f "$arg" || -d "$arg" ]]; then
-        # If it's a file or directory, resolve the real path
-        resolved_args+=("$(readlink -f "$arg" 2>/dev/null || echo "$arg")")
-    else
-        # Pass through non-file arguments like options (-n, --help, etc.)
-        resolved_args+=("$arg")
+    if (( skip_next )); then
+      skip_next=0
+      resolved_args+=("$arg")
+      continue
     fi
+    case "$arg" in
+      --project|--command)
+        [[ "$arg" == --command ]] && has_command=1
+        skip_next=1
+        resolved_args+=("$arg")
+        ;;
+      --*|-*)
+        resolved_args+=("$arg")
+        ;;
+      *)
+        if [[ -f "$arg" || -d "$arg" ]]; then
+          local resolved
+          resolved="$(readlink -f "$arg" 2>/dev/null || echo "$arg")"
+          resolved_args+=("$resolved")
+          # Collect regular files that are not Sublime project/workspace files
+          if [[ -f "$arg" && "$arg" != *.sublime-project && "$arg" != *.sublime-workspace ]]; then
+            file_args+=("$resolved")
+          fi
+        else
+          resolved_args+=("$arg")
+        fi
+        ;;
+    esac
   done
 
+  # Inject --command move_to_leftmost_pane when opening regular files and no
+  # --command was already provided by the caller. The plugin is a no-op when
+  # the window has only one group, so this is always safe to pass.
+  local extra_cmd=()
+  if (( ! has_command && ${#file_args[@]} > 0 )); then
+    local json_files="[" first=1
+    for f in "${file_args[@]}"; do
+      local esc="${f//\\/\\\\}"
+      esc="${esc//\"/\\\"}"
+      (( first )) && json_files+="\"$esc\"" || json_files+=", \"$esc\""
+      first=0
+    done
+    json_files+="]"
+    extra_cmd=(--command "move_to_leftmost_pane {\"files\": $json_files}")
+  fi
+
   # Execute the Sublime Text binary with resolved arguments
-  "$subl_path" -p "$RSUBL_PORT" "${resolved_args[@]}"
+  "$subl_path" -p "$RSUBL_PORT" "${extra_cmd[@]}" "${resolved_args[@]}"
 }
 
 _subl_main "$@"

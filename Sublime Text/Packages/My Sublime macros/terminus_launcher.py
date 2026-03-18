@@ -275,6 +275,69 @@ class TerminusOpenNewTabCommand(sublime_plugin.WindowCommand):  # type: ignore[m
         s = view.settings()
         return bool(s.get("terminus_view") and not s.get("terminus_view.finished"))
 
+# ---------------------------------------------------------------------------
+# CLI left-pane helper: move files opened via `subl` to the leftmost pane.
+# ---------------------------------------------------------------------------
+
+def _leftmost_group_index(window):
+    layout = window.get_layout()
+    cells = layout.get("cells") or []
+    if not cells:
+        return 0
+
+    best = 0
+    best_x = _layout_group_x_center(layout, 0)
+    for i in range(1, len(cells)):
+        x = _layout_group_x_center(layout, i)
+        if x < best_x:
+            best = i
+            best_x = x
+    return best
+
+
+class MoveToLeftmostPaneCommand(sublime_plugin.WindowCommand):  # type: ignore[misc]
+    """Move CLI-opened files to the leftmost pane when a split layout is active.
+
+    Accepts ``file`` (single path) or ``files`` (list of paths).
+    Retries up to _MAX_ATTEMPTS times for views still loading when the command
+    fires. Does nothing when the window has only one group.
+    """
+
+    _MAX_ATTEMPTS = 20
+    _RETRY_MS = 100
+
+    def run(self, file=None, files=None):
+        window = self.window
+        if window.num_groups() < 2:
+            return
+
+        paths = []
+        if file:
+            paths.append(os.path.normpath(file))
+        if files:
+            paths.extend(os.path.normpath(f) for f in files)
+
+        for path in paths:
+            self._schedule_move(window, path, self._MAX_ATTEMPTS)
+
+    def _schedule_move(self, window, path, attempts):
+        view = next(
+            (v for v in window.views()
+             if v.file_name() and os.path.normpath(v.file_name()) == path),
+            None,
+        )
+        if view is None or view.is_loading():
+            if attempts > 0:
+                sublime.set_timeout(
+                    lambda: self._schedule_move(window, path, attempts - 1),
+                    self._RETRY_MS,
+                )
+            return
+
+        target = _leftmost_group_index(window)
+        current, _ = window.get_view_index(view)
+        if current != target:
+            window.set_view_index(view, target, len(window.views_in_group(target)))
 
 # ---------------------------------------------------------------------------
 # Appearance-change listener: regenerate Terminus theme when the color scheme

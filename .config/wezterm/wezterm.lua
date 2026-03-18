@@ -182,7 +182,7 @@ config.color_schemes = {
 config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
 
 -- Cursor style
-config.default_cursor_style = 'BlinkingBar'
+config.default_cursor_style = 'BlinkingBlock'
 config.cursor_thickness = "150%"
 config.cursor_blink_rate = 250
 

@@ -40,25 +40,31 @@ skip_global_compinit=1
 # HOMEBREW SETUP        #
 #########################
 
-# Detect HomeBrew (macOS)
-if [[ $OSTYPE =~ 'darwin*' ]]; then
-  local brew_path="${$(command -v /opt/homebrew/bin/brew || command -v /usr/local/bin/brew):-}"
-  if [[ -n "$brew_path" ]] then
-    local homebrew_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/homebrew"
-    local shellenv_script="${homebrew_cache_dir}/shellenv.zsh"
-    if [[ ! -f "$shellenv_script" ]]; then
-      mkdir -p "$homebrew_cache_dir"
-      "$brew_path" shellenv > "$shellenv_script"
-      zcompile -Uz -- "$shellenv_script"
-    fi
-    () {
-      local PATH # Prevent overwriting PATH
-      source "$shellenv_script"
-    }
-    path=("${brew_path:h}" $path)
-  fi
-  typeset -U fpath
-fi
+() {
+  # Detect HomeBrew (macOS)
+  if [[ $OSTYPE =~ 'darwin*' ]]; then
+    local brew_path="${$(command -v /opt/homebrew/bin/brew || command -v /usr/local/bin/brew):-}"
+    if [[ -n "$brew_path" ]] then
+     local homebrew_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/homebrew"
+     local shellenv_script="${homebrew_cache_dir}/shellenv.zsh"
+     if [[ ! -f "$shellenv_script" ]]; then
+       mkdir -p "$homebrew_cache_dir"
+       "$brew_path" shellenv > "$shellenv_script"
+       zcompile -Uz -- "$shellenv_script"
+     fi
+     () {
+       # do not let the script clobber PATH,
+       # because the line right after does it manually
+       # and more carefully
+       local PATH # Prevent overwriting PATH
+       source "$shellenv_script"
+     }
+     path=("${brew_path:h}" $path)
+   fi
+   # make fpath a unique array to avoid duplicates  
+   typeset -U fpath
+ fi
+}
 
 #########################
 # PERL SETUP            #
@@ -118,20 +124,22 @@ export PATH="$JAVA_HOME/bin:$PATH"
 # os default paths        #
 ###########################
 
-if [[ $OSTYPE == darwin* ]]; then
-  # Execution time ~ 3m
-  # eval $(/usr/libexec/path_helper -s)
+() {
+  if [[ $OSTYPE == darwin* ]]; then
+    # Execution time ~ 3m
+    # eval $(/usr/libexec/path_helper -s)
 
-  local -a added_paths=(
-    /usr/local/bin
-    /usr/bin
-    /bin
-    /usr/sbin
-    /sbin
-  )  
-  # append the dirs
-  path+=(${^added_paths})
-fi
+    local -a added_paths=(
+      /usr/local/bin
+      /usr/bin
+      /bin
+      /usr/sbin
+      /sbin
+    )  
+    # append the dirs
+    path+=(${^added_paths})
+  fi
+}
 
 ###########################
 # Zinit path              #

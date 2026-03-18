@@ -1,4 +1,8 @@
-# Example build.yml
-icon: dragon-plus
-patches:
-inject_path: false
+ # ~/.config/emacs-plus/build.yml
+ icon: dragon-plus
+
+ patches:
+   - frame-transparency          # community registry patches
+   - aggressive-read-buffering
+
+inject_path: false              # optional: skip injecting PATH into Info.plist,

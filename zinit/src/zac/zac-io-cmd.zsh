@@ -42,6 +42,12 @@ if (( is_dark )); then
     > "$XDG_STATE_HOME/opencode/kv.json.tmp" && \
     mv "$XDG_STATE_HOME/opencode/kv.json.tmp" "$XDG_STATE_HOME/opencode/kv.json" || exit 1
 
+  # IPython
+  sed -E "s/^[[:space:]]*c\.InteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.InteractiveShell.colors = 'linux'/" \
+    "$DOTFILES_DIR/ipython/profile_default/ipython_config.py" | \
+    sed -E "s/^[[:space:]]*c\.TerminalInteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.TerminalInteractiveShell.colors = 'linux'/" \
+    > "$HOME/.ipython/profile_default/ipython_config.py"
+
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_dark" "$vivid_cache_dir/ls_colors" || exit 1
 else
@@ -64,6 +70,12 @@ else
     sed -E 's/^([[:space:]]*"theme"[[:space:]]*:[[:space:]]*")[^"]*(".*)/\1catppuccin\2/' \
     > "$XDG_STATE_HOME/opencode/kv.json.tmp" && \
     mv "$XDG_STATE_HOME/opencode/kv.json.tmp" "$XDG_STATE_HOME/opencode/kv.json" || exit 1
+
+  # IPython
+  sed -E "s/^[[:space:]]*c\.InteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.InteractiveShell.colors = 'lightbg'/" \
+    "$DOTFILES_DIR/ipython/profile_default/ipython_config.py" | \
+    sed -E "s/^[[:space:]]*c\.TerminalInteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.TerminalInteractiveShell.colors = 'lightbg'/" \
+    > "$HOME/.ipython/profile_default/ipython_config.py"
 
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_light" "$vivid_cache_dir/ls_colors" || exit 1

@@ -79,8 +79,8 @@ reload!() {
 # set the cursor style explictly
 restore_cursor() {
   emulate -LR zsh
-  # Blinking bar
-  echo -ne '\e[5 q'
+  # Blinking block
+  echo -ne '\e[1 q'
 }
 
 # Wrapper functions to launch a given utility with proper restoration of cursor after exiting
