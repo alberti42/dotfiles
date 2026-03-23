@@ -156,26 +156,26 @@ config.color_schemes = {
   ["Catppuccin Mocha Custom"] = extend_scheme("Catppuccin Mocha", {
     -- background = 'white'
     cursor_bg = "#cad3f5",
-    cursor_fg = "#cad3f5",
+    -- cursor_fg = "#cad3f5",
     cursor_border = "#cad3f5",
   }),
   ["Catppuccin Macchiato Custom"] = extend_scheme("Catppuccin Macchiato", {
     -- background = 'white'
     cursor_bg = "#cad3f5",
-    cursor_fg = "#cad3f5",
+    -- cursor_fg = "#cad3f5",
     cursor_border = "#cad3f5",
   }),
   ["Catppuccin Frappe Custom"] = extend_scheme("Catppuccin Frappe", {
     -- background = 'white'
     cursor_bg = "#cad3f5",
-    cursor_fg = "#cad3f5",
+    -- cursor_fg = "#cad3f5",
     cursor_border = "#cad3f5",
   }),
   ["Catppuccin Latte Custom"] = extend_scheme("Catppuccin Latte", {
     -- background = 'white',
-    cursor_bg = "#cad3f5",
-    cursor_fg = "#cad3f5",
-    cursor_border = "#cad3f5",
+    -- cursor_bg = "#b58dd7",
+    -- cursor_fg = "#cad3f5",
+    -- cursor_border = "#b58dd7",
   }),
 }
 -- Catppuccin color scheme https://github.com/catppuccin/wezter
@@ -183,7 +183,7 @@ config.color_scheme = scheme_for_appearance(wezterm.gui.get_appearance())
 
 -- Cursor style
 config.default_cursor_style = 'BlinkingBlock'
-config.cursor_thickness = "150%"
+-- config.cursor_thickness = "150%"
 config.cursor_blink_rate = 250
 
 -- Scrollback
@@ -228,9 +228,6 @@ config.send_composed_key_when_right_alt_is_pressed = true
 config.disable_default_key_bindings = true
 config.enable_csi_u_key_encoding = true
 config.keys = {
-  { key = 'LeftArrow', mods = 'ALT', action = wezterm.action { SendString = '\x1bb' } }, -- Alt + Left (Move backward one word)
-  { key = 'RightArrow', mods = 'ALT', action = wezterm.action { SendString = '\x1bf' } }, -- Alt + Right (Move forward one word)
-
   { key = '[', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02p') }, -- Cmd + Shift + [ -> Move to previous tmux pane
   { key = ']', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02n') }, -- Cmd + Shift + ] -> Move to next tmux pane
 

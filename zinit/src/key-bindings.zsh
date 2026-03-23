@@ -40,11 +40,17 @@ if [[ -n "${terminfo[kLFT]}" ]]; then
 else
   bindkey -M emacs "^[^[[D" emacs-backward-word
 fi
+# Standard CSI sequences for Alt+Left/Right (WezTerm without remapping)
+bindkey -M emacs '\e[1;3C' emacs-forward-word
+bindkey -M emacs '\e[1;3D' emacs-backward-word
+
+# Bind delete key to deleting character at the cursor position
 if [[ -n "${terminfo[kdch1]}" ]]; then
   bindkey -M emacs "${terminfo[kdch1]}" delete-char
 else
   bindkey -M emacs "^[[3~" delete-char
 fi
+
 # Fixes a problem with Terminus which does not have the right
 # description of terminfo `infocmp -L -1`
 if [[ $TERM_PROGRAM == "Terminus-Sublime" ]]; then

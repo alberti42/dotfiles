@@ -19,7 +19,9 @@ function __my_appearance_immediate() {
     export BAT_CONFIG_PATH="$DOTFILES_DIR/.config/bat/config-dark"
 
     # fast-syntax-highlighting
-    source "$FSH_CACHE_FILES[dark]"
+    #source "$FSH_CACHE_FILES[dark]"
+
+    # ZLE customization
     typeset -ga zle_highlight=('paste:fg=#00E5FF,bg=#002B36')
   else
     local BACKGROUND_COLOR="#EFF1F5"
@@ -34,7 +36,9 @@ function __my_appearance_immediate() {
     export BAT_CONFIG_PATH="$DOTFILES_DIR/.config/bat/config-light"
 
     # fast-syntax-highlighting
-    source "$FSH_CACHE_FILES[light]"
+    #source "$FSH_CACHE_FILES[light]"
+
+    # ZLE customization
     typeset -ga zle_highlight=('paste:fg=#00B3FF,bg=#DDECF9')
   fi
 

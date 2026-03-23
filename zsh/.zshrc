@@ -252,7 +252,15 @@ zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'dist/superfile*/spf -
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
 
 # Load syntax highlighting
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"
+
+# Load patina for fast syntax highlighting
+zinit binary lucid light-mode wait from'gh-r' extract'!' \
+      atclone'./zsh-patina activate > patina_activate.zsh' \
+      atpull'%atclone' \
+      atload'__zcompile_if_needed_and_source patina_activate.zsh' \
+      lbin'zsh-patina -> patina' \
+      for @michel-kraemer/zsh-patina
 
 # Finalize Zsh initialization after all plugins and completions are loaded
 zinit ice id-as'zinit/compinit' lucid as'null' wait atload'
@@ -322,36 +330,6 @@ setopt PUSHD_MINUS                  # exchanges the meanings of `+' and `-' when
 # ENV VARIABLE      #
 #####################
 
-# macOS dependent variables
-if [[ $OSTYPE =~ 'darwin*' ]]; then
-  # Set CLICOLOR for Ansi Colors: With this setting,
-  # BSD systems directly assume color output (e.g., -G option in ls)
-  export CLICOLOR=1;
-
-  if [[ ${SHELL:t} != zsh_macos_(arm|intel)_launcher ]]; then
-    echo $ZINIT[col-warn]Warning:$ZINIT[col-rst] macOS shell set to $SHELL instead of zsh special launcher
-  fi
-fi
-
-# Preferred editor for local and remote sessions
-local -a editor_cmd
-
-if [[ -n $SSH_CONNECTION ]]; then
-  # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
-  editor_cmd=(rsubl -w)
-else
-  editor_cmd=(emacsclient '-nw' '-c')  # Emacs
-  # editor_cmd=(subl -nw)
-fi
-
-# Check whether the editor is found in the path
-if (( $#editor_cmd )) && command -v "$editor_cmd[1]" >/dev/null 2>&1; then
-  export EDITOR="${(j: :)editor_cmd}"
-else
-  # echo "Warning: '$editor_cmd' not found in the path. Using 'nano' as a fallback."
-  export EDITOR="nano"
-fi
-
 # Always tell bat to use less -R for colors
 # export BAT_PAGER="less -sR -j5"
 
@@ -374,6 +352,38 @@ export LESS="-sR -j5 --mouse"
 
 # Configure pager that is used by bat, git, and other utilities
 export PAGER="less"
+
+#####################
+# EDITORS           #
+#####################
+
+# Preferred editor for local and remote sessions
+local -a editor_cmd
+
+if [[ -n $SSH_CONNECTION ]]; then
+  # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
+  editor_cmd=(rsubl -w)
+else
+  editor_cmd=(emacsclient '-nw' '-c')  # Emacs
+  # editor_cmd=(subl -nw)
+fi
+
+# Check whether the editor is found in the path
+if (( $#editor_cmd )) && command -v "$editor_cmd[1]" >/dev/null 2>&1; then
+  export EDITOR="${(j: :)editor_cmd}"
+else
+  # echo "Warning: '$editor_cmd' not found in the path. Using 'nano' as a fallback."
+  export EDITOR="nano"
+fi
+
+# Bridge to emacs vterm
+if [[ -n "$INSIDE_EMACS" && "$INSIDE_EMACS" = vterm ]]; then
+  () {
+    local script="$XDG_CONFIG_HOME/emacs/straight/repos/emacs-libvterm/etc/emacs-vterm-zsh.sh"
+    [[ -f "$script" ]] && source "$script"
+    ev() { vterm_cmd find-file "$(realpath "${@:-.}")"; }
+  }
+fi
 
 #####################
 # ALIASES           #
