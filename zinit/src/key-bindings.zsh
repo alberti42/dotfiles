@@ -3,6 +3,20 @@
 # man zshzle; note: the key bindings are case sensitive!
 # for other key bindings check: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/refs/heads/master/lib/key-bindings.zsh
 
+# Support for CSI u protocol
+#
+# - \e[> — CSI with > meaning "private/DEC" parameter prefix
+# - 4 — refers to key encoding
+# - 1 — enable CSI-u mode for ambiguous sequences
+#
+# The full set:
+# - 0 — disable (reset to legacy)
+# - 1 — disambiguate (send CSI-u only for ambiguous keys like Ctrl+I vs Tab)
+# - 2 — report all keys as CSI-u
+# - 4 — report alternate keys too
+# - 8 — report all associated text
+printf '\e[>4;1m'
+
 # Ensures that zsh/terminfo is loaded
 zmodload zsh/terminfo
 
@@ -11,7 +25,6 @@ zmodload zsh/terminfo
 # It often gets loaded automatically the first time completion needs it (e.g. when you use menu
 # select or certain listing behaviors).
 zmodload -i zsh/complist
-
 
 # Bind to arrow keys
 autoload -Uz up-line-or-beginning-search
@@ -59,6 +72,21 @@ if [[ $TERM_PROGRAM == "Terminus-Sublime" ]]; then
   # Alt + Left Arrow Key
   bindkey -M emacs "\e[1;3D"   emacs-backward-word
 fi
+
+# Newline insertion (multi-line editing)
+_widget.shift_enter() { LBUFFER+=$'\n' }
+zle -N _widget.shift_enter
+bindkey '\e[13;2u'  _widget.shift_enter   # Shift+Enter (CSI u sequence)
+bindkey '^[^M'      _widget.shift_enter   # Alt+Enter (legacy ESC+CR)
+
+# Shift delete
+bindkey '\e[127;2u'  backward-delete-char
+bindkey '\e[8;5u'    backward-delete-char
+
+# Ctrl-tab
+_widget.ctrl_tab() { LBUFFER+=$'\t' }
+zle -N _widget.ctrl_tab
+bindkey '\e[9;5u' _widget.ctrl_tab   # Ctrl+Tab → insert literal tab
 
 # Home key: Beginning of line
 if [[ -n "${terminfo[khome]}" ]]; then

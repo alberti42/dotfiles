@@ -279,7 +279,8 @@ zinit light zdharma-continuum/null
 # Keybindings       #
 #####################
 
-zinit is-snippet wait'0a' lucid light-mode nocompile link id-as'local/key-bindings' for $DOTFILES_DIR/zinit/src/key-bindings.zsh
+# Loading time ~2ms
+__zcompile_if_needed_and_source $DOTFILES_DIR/zinit/src/key-bindings.zsh
 
 #####################
 # HISTORY           #
@@ -352,38 +353,6 @@ export LESS="-sR -j5 --mouse"
 
 # Configure pager that is used by bat, git, and other utilities
 export PAGER="less"
-
-#####################
-# EDITORS           #
-#####################
-
-# Preferred editor for local and remote sessions
-local -a editor_cmd
-
-if [[ -n $SSH_CONNECTION ]]; then
-  # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
-  editor_cmd=(rsubl -w)
-else
-  editor_cmd=(emacsclient '-nw' '-c')  # Emacs
-  # editor_cmd=(subl -nw)
-fi
-
-# Check whether the editor is found in the path
-if (( $#editor_cmd )) && command -v "$editor_cmd[1]" >/dev/null 2>&1; then
-  export EDITOR="${(j: :)editor_cmd}"
-else
-  # echo "Warning: '$editor_cmd' not found in the path. Using 'nano' as a fallback."
-  export EDITOR="nano"
-fi
-
-# Bridge to emacs vterm
-if [[ -n "$INSIDE_EMACS" && "$INSIDE_EMACS" = vterm ]]; then
-  () {
-    local script="$XDG_CONFIG_HOME/emacs/straight/repos/emacs-libvterm/etc/emacs-vterm-zsh.sh"
-    [[ -f "$script" ]] && source "$script"
-    ev() { vterm_cmd find-file "$(realpath "${@:-.}")"; }
-  }
-fi
 
 #####################
 # ALIASES           #
@@ -460,6 +429,41 @@ fi
 
 # Git
 alias gitP='git -P'
+
+#####################
+# EDITORS           #
+#####################
+
+# Preferred editor for local and remote sessions
+local -a editor_cmd
+
+if [[ -n $SSH_CONNECTION ]]; then
+  # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
+  editor_cmd=(rsubl -w)
+else
+  editor_cmd=(emacsclient '-nw' '-c')  # Emacs
+  # editor_cmd=(subl -nw)
+fi
+
+# Check whether the editor is found in the path
+if (( $#editor_cmd )) && command -v "$editor_cmd[1]" >/dev/null 2>&1; then
+  export EDITOR="${(j: :)editor_cmd}"
+else
+  # echo "Warning: '$editor_cmd' not found in the path. Using 'nano' as a fallback."
+  export EDITOR="nano"
+fi
+
+# Bridge to emacs vterm
+if [[ -n "$INSIDE_EMACS" && "$INSIDE_EMACS" = vterm ]]; then
+  vterm_init_script="$XDG_CONFIG_HOME/emacs/straight/repos/emacs-libvterm/etc/emacs-vterm-zsh.sh"
+  if [[ -f "$vterm_init_script" ]]; then
+    __zcompile_if_needed_and_source "$vterm_init_script"
+  fi
+  unset vterm_init_script
+  alias claude='claude'
+  alias oc='opencode attach http://localhost:4096 --dir .'
+  export EDITOR="ev -nw"
+fi
 
 ##########################
 # Local customizations   #

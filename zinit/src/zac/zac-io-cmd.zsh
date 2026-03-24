@@ -91,8 +91,6 @@ else
   # patina
   sed -E 's/^([[:space:]]*theme[[:space:]]*=[[:space:]]*).*$/\1"classic"/' \
       "$DOTFILES_DIR/.config/zsh-patina/config.toml" > "$HOME/.config/zsh-patina/config.toml" && patina restart || exit 1
-
-  
   
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_light" "$vivid_cache_dir/ls_colors" || exit 1

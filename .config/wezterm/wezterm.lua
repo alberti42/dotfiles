@@ -251,7 +251,9 @@ config.keys = {
 
   { key = 'Enter', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment }, -- Disable Alt + Enter (fullscreen toggle)
 
-  { key = 'Enter', mods = 'SHIFT', action = wezterm.action.SendKey { key = "Enter", mods = "ALT" } }, -- Remap Shift+Enter to Alt+Enter
+  -- Use in tmux `printf '\e[>4;1m'` to enable usage of CSI u 
+	{ key = 'Tab', mods = 'CTRL', action = wezterm.action.SendString('\x1b[9;5u') },
+	{ key = 'Enter', mods = 'SHIFT', action = wezterm.action.SendString('\x1b[13;2u') },
 
   { key = 'c', mods = 'SUPER', action = wezterm.action { CopyTo="Clipboard" } },
   { key = 'v', mods = 'SUPER', action = wezterm.action { PasteFrom="Clipboard" } },

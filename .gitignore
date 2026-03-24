@@ -10,3 +10,5 @@ Sublime Text/Packages/User/sftp/*.sublime-color-scheme
 Sublime Text/Packages/User/Terminus/Terminus.hidden-color-scheme
 **/CLAUDE.md
 Sublime Text/Packages/User/GitSavvy/*
+/.agent-shell/
+**/.dir-locals.el
