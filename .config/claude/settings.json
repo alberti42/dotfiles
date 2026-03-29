@@ -70,7 +70,12 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "clangd-lsp@claude-plugins-official": true
   },
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "statusLine": {
+    "type": "command",
+    "command": "sh \"$HOME/.claude/statusline-command.sh\""
+  }
 }

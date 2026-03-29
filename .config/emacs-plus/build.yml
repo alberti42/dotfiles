@@ -1,8 +1,14 @@
- # ~/.config/emacs-plus/build.yml
- icon: dragon-plus
+# ~/.config/emacs-plus/build.yml
+icon: dragon-plus
 
- patches:
-   - frame-transparency          # community registry patches
-   - aggressive-read-buffering
+patches:
+  - frame-transparency          # community registry patches
+  - aggressive-read-buffering     
+  - left-margin-background-fix:
+      url: https://github.com/alberti42/fork-emacs/commit/452a08650adcdfe79cccc0f1560770beb2599d9d.patch
+      sha256: a5a5bc186c5138b846ee97d77d4729513eff4d8326450019096fcf2fd9875347
+  - exit-strategy-fix:
+      url: https://github.com/alberti42/fork-emacs/commit/949f79113556ed1052a0f319ad8edc4c21a22c30.patch
+      sha256: 3798f491be0d0b99951f2eb7ab1c93e2a239dbc2feba2b6283eaee460b418cc7
 
 inject_path: false              # optional: skip injecting PATH into Info.plist,

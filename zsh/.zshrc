@@ -142,7 +142,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
       $__local_plugin_path/zsh-opencode-tab
 
     # Import useful misc zsh functions (make sure to execute this wrapper after the other plugins have been loaded)
-    wait'0c' atload:"wrap_restore_cursor nvim yazi tmux ssh-tmux ipython opencode; restore_cursor" $__local_plugin_path/zsh-misc-functions
+    wait'0c' atload:"wrap_restore_tty nvim yazi tmux ssh-tmux ipython opencode claude; restore_tty" $__local_plugin_path/zsh-misc-functions
   )
   zinit lucid wait light-mode for "${__local_plugins[@]}"
 }
@@ -258,7 +258,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
 zinit binary lucid light-mode wait from'gh-r' extract'!' \
       atclone'./zsh-patina activate > patina_activate.zsh' \
       atpull'%atclone' \
-      atload'__zcompile_if_needed_and_source patina_activate.zsh' \
+      atload'__zcompile_if_needed_and_source patina_activate.zsh && ( [[ -S ~/.local/share/zsh-patina/daemon.sock ]] ||  patina start )' \
       lbin'zsh-patina -> patina' \
       for @michel-kraemer/zsh-patina
 
@@ -390,7 +390,6 @@ alias eg='emacsclient -n -c'    # opens GUI frame, non-blocking
 alias emacs='emacs -nw'
 
 alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'
-alias claude='EDITOR="emacsclient -nw -c" claude'
 
 alias diff='diff --color=auto'
 

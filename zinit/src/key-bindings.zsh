@@ -3,20 +3,6 @@
 # man zshzle; note: the key bindings are case sensitive!
 # for other key bindings check: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/refs/heads/master/lib/key-bindings.zsh
 
-# Support for CSI u protocol
-#
-# - \e[> — CSI with > meaning "private/DEC" parameter prefix
-# - 4 — refers to key encoding
-# - 1 — enable CSI-u mode for ambiguous sequences
-#
-# The full set:
-# - 0 — disable (reset to legacy)
-# - 1 — disambiguate (send CSI-u only for ambiguous keys like Ctrl+I vs Tab)
-# - 2 — report all keys as CSI-u
-# - 4 — report alternate keys too
-# - 8 — report all associated text
-printf '\e[>4;1m'
-
 # Ensures that zsh/terminfo is loaded
 zmodload zsh/terminfo
 

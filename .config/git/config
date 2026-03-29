@@ -67,3 +67,5 @@
 	helper = store
 [init]
 	defaultBranch = main
+[transfer]
+	fsckObjects = true

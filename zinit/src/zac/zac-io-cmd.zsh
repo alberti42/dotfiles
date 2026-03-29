@@ -60,6 +60,10 @@ if (( is_dark )); then
 
   # tmux-fzf-links
   tmux set-option -g @fzf-links-fzf-display-options "$(printf '%s' "$FZF_DEFAULT_OPTS" | sed -E 's/--border(=[^[:space:]]+)?[[:space:]]*//g') --color=preview-bg:#232634,gutter:#232634 -w 100% --maxnum-displayed 20 --multi --track --no-preview"
+
+  # btop
+  sed -E 's/^(color_theme[[:space:]]*=[[:space:]]*\").*\"$/\1catppuccin_frappe\"/' \
+      "$DOTFILES_DIR/.config/btop/btop.conf" > "$HOME/.config/btop/btop.conf" || exit 1
   
 else
   # yazi
@@ -97,4 +101,9 @@ else
 
   # tmux-fzf-links
   tmux set-option -g @fzf-links-fzf-display-options "$(printf '%s' "$FZF_DEFAULT_OPTS" | sed -E 's/--border(=[^[:space:]]+)?[[:space:]]*//g') --color=preview-bg:#dce0e8,gutter:#dce0e8 -w 100% --maxnum-displayed 20 --multi --track --no-preview"
+
+  # btop
+  sed -E 's/(color_theme[[:space:]]*=[[:space:]]*\").*\"$/\1catppuccin_latte\"/' \
+      "$DOTFILES_DIR/.config/btop/btop.conf" > "$HOME/.config/btop/btop.conf" || exit 1
+
 fi

@@ -226,7 +226,8 @@ config.send_composed_key_when_right_alt_is_pressed = true
 
 -- Key bindings
 config.disable_default_key_bindings = true
-config.enable_csi_u_key_encoding = true
+config.enable_csi_u_key_encoding = false
+config.enable_kitty_keyboard = false
 config.keys = {
   { key = '[', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02p') }, -- Cmd + Shift + [ -> Move to previous tmux pane
   { key = ']', mods = 'CTRL|ALT', action = wezterm.action.SendString('\x02n') }, -- Cmd + Shift + ] -> Move to next tmux pane
@@ -252,8 +253,8 @@ config.keys = {
   { key = 'Enter', mods = 'ALT', action = wezterm.action.DisableDefaultAssignment }, -- Disable Alt + Enter (fullscreen toggle)
 
   -- Use in tmux `printf '\e[>4;1m'` to enable usage of CSI u 
-	{ key = 'Tab', mods = 'CTRL', action = wezterm.action.SendString('\x1b[9;5u') },
-	{ key = 'Enter', mods = 'SHIFT', action = wezterm.action.SendString('\x1b[13;2u') },
+  { key = 'Tab', mods = 'CTRL', action = wezterm.action.SendString('\x1b[9;5u') },
+  { key = 'Enter', mods = 'SHIFT', action = wezterm.action.SendString('\x1b[13;2u') },
 
   { key = 'c', mods = 'SUPER', action = wezterm.action { CopyTo="Clipboard" } },
   { key = 'v', mods = 'SUPER', action = wezterm.action { PasteFrom="Clipboard" } },

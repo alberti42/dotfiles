@@ -76,15 +76,31 @@ reload!() {
   exec env PATH=$PATH $SHELL --login
 }
 
-# set the cursor style explictly
-restore_cursor() {
+# set the tty properties and flags explictly
+restore_tty() {
   emulate -LR zsh
+
+  # Prevent exiting shell with Ctrl-D
+  stty eof undef
+  
   # Blinking block
-  echo -ne '\e[1 q'
+  printf '\e[1 q'
+  
+  # CSI u XTMODKEYS (modifyOtherKeys)
+  #
+  # - \e[> — CSI with > meaning "private/DEC" parameter prefix
+  # - 4 — refers to key encoding (KeyModifierOptions)
+  # - 1 — enable CSI-u mode for ambiguous sequences
+  #
+  # The full set:
+  # - 0 — disable (reset to legacy)
+  # - 1 — report modifiers for "other" keys (those without existing modifier handling)
+  # - 2 — report modifiers for all keys
+  printf '\e[>4;1m'
 }
 
-# Wrapper functions to launch a given utility with proper restoration of cursor after exiting
-wrap_restore_cursor() {
+# Wrapper functions to launch a given utility with proper restoration of tty properties after exiting
+wrap_restore_tty() {
   emulate -LR zsh
   setopt localoptions no_aliases
 
@@ -93,7 +109,7 @@ wrap_restore_cursor() {
   for cmd in "$@"; do
     # Make a safe backup function name (in case cmd has odd chars)
     safe=${cmd//[^A-Za-z0-9_]/_}
-    orig="__restore_cursor_orig_${safe}"
+    orig="__restore_tty_orig_${safe}"
 
     if (( $+functions[$cmd] )); then
       # It's a zsh function: copy it, so the wrapper can call the original
@@ -101,7 +117,7 @@ wrap_restore_cursor() {
     else
       # Not a function: treat as command/builtin (also avoids aliases due to no_aliases)
       if ! whence -w -- "$cmd" >/dev/null; then
-        print -u2 -- "wrap_restore_cursor: not found: $cmd"
+        print -u2 -- "wrap_restore_tty: not found: $cmd"
         continue
       fi
 
@@ -111,10 +127,16 @@ wrap_restore_cursor() {
 
     # Define the wrapper itself
     eval "function $cmd() {
-      $orig \"\$@\"
-      local rc=\$?
-      restore_cursor
-      return \$rc
+      local rc=1
+      export INSIDE_${safe}=1
+      {
+        $orig \"\$@\"
+        rc=\$?
+      } always {
+        unset INSIDE_${safe}
+        restore_tty
+        return \$rc    
+      }
     }"
   done
 }
