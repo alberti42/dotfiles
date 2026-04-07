@@ -27,11 +27,13 @@ __zcompile_if_needed_and_source $DOTFILES_DIR/zinit/src/fzf/__fzf_atinit_hook.zs
 if (( is_dark )); then
   # yazi
   sed -E 's/^(dark|light)[[:space:]]*=.*$/\1 = "catppuccin-frappe"/' \
-    "$DOTFILES_DIR/.config/yazi/theme.toml" > "$XDG_CONFIG_HOME/yazi/theme.toml" || exit 1
+    "$DOTFILES_DIR/.config/yazi/theme.toml" > "$DOTFILES_DIR/.config/yazi/theme.toml.tmp" && \
+    mv "$DOTFILES_DIR/.config/yazi/theme.toml.tmp" "$DOTFILES_DIR/.config/yazi/theme.toml" || exit 1
 
   # gemini
   sed -E 's/^([[:space:]]*\"theme\")[[:space:]]*\:.*$/\1\: "Default Dark"/' \
-    "$DOTFILES_DIR/.config/gemini/settings.json" > "$HOME/.gemini/settings.json" || exit 1
+    "$DOTFILES_DIR/.config/gemini/settings.json" > "$DOTFILES_DIR/.config/gemini/settings.json.tmp" && \
+    mv "$DOTFILES_DIR/.config/gemini/settings.json.tmp" "$DOTFILES_DIR/.config/gemini/settings.json" || exit 1
 
   # claude
   sed -E 's/^([[:space:]]*"theme"[[:space:]]*:[[:space:]]*")[^"]*(".*)/\1dark-ansi\2/' \
@@ -49,11 +51,14 @@ if (( is_dark )); then
   sed -E "s/^[[:space:]]*c\.InteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.InteractiveShell.colors = 'linux'/" \
     "$DOTFILES_DIR/ipython/profile_default/ipython_config.py" | \
     sed -E "s/^[[:space:]]*c\.TerminalInteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.TerminalInteractiveShell.colors = 'linux'/" \
-        > "$HOME/.ipython/profile_default/ipython_config.py"
+    > "$DOTFILES_DIR/ipython/profile_default/ipython_config.py.tmp" && \
+    mv "$DOTFILES_DIR/ipython/profile_default/ipython_config.py.tmp" \
+       "$DOTFILES_DIR/ipython/profile_default/ipython_config.py"
 
   # patina
   sed -E 's/^([[:space:]]*theme[[:space:]]*=[[:space:]]*).*$/\1"nord"/' \
-      "$DOTFILES_DIR/.config/zsh-patina/config.toml" > "$HOME/.config/zsh-patina/config.toml" && patina restart || exit 1
+      "$DOTFILES_DIR/.config/zsh-patina/config.toml" > "$DOTFILES_DIR/.config/zsh-patina/config.toml.tmp" && \
+    mv "$DOTFILES_DIR/.config/zsh-patina/config.toml.tmp" "$DOTFILES_DIR/.config/zsh-patina/config.toml" && patina restart || exit 1
 
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_dark" "$vivid_cache_dir/ls_colors" || exit 1
@@ -63,16 +68,22 @@ if (( is_dark )); then
 
   # btop
   sed -E 's/^(color_theme[[:space:]]*=[[:space:]]*\").*\"$/\1catppuccin_frappe\"/' \
-      "$DOTFILES_DIR/.config/btop/btop.conf" > "$HOME/.config/btop/btop.conf" || exit 1
+      "$DOTFILES_DIR/.config/btop/btop.conf" > "$DOTFILES_DIR/.config/btop/btop.conf.tmp" && \
+    mv "$DOTFILES_DIR/.config/btop/btop.conf.tmp" "$DOTFILES_DIR/.config/btop/btop.conf" || exit 1
+
+  # git CLI
+  ln -f -s "$DOTFILES_DIR/.config/git/theme-dark.gitconfig" "$XDG_CONFIG_HOME/git/theme.gitconfig"
   
 else
   # yazi
   sed -E 's/^(dark|light)[[:space:]]*=.*$/\1 = "catppuccin-latte"/' \
-    "$DOTFILES_DIR/.config/yazi/theme.toml" > "$XDG_CONFIG_HOME/yazi/theme.toml" || exit 1
+    "$DOTFILES_DIR/.config/yazi/theme.toml" > "$DOTFILES_DIR/.config/yazi/theme.toml.tmp" && \
+    mv "$DOTFILES_DIR/.config/yazi/theme.toml.tmp" "$DOTFILES_DIR/.config/yazi/theme.toml" || exit 1
 
   # gemini
   sed -E 's/^([[:space:]]*\"theme\")[[:space:]]*\:.*$/\1\: "Default Light"/' \
-    "$DOTFILES_DIR/.config/gemini/settings.json" > "$HOME/.gemini/settings.json" || exit 1
+    "$DOTFILES_DIR/.config/gemini/settings.json" > "$DOTFILES_DIR/.config/gemini/settings.json.tmp" && \
+    mv "$DOTFILES_DIR/.config/gemini/settings.json.tmp" "$DOTFILES_DIR/.config/gemini/settings.json" || exit 1
 
   # claude
   sed -E 's/^([[:space:]]*"theme"[[:space:]]*:[[:space:]]*")[^"]*(".*)/\1light-ansi\2/' \
@@ -90,11 +101,14 @@ else
   sed -E "s/^[[:space:]]*c\.InteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.InteractiveShell.colors = 'lightbg'/" \
     "$DOTFILES_DIR/ipython/profile_default/ipython_config.py" | \
     sed -E "s/^[[:space:]]*c\.TerminalInteractiveShell\.colors[[:space:]]*=[[:space:]]*.*$/c.TerminalInteractiveShell.colors = 'lightbg'/" \
-    > "$HOME/.ipython/profile_default/ipython_config.py"
+    > "$DOTFILES_DIR/ipython/profile_default/ipython_config.py.tmp" && \
+    mv "$DOTFILES_DIR/ipython/profile_default/ipython_config.py.tmp" \
+       "$DOTFILES_DIR/ipython/profile_default/ipython_config.py"
 
   # patina
   sed -E 's/^([[:space:]]*theme[[:space:]]*=[[:space:]]*).*$/\1"classic"/' \
-      "$DOTFILES_DIR/.config/zsh-patina/config.toml" > "$HOME/.config/zsh-patina/config.toml" && patina restart || exit 1
+      "$DOTFILES_DIR/.config/zsh-patina/config.toml" > "$DOTFILES_DIR/.config/zsh-patina/config.toml.tmp" && \
+    mv "$DOTFILES_DIR/.config/zsh-patina/config.toml.tmp" "$DOTFILES_DIR/.config/zsh-patina/config.toml" && patina restart || exit 1
   
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_light" "$vivid_cache_dir/ls_colors" || exit 1
@@ -104,6 +118,10 @@ else
 
   # btop
   sed -E 's/(color_theme[[:space:]]*=[[:space:]]*\").*\"$/\1catppuccin_latte\"/' \
-      "$DOTFILES_DIR/.config/btop/btop.conf" > "$HOME/.config/btop/btop.conf" || exit 1
+      "$DOTFILES_DIR/.config/btop/btop.conf" > "$DOTFILES_DIR/.config/btop/btop.conf.tmp" && \
+    mv "$DOTFILES_DIR/.config/btop/btop.conf.tmp" "$DOTFILES_DIR/.config/btop/btop.conf" || exit 1
+
+  # git CLI
+  ln -f -s "$DOTFILES_DIR/.config/git/theme-light.gitconfig" "$XDG_CONFIG_HOME/git/theme.gitconfig"
 
 fi

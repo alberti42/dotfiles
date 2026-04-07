@@ -1,12 +1,13 @@
 {
-  "ignore_diff_white_space": true,
+  "ignore_diff_white_space": false,
   "trim_trailing_white_space_on_save": false,
   "side_bar_layout": "locations_as_column",
   "theme": "auto",
   "diff_style": "side-by-side",
   "visible_carriage_returns_at_eol": true,
-  "editor_argument_format": "${file}:${line}:${col}",
-  "editor_path": "~/.local/bin/subl",
+  "editor_argument_format": "+${line}:${col} ${file}",
+  "editor_path": "/Users/andrea/google-drive/dotfiles/.local/bin/emacsclient",
   "font_size": 15,
   "expand_untracked_files_by_default": false,
+  "image_diff_style": "side-by-side",
 }

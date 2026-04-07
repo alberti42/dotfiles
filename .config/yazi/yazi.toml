@@ -128,6 +128,20 @@ run = "git"
 # orphan = true
 
 [[opener.edit]]
+run = "emacsclient -n %s"
+desc = "emacsclient"
+for = "unix"
+block = false
+orphan = true
+
+[[opener.edit]]
+run = "emacsclient -t %s"
+desc = "emacsclient (blocking)"
+for = "unix"
+block = true
+orphan = false
+
+[[opener.edit]]
 run = "subl -w %s"
 desc = "Sublime Text Editor"
 for = "unix"
@@ -140,13 +154,6 @@ desc = "Sublime Text Editor (block)"
 for = "unix"
 block = true
 orphan = false
-
-[[opener.edit]]
-run = "emacsclient -a= -nw -c %s"
-desc = "emacs"
-for = "unix"
-block = true
-orphan = true
 
 [[opener.edit]]
 run = "nvim %s"

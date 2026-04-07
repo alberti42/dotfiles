@@ -40,6 +40,22 @@
 		<key>executable</key>
 		<false/>
 		<key>filePath</key>
+		<string>BlankDocument</string>
+		<key>prefix</key>
+		<string>NewFile</string>
+		<key>suffix</key>
+		<string></string>
+		<key>title</key>
+		<string>Blank Document</string>
+		<key>uuid</key>
+		<string>78F0394E-3DF3-40C1-9AA0-CC36C8E5CADF</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<true/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
 		<string>new_sublime_project.sublime-project.json</string>
 		<key>prefix</key>
 		<string>new_sublime_project</string>
@@ -56,111 +72,15 @@
 		<key>executable</key>
 		<false/>
 		<key>filePath</key>
-		<string>RTFDocument.rtf</string>
+		<string>eslint.config.js</string>
 		<key>prefix</key>
-		<string>New RTF Document</string>
+		<string>eslint.config</string>
 		<key>suffix</key>
-		<string>rtf</string>
+		<string>js</string>
 		<key>title</key>
-		<string>Rich Text Document</string>
+		<string>eslint.config</string>
 		<key>uuid</key>
-		<string>A4861A08-1D00-4DD1-9936-2D3C46D3782A</string>
-	</dict>
-	<dict>
-		<key>enabled</key>
-		<true/>
-		<key>executable</key>
-		<false/>
-		<key>filePath</key>
-		<string>Pages.pages</string>
-		<key>prefix</key>
-		<string>Pages New Document</string>
-		<key>suffix</key>
-		<string>pages</string>
-		<key>title</key>
-		<string>Pages Document</string>
-		<key>uuid</key>
-		<string>77197CA3-ECBF-49EA-BA99-976075B5C545</string>
-	</dict>
-	<dict>
-		<key>enabled</key>
-		<true/>
-		<key>executable</key>
-		<false/>
-		<key>filePath</key>
-		<string>Numbers.numbers</string>
-		<key>prefix</key>
-		<string>New Numbers Document</string>
-		<key>suffix</key>
-		<string>numbers</string>
-		<key>title</key>
-		<string>Numbers Document</string>
-		<key>uuid</key>
-		<string>F1C4B8D3-F15A-4549-AF0C-375EF12C7DC2</string>
-	</dict>
-	<dict>
-		<key>enabled</key>
-		<true/>
-		<key>executable</key>
-		<false/>
-		<key>filePath</key>
-		<string>Keynote.key</string>
-		<key>prefix</key>
-		<string>New Keynote Document</string>
-		<key>suffix</key>
-		<string>key</string>
-		<key>title</key>
-		<string>Keynote Document</string>
-		<key>uuid</key>
-		<string>CEEACA23-C4E0-4B3D-9841-AE61A1EEA9F7</string>
-	</dict>
-	<dict>
-		<key>enabled</key>
-		<true/>
-		<key>executable</key>
-		<false/>
-		<key>filePath</key>
-		<string>WordDocument.docx</string>
-		<key>prefix</key>
-		<string>New Word Document</string>
-		<key>suffix</key>
-		<string>docx</string>
-		<key>title</key>
-		<string>Word Document</string>
-		<key>uuid</key>
-		<string>82EACE6C-1FAD-42BB-B58B-60F3A3B82686</string>
-	</dict>
-	<dict>
-		<key>enabled</key>
-		<true/>
-		<key>executable</key>
-		<false/>
-		<key>filePath</key>
-		<string>ExcelDocument.xlsx</string>
-		<key>prefix</key>
-		<string>New Excel Document</string>
-		<key>suffix</key>
-		<string>xlsx</string>
-		<key>title</key>
-		<string>Excel Document</string>
-		<key>uuid</key>
-		<string>CCBE98B3-2852-473E-A0B3-8AA13868B68A</string>
-	</dict>
-	<dict>
-		<key>enabled</key>
-		<true/>
-		<key>executable</key>
-		<false/>
-		<key>filePath</key>
-		<string>PowerPointDocument.pptx</string>
-		<key>prefix</key>
-		<string>New PowerPoint Document</string>
-		<key>suffix</key>
-		<string>pptx</string>
-		<key>title</key>
-		<string>PowerPoint Document</string>
-		<key>uuid</key>
-		<string>D3771767-B861-4C9B-BC62-B3575D1C50FE</string>
+		<string>BA36F469-3DAC-4054-8C62-1AAFE654A2CB</string>
 	</dict>
 	<dict>
 		<key>enabled</key>
@@ -212,19 +132,115 @@
 	</dict>
 	<dict>
 		<key>enabled</key>
-		<true/>
+		<false/>
 		<key>executable</key>
 		<false/>
 		<key>filePath</key>
-		<string>BlankDocument</string>
+		<string>RTFDocument.rtf</string>
 		<key>prefix</key>
-		<string>NewFile</string>
+		<string>New RTF Document</string>
 		<key>suffix</key>
-		<string></string>
+		<string>rtf</string>
 		<key>title</key>
-		<string>Blank Document</string>
+		<string>Rich Text Document</string>
 		<key>uuid</key>
-		<string>78F0394E-3DF3-40C1-9AA0-CC36C8E5CADF</string>
+		<string>A4861A08-1D00-4DD1-9936-2D3C46D3782A</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>Pages.pages</string>
+		<key>prefix</key>
+		<string>Pages New Document</string>
+		<key>suffix</key>
+		<string>pages</string>
+		<key>title</key>
+		<string>Pages Document</string>
+		<key>uuid</key>
+		<string>77197CA3-ECBF-49EA-BA99-976075B5C545</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>Numbers.numbers</string>
+		<key>prefix</key>
+		<string>New Numbers Document</string>
+		<key>suffix</key>
+		<string>numbers</string>
+		<key>title</key>
+		<string>Numbers Document</string>
+		<key>uuid</key>
+		<string>F1C4B8D3-F15A-4549-AF0C-375EF12C7DC2</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>Keynote.key</string>
+		<key>prefix</key>
+		<string>New Keynote Document</string>
+		<key>suffix</key>
+		<string>key</string>
+		<key>title</key>
+		<string>Keynote Document</string>
+		<key>uuid</key>
+		<string>CEEACA23-C4E0-4B3D-9841-AE61A1EEA9F7</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>WordDocument.docx</string>
+		<key>prefix</key>
+		<string>New Word Document</string>
+		<key>suffix</key>
+		<string>docx</string>
+		<key>title</key>
+		<string>Word Document</string>
+		<key>uuid</key>
+		<string>82EACE6C-1FAD-42BB-B58B-60F3A3B82686</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>ExcelDocument.xlsx</string>
+		<key>prefix</key>
+		<string>New Excel Document</string>
+		<key>suffix</key>
+		<string>xlsx</string>
+		<key>title</key>
+		<string>Excel Document</string>
+		<key>uuid</key>
+		<string>CCBE98B3-2852-473E-A0B3-8AA13868B68A</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>PowerPointDocument.pptx</string>
+		<key>prefix</key>
+		<string>New PowerPoint Document</string>
+		<key>suffix</key>
+		<string>pptx</string>
+		<key>title</key>
+		<string>PowerPoint Document</string>
+		<key>uuid</key>
+		<string>D3771767-B861-4C9B-BC62-B3575D1C50FE</string>
 	</dict>
 </array>
 </plist>

@@ -2,11 +2,11 @@
 icon: dragon-plus
 
 patches:
-  - frame-transparency          # community registry patches
   - aggressive-read-buffering     
   - left-margin-background-fix:
-      url: https://github.com/alberti42/fork-emacs/commit/452a08650adcdfe79cccc0f1560770beb2599d9d.patch
-      sha256: a5a5bc186c5138b846ee97d77d4729513eff4d8326450019096fcf2fd9875347
+      url: https://github.com/alberti42/fork-emacs/commit/a25f72104bc7ddc64dd3403536effa0a7020838a.patch
+      # curl -sL https://github.com/alberti42/fork-emacs/commit/a25f72104bc7ddc64dd3403536effa0a7020838a.patch | shasum -a 256       
+      sha256: 751758ff3e91b4ba9d36e0204a5f74a9fa2eeb4a28459e81558d6697da9c4877
   - exit-strategy-fix:
       url: https://github.com/alberti42/fork-emacs/commit/949f79113556ed1052a0f319ad8edc4c21a22c30.patch
       sha256: 3798f491be0d0b99951f2eb7ab1c93e2a239dbc2feba2b6283eaee460b418cc7

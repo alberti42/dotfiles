@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>KeepAlive</key>
+	<true/>
+	<key>Label</key>
+	<string>com.alberti42.patina</string>
+	<key>LowPriorityIO</key>
+	<true/>
+  <key>EnvironmentVariables</key>
+	<dict>
+		<key>RUST_LOG_DISABLED</key>
+		<string>debug</string>
+	</dict>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/andrea/.local/share/zinit/plugins/michel-kraemer---zsh-patina/zsh-patina</string>
+    <string>start</string>
+    <string>--no-daemon</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+  <key>StandardErrorPath</key>
+	<string>/tmp/zsh-patina.err</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/zsh-patina.out</string>
+</dict>
+</plist>

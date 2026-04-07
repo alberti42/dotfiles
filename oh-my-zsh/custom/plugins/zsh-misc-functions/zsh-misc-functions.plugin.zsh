@@ -80,8 +80,8 @@ reload!() {
 restore_tty() {
   emulate -LR zsh
 
-  # Prevent exiting shell with Ctrl-D
-  stty eof undef
+  # Disable terminal flow control (^S/^Q) and disable EOF (^D) on this TTY
+  stty -ixon eof undef start undef stop undef
   
   # Blinking block
   printf '\e[1 q'

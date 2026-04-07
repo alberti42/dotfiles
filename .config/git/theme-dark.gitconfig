@@ -1,0 +1,14 @@
+[color "status"]
+  header = "#b0b0b0"
+  added = "#99cc99"
+  changed = "#f2777a"
+  untracked = "#ffcc66"
+  branch = "#e5e5e5" "#6699cc"
+  nobranch = bold ul "#f99157"
+[color "diff"]
+  meta = bold "#cfcfcf"
+  frag = bold "#66cccc"
+  func = "#cc99cc"
+  context = "#b0b0b0"
+  old = "#f2777a" "#3a1f1f"
+  new = "#bef2be" "#1f3a1f"

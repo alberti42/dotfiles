@@ -48,8 +48,9 @@
         "ltex.dictionary": {
             "en-US":
             [
-				"adiabatically"
-			],
+				"adiabatically",
+                "qubits",
+            ],
         },
         // Lists of rules that should be disabled (if enabled by default by LanguageTool).
         "ltex.disabledRules": {},
@@ -103,7 +104,7 @@
         // If set to true, diagnostics of a file are cleared when the file is closed
         "ltex.clearDiagnosticsWhenClosingFile": true,
         // Java path to use. Should point to the JAVA_HOME/bin directory. Currently disabled.
-        "ltex.java.path": "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/jdk-21.0.8+9"
+        "ltex.java.path": "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/jdk-21.0.8+9",
     },
 }
 

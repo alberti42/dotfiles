@@ -24,7 +24,7 @@ builtin source "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then  
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k;/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   __zcompile_if_needed_and_source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -110,8 +110,9 @@ zinit from"gh-r" lbin'jq-* -> jq' null lucid wait light-mode for @jqlang/jq
 
 # Load powerlevel10k and customize prompt with ~/.p10k.zsh.
 () {
-  local XDG_CACHE_HOME=${XDG_CACHE_HOME:-~/.cache}/p10k # Covenient fix to change the cache folder to ~/.cache/p10k
-  zinit depth=1 lucid light-mode for @romkatv/powerlevel10k
+  local XDG_CACHE_HOME=${XDG_CACHE_HOME:-~/.cache}/p10k # Shadow XDG_CACHE_HOME to change the cache folder to ~/.cache/p10k
+  # Make sure to disable Ctrl-D for signaling EOF
+  zinit depth=1 lucid light-mode atload'stty -ixon eof undef start undef stop undef' for @romkatv/powerlevel10k
   [[ -f $DOTFILES_DIR/.p10k.zsh ]] && __zcompile_if_needed_and_source $DOTFILES_DIR/.p10k.zsh
 }
 
@@ -192,7 +193,8 @@ zinit lucid wait'0c' from'gh-r' extract'!' light-mode \
     # id-as'tmux-plugins/tmux-tokyo-night' @janoamaral/tokyo-night-tmux
     # id-as'tmux-plugins/tmux-catppuccin' @catppuccin/tmux \
     # @tmux-plugins/tmux-yank
-    id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect
+    # id-as'tmux-plugins/tmux-resurrect' @alberti42/fork-tmux-resurrect
+    id-as'tmux-plugins/tmux-jump' @schasse/tmux-jump
     id-as'tmux-plugins/tmux-suspend' @MunifTanjim/tmux-suspend
     # id-as'tmux-plugins/tmux-menus' @jaclu/tmux-menus
     from'gh-r' id-as'tmux-plugins/tmux-fzf-links' extract'!' @alberti42/tmux-fzf-links
@@ -233,7 +235,7 @@ zinit binary lucid light-mode wait from'gh-r' lbin'**/rg(.exe|) -> rg' cp"ripgre
 # Import btop
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/btop/btop.zsh"
 
-# Import viu
+# Import LSP Ltex Plus
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/lsp-ltex-plus/lsp-ltex-plus.zsh"
 
 # Import viu
@@ -258,7 +260,11 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
 zinit binary lucid light-mode wait from'gh-r' extract'!' \
       atclone'./zsh-patina activate > patina_activate.zsh' \
       atpull'%atclone' \
-      atload'__zcompile_if_needed_and_source patina_activate.zsh && ( [[ -S ~/.local/share/zsh-patina/daemon.sock ]] ||  patina start )' \
+      atload'__zcompile_if_needed_and_source patina_activate.zsh
+                                            # patina restart
+                                            if ! zsocket "$HOME/.local/share/zsh-patina/daemon.sock" 2>/dev/null; then
+                                              patina start
+                                            fi' \
       lbin'zsh-patina -> patina' \
       for @michel-kraemer/zsh-patina
 
@@ -384,9 +390,8 @@ alias 7='cd -7 >/dev/null'
 alias 8='cd -8 >/dev/null'
 alias 9='cd -9 >/dev/null'
 
-alias e='emacsclient -nw'         # opens terminal frame, blocking
-alias eg='emacsclient -n -c'    # opens GUI frame, non-blocking
-# alias eg='open -b org.gnu.Emacs'  # opens GUI frame, non-blocking
+alias e='emacsclient -nw'            # opens terminal frame, blocking
+alias eg='emacsclient -n'            # opens GUI frame, non-blocking due to `-n`
 alias emacs='emacs -nw'
 
 alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'
@@ -426,8 +431,11 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 # alias mc='mc --nosubshell'
 
-# Git
+# Git (alias skippin pagination)
 alias gitP='git -P'
+# Enforce the same autocompletion for gitP as for git
+# Use zinit optimized form; equivalent to: compdef gitP=git
+:zinit-tmp-subst-compdef gitP=git
 
 #####################
 # EDITORS           #
@@ -440,7 +448,7 @@ if [[ -n $SSH_CONNECTION ]]; then
   # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
   editor_cmd=(rsubl -w)
 else
-  editor_cmd=(emacsclient '-nw' '-c')  # Emacs
+  editor_cmd=(emacsclient '-nw')  # Emacs
   # editor_cmd=(subl -nw)
 fi
 

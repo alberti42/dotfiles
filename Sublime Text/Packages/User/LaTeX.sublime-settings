@@ -21,18 +21,11 @@
 	// Set to true to insert spaces when tab is pressed
 	"translate_tabs_to_spaces": true,
 
-	"tab_size": 2,
-    
 	// Controls auto pairing of quotes, brackets etc	
 	"auto_match_enabled": true,
 
 	// Set to false to hide the gutter altogether
 	"gutter": true,
-
-  "word_wrap": "true",
-  
-  "wrap_width": 120,
-  "wrap_width_style": "min",
 
   // The number of spaces a tab is considered equal to
   "tab_size": 2,

@@ -44,21 +44,6 @@
 	ui = true
 [diff]
 	colorMoved = zebra
-[color "status"]
-  header = "#999999"
-  added = "#99cc99"
-  changed = "#f2777a"
-  untracked = "#ffcc66"
-  branch = "#2d2d2d" "#6699cc"
-  # Because the phrase "Detached HEAD" isn't unnerving enough
-  nobranch = bold ul blink "#f99157"
-[color "diff"]
-  meta = "#515151"
-  func = "#cc99cc"
-  frag = "#66cccc"
-  context = "#999999"
-  old = "#f2777a" "#393939"
-  new = "#bef2be" "#515151"
 [diff "plist"]
 	textconv = plutil -convert xml1 -o - --
 [pretty]
@@ -69,3 +54,5 @@
 	defaultBranch = main
 [transfer]
 	fsckObjects = true
+[include]
+  path = ~/.config/git/theme.gitconfig

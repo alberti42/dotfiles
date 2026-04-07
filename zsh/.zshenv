@@ -187,6 +187,9 @@ fi
 if [[ -d "$HOME/bin" ]]; then
   path=("$HOME/bin" $path)
 fi
+if [[ -d "$HOME/.npm-global/bin" ]]; then
+  path=("$HOME/.npm-global/bin" $path)
+fi
 if [[ -d "$HOME/.local/bin" ]]; then
   path=("$HOME/.local/bin" $path)
 fi

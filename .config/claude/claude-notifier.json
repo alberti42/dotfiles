@@ -22,9 +22,9 @@
     "subagent_complete": "Claude Code subagent completed"
   },
   "sounds": {
-    "permission_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/alert-01.aac",
-    "idle_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac",
-    "elicitation_dialog": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-01.aac",
+    "permission_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/alert-08.aac",
+    "idle_prompt": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-03.aac",
+    "elicitation_dialog": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/bip-bop-05.aac",
     "auth_success": "/System/Library/Sounds/Hero.aiff",
     "complete": "/System/Library/Sounds/Bottle.aiff",
     "subagent_complete": "/Users/andrea/Documents/Programming/Others/fork-opencode.nosync/packages/ui/src/assets/audio/yup-01.aac",

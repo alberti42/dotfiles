@@ -4,5 +4,5 @@
 declare -a claude_paths=("${(@f)$(whence -a claude)}")
 # EDITOR export
 export EDITOR="$HOME/.local/bin/emacsclient -nw -c"
-# exec $claude_paths[2] — executes the second entry (the real claude binary, not this wrapper)
-exec $claude_paths[2] "$@"
+# exec $claude_paths[1] — executes the first entry (the real claude binary, not this wrapper)
+exec $claude_paths[1] "$@"

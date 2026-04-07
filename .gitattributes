@@ -1,2 +1,7 @@
 Sublime[[:space:]]Text/Packages/User/Preferences.sublime-settings filter=ignore-dictionary-key
 Sublime[[:space:]]Text/Packages/User/LSP-ltex-ls.sublime-settings filter=ignore-ltex_language-key
+.config/gemini/settings.json filter=gemini-theme
+.config/yazi/theme.toml filter=yazi-theme
+.config/btop/btop.conf filter=btop-theme
+.config/zsh-patina/config.toml filter=patina-theme
+ipython/profile_default/ipython_config.py filter=ipython-theme
