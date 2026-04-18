@@ -3,6 +3,7 @@
   "gutter": true,
   "ignored_packages":
   [
+    "Markdown Extended",
     "Vintage",
   ],
   "draw_white_space": "selection",

@@ -242,5 +242,37 @@
 		<key>uuid</key>
 		<string>D3771767-B861-4C9B-BC62-B3575D1C50FE</string>
 	</dict>
+	<dict>
+		<key>enabled</key>
+		<false/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>RTFDDocument.rtfd</string>
+		<key>prefix</key>
+		<string>NewFile</string>
+		<key>suffix</key>
+		<string>rtfd</string>
+		<key>title</key>
+		<string>Rich Text Document with Attachments</string>
+		<key>uuid</key>
+		<string>CB78A194-07C8-4FD7-AE1E-3CBCFDE2BC4B</string>
+	</dict>
+	<dict>
+		<key>enabled</key>
+		<true/>
+		<key>executable</key>
+		<false/>
+		<key>filePath</key>
+		<string>Markdown.md</string>
+		<key>prefix</key>
+		<string>Markdown</string>
+		<key>suffix</key>
+		<string>md</string>
+		<key>title</key>
+		<string>Markdown Document</string>
+		<key>uuid</key>
+		<string>73B613A0-52ED-40C4-B5E5-7447A29A6209</string>
+	</dict>
 </array>
 </plist>

@@ -5,7 +5,7 @@
     // The startup command.
     // Do not change this unless you know what you do!
     "command": [
-        "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/bin/${script}-plus"
+        "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/bin/${script}"
     ],
     // Extra variables to override/add to language server's environment.
     "env": {
@@ -84,7 +84,7 @@
         "ltex.additionalRules.word2VecModel": "",
         // If set to a non-empty string, LTEX will not use the bundled, 
         // built-in version of LanguageTool. Instead, LTEX will connect to an external one
-        "ltex.languageToolHttpServerUri": "",
+        "ltex.languageToolHttpServerUri": "https://api.languagetoolplus.com",
         // username on languagetool.org for Premium API access
         "ltex.languageToolOrg.username": "...",
         // set API key on languagetool.org for Premium API access

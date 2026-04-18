@@ -1,0 +1,3 @@
+#!/bin/zsh -d -l
+path=(${path:#${0:h}})
+emacsclient -n "$@"

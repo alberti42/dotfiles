@@ -16,4 +16,4 @@
     // list of the column, the ruler style and optionally the ruler width, for
     // example: [[80, "solid", 2], 78, [90, "dotted"]]
     "rulers": [[120,"solid",1]],
-}   
+}

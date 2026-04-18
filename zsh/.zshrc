@@ -84,7 +84,7 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/vivid/vivid.zsh"
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sharkdp/sharkdp.zsh"
 
 # Load fzy
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzy/fzy.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzy/fzy.zsh"
 
 # (not needed) Wrapper snippet for alberti42/LS_COLORS_TRUE_COLORS
 # source "$DOTFILES_DIR/zinit/src/LS_COLORS_TRUE_COLORS/LS_COLORS_TRUE_COLORS.zsh"
@@ -390,8 +390,8 @@ alias 7='cd -7 >/dev/null'
 alias 8='cd -8 >/dev/null'
 alias 9='cd -9 >/dev/null'
 
-alias e='emacsclient -nw'            # opens terminal frame, blocking
-alias eg='emacsclient -n'            # opens GUI frame, non-blocking due to `-n`
+alias e='emacsclient -nw -r'         # opens terminal frame, blocking
+alias eg='emacsclient -n -r'         # opens GUI frame, non-blocking due to `-n`; `-r` force reusing existing frames
 alias emacs='emacs -nw'
 
 alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'

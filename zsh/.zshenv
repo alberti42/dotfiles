@@ -45,9 +45,9 @@ skip_global_compinit=1
   if [[ $OSTYPE =~ 'darwin*' ]]; then
     local brew_path="${$(command -v /opt/homebrew/bin/brew || command -v /usr/local/bin/brew):-}"
     if [[ -n "$brew_path" ]] then
-     local homebrew_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/homebrew"
-     local shellenv_script="${homebrew_cache_dir}/shellenv.zsh"
-     if [[ ! -f "$shellenv_script" ]]; then
+      local homebrew_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/homebrew"
+      local shellenv_script="${homebrew_cache_dir}/shellenv.zsh"
+      if [[ ! -f "$shellenv_script" ]]; then
        mkdir -p "$homebrew_cache_dir"
        "$brew_path" shellenv > "$shellenv_script"
        zcompile -Uz -- "$shellenv_script"
@@ -85,8 +85,7 @@ fi
 if (( ${+HOMEBREW_PREFIX} )); then
   # Path to HomeBrew-version of Ruby
   if [ -d "$HOMEBREW_PREFIX/opt/ruby/bin" ]; then
-    export path=("$HOMEBREW_PREFIX/opt/ruby/bin" $path)
-    export path=("$(gem environment gemdir)/bin" $path)
+    path=("$HOMEBREW_PREFIX/opt/ruby/bin" $path)
   fi
 fi
 
