@@ -1,0 +1,5 @@
+#!/bin/sh -f
+# Script: remacs
+# Description: A wrapper for `rmate` that passes all arguments and specifies port 52698.
+
+exec rmate "$@" --port 52698

@@ -1,0 +1,45 @@
+# Lite Starship config for "junk-drawer" directories (~/Downloads, ~/Desktop,
+# /tmp). Loaded by the chpwd hook in starship.zsh when $PWD is under one of those.
+#
+# The point: Starship only EVALUATES modules listed in `format`, so by omitting
+# every language/toolchain module (swift, python, nodejs, rust, …) we never scan
+# for their files or fork `<lang> --version` — which is what makes the prompt slow
+# in a folder full of random files, regardless of file type or installed toolchain.
+#
+# The cosmetic settings below are kept in sync (by hand) with starship.toml so the
+# prompt looks identical to the normal one, just without the language segments.
+
+format = "$username$hostname$directory$git_branch$git_status$cmd_duration$line_break$character"
+
+[username]
+style_user = "green bold"
+style_root = "red bold"
+format = "[$user]($style) "
+disabled = false
+show_always = true
+
+[hostname]
+ssh_only = false
+format = 'on [$hostname](bold yellow) '
+trim_at = "."
+disabled = false
+
+[directory]
+read_only = " "
+truncation_length = 3                  # keep the last 3 path components
+truncation_symbol = "…/"               # prepend an ellipsis when truncated (p10k style)
+truncate_to_repo = true
+style = "bold italic blue"
+
+[git_branch]
+symbol = " "
+
+[cmd_duration]
+min_time = 4
+show_milliseconds = false
+disabled = false
+style = "bold italic red"
+
+[character]
+success_symbol = "[»](bold green)"
+error_symbol = "[✗](bold red)"

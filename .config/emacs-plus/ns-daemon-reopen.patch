@@ -1,0 +1,349 @@
+diff --git a/lisp/files.el b/lisp/files.el
+index 5aaa0d44a04..6f05bfdfa82 100644
+--- a/lisp/files.el
++++ b/lisp/files.el
+@@ -8649,11 +8649,22 @@ save-buffers-kill-terminal
+ With prefix ARG, silently save all file-visiting buffers, then kill.
+ 
+ If emacsclient was started with a list of file names to edit, then
+-only these files will be asked to be saved."
++only these files will be asked to be saved.
++
++In a daemon, a frame with no client (for example one created in-process
++by `make-frame', or from the macOS Dock) does not kill Emacs when closed
++this way: the daemon is meant to persist.  Closing such a frame offers to
++save buffers and deletes the frame, mirroring how closing an emacsclient
++frame leaves the daemon running, and parks the daemon frameless (on
++Nextstep, reopenable from the Dock).  Killing the daemon then requires an
++explicit `save-buffers-kill-emacs' or `server-stop-automatically'."
+   (interactive "P")
+-  (if (frame-parameter nil 'client)
+-      (server-save-buffers-kill-terminal arg)
+-    (save-buffers-kill-emacs arg)))
++  (cond ((frame-parameter nil 'client)
++         (server-save-buffers-kill-terminal arg))
++        ((daemonp)
++         (server-save-buffers-kill-terminal-noclient arg))
++        (t
++         (save-buffers-kill-emacs arg))))
+ 
+ (defun restart-emacs ()
+   "Kill the current Emacs process and start a new one.
+diff --git a/lisp/server.el b/lisp/server.el
+index b912b185275..22d10402805 100644
+--- a/lisp/server.el
++++ b/lisp/server.el
+@@ -1905,15 +1905,10 @@ server-save-buffers-kill-terminal
+               (memq server-stop-automatically '(kill-terminal delete-frame))))
+         (proc (frame-parameter nil 'client)))
+     (cond ((eq proc 'nowait)
+-	   ;; Nowait frames have no client buffer list.
+-	   (if (length> (frame-list) (if stop-automatically 2 1))
+-               ;; If there are any other frames, only delete this one.
+-               ;; When `server-stop-automatically' is set, don't count
+-               ;; the daemon frame.
+-	       (progn (save-some-buffers arg)
+-		      (delete-frame))
+-	     ;; If we're the last frame standing, kill Emacs.
+-	     (save-buffers-kill-emacs arg)))
++	   ;; A `nowait' frame is flagged client-created but has a dummy
++	   ;; client and no buffer list; its lifecycle is that of any
++	   ;; other clientless frame.
++	   (server-save-buffers-kill-terminal-noclient arg))
+ 	  ((processp proc)
+            (if (or (not stop-automatically)
+                    (length> server-clients 1)
+@@ -1941,6 +1936,35 @@ server-save-buffers-kill-terminal
+              (save-buffers-kill-emacs arg)))
+ 	  (t (error "Invalid client frame")))))
+ 
++;;;###autoload
++(defun server-save-buffers-kill-terminal-noclient (arg)
++  "Offer to save buffers, then close the current frame or kill Emacs.
++This implements \\[save-buffers-kill-terminal] for frames not owned by a
++client process: `nowait' emacsclient frames, and -- in a daemon -- plain
++in-process frames such as those created from the macOS Dock.
++
++If other frames remain, just close this one (offering to save buffers
++first, since they would otherwise linger modified in the still-running
++Emacs and be lost on the next restart).  If this is the last frame, kill
++Emacs with `save-buffers-kill-emacs'.
++
++In a daemon the always-present initial frame is not counted, so the
++daemon normally persists; `server-stop-automatically' is honored, so a
++user who opted into automatic shutdown still gets it.  Killing the daemon
++otherwise requires an explicit `save-buffers-kill-emacs'.
++
++With ARG non-nil, silently save all file-visiting buffers."
++  (let ((stop-automatically
++         (and (daemonp)
++              (memq server-stop-automatically '(kill-terminal delete-frame)))))
++    (if (length> (frame-list) (if stop-automatically 2 1))
++        ;; Other frames remain (in a daemon the initial frame always
++        ;; does, hence the discount above): only close this one.
++        (progn (save-some-buffers arg)
++               (delete-frame))
++      ;; Last frame standing: this really does terminate Emacs.
++      (save-buffers-kill-emacs arg))))
++
+ (defun server-stop-automatically--handle-delete-frame (_frame)
+   "Handle deletion of FRAME when `server-stop-automatically' is `delete-frame'."
+   (when (null (cddr (frame-list)))
+diff --git a/lisp/term/ns-win.el b/lisp/term/ns-win.el
+index f78e75b743e..09c25e91c7e 100644
+--- a/lisp/term/ns-win.el
++++ b/lisp/term/ns-win.el
+@@ -171,22 +171,34 @@ global-map
+ ;; Moved here from common-win.el because they need to work in a -nw
+ ;; invocation of a (featurep 'ns) => true build (Bug#74619).
+ (defun ns-setup-special-keys ()
+-  (setq system-key-alist
+-        (list
+-         ;; These are special "keys" used to pass events from C to lisp.
+-         (cons  1 (make-non-key-event 'ns-power-off))
+-         (cons  2 (make-non-key-event 'ns-open-file))
+-         (cons  3 (make-non-key-event 'ns-open-temp-file))
+-         (cons  4 (make-non-key-event 'ns-drag-file))
+-         (cons  5 (make-non-key-event 'ns-drag-color))
+-         (cons  6 (make-non-key-event 'ns-drag-text))
+-         (cons  8 (make-non-key-event 'ns-open-file-line))
++  (let ((alist
++         (list
++          ;; These are special "keys" used to pass events from C to lisp.
++          (cons  1 (make-non-key-event 'ns-power-off))
++          (cons  2 (make-non-key-event 'ns-open-file))
++          (cons  3 (make-non-key-event 'ns-open-temp-file))
++          (cons  4 (make-non-key-event 'ns-drag-file))
++          (cons  5 (make-non-key-event 'ns-drag-color))
++          (cons  6 (make-non-key-event 'ns-drag-text))
++          (cons  8 (make-non-key-event 'ns-open-file-line))
+ ;;;            (cons  9 (make-non-key-event 'ns-insert-working-text))
+ ;;;            (cons 10 (make-non-key-event 'ns-delete-working-text))
+-         (cons 11 (make-non-key-event 'ns-spi-service-call))
+-         (cons 12 (make-non-key-event 'ns-new-frame))
+-         (cons 13 (make-non-key-event 'ns-toggle-toolbar))
+-         (cons 14 (make-non-key-event 'ns-show-prefs)))))
++          (cons 11 (make-non-key-event 'ns-spi-service-call))
++          (cons 12 (make-non-key-event 'ns-new-frame))
++          (cons 13 (make-non-key-event 'ns-toggle-toolbar))
++          (cons 14 (make-non-key-event 'ns-show-prefs)))))
++    (setq system-key-alist alist)
++    ;; `system-key-alist' is per-keyboard.  The setq above only covers the
++    ;; current terminal's keyboard, but these app-level Nextstep command
++    ;; events are delivered to whatever frame is selected -- which, for a
++    ;; daemon with no GUI frame, is the initial terminal.  Populate every
++    ;; live terminal's keyboard so those events still translate while
++    ;; frameless (notably ns-new-frame for the reopen gesture).
++    (dolist (terminal (terminal-list))
++      (when-let* ((frame (car (filtered-frame-list
++                               (lambda (f) (eq (frame-terminal f) terminal))))))
++        (with-selected-frame frame
++          (setq system-key-alist alist))))))
+ (ns-setup-special-keys)
+ 
+ ;; Special Nextstep-generated events are converted to function keys.  Here
+@@ -197,10 +209,70 @@ global-map
+ (define-key global-map [ns-open-temp-file] [ns-open-file])
+ (define-key global-map [ns-open-file-line] 'ns-open-file-select-line)
+ (define-key global-map [ns-spi-service-call] 'ns-spi-service-call)
+-(define-key global-map [ns-new-frame] 'make-frame)
++;; Dispatch [ns-new-frame] as a *special event*, not an ordinary global-map
++;; key.  The Dock reopen gesture (applicationShouldHandleReopen:) queues this
++;; event, but an idle, frameless daemon's command loop will not dispatch a
++;; global-map key event until the next input arrives -- it has no focused-frame
++;; / current-keyboard context to run `read-key-sequence' against, so the first
++;; Dock click would merely queue the event and a second was needed to flush it.
++;; Special events are run by `read-char' the instant the buffer is read,
++;; regardless of focus, so the first click now creates the frame.
++(define-key special-event-map [ns-new-frame] 'ns-new-frame)
+ (define-key global-map [ns-toggle-toolbar] 'ns-toggle-toolbar)
+ (define-key global-map [ns-show-prefs] 'customize)
+ 
++(defun ns-new-frame ()
++  "Create a new frame on an NS display.
++Bound to the Nextstep \"new frame\" event, posted by the Dock menu's
++\"New Frame\" item and by the reopen gesture (clicking the Dock icon or
++`open'ing the bundle while no window is visible).
++
++Normally this is just `make-frame'.  But a daemon that has dropped its
++last GUI frame keeps running with its selected frame on the initial
++terminal, where `make-frame' cannot create a GUI frame (\"Unknown
++terminal type\").  In that case create the frame on an existing NS
++display instead, so the reopen gesture brings back a usable frame."
++  (interactive)
++  (if (eq (framep (selected-frame)) 'ns)
++      (make-frame)
++    (let ((display (car (x-display-list))))
++      (if display
++          (select-frame-set-input-focus (make-frame-on-display display))
++        (make-frame)))))
++
++(defun ns-show-daemon-in-dock ()
++  "Give a headless Emacs daemon a macOS Dock presence without showing a window.
++A daemon started with `emacs --daemon' / `--fg-daemon' has not opened the
++Nextstep connection, so it has no Dock tile and cannot be reached by clicking
++the Dock icon or by `open'.  Calling this registers the process with the window
++server -- and hence Launch Services, giving it a Dock tile -- while leaving no
++visible window.  A subsequent Dock click is then handled by
++`applicationShouldHandleReopen:' (see `ns-reopen-creates-frame'), which opens a
++real frame.
++
++Typically called from a daemon's init file:
++
++    (when (daemonp) (ns-show-daemon-in-dock))
++
++Does nothing unless Emacs is running as a daemon."
++  (interactive)
++  (when (daemonp)
++    ;; Implementation: register by briefly creating an invisible NS frame and
++    ;; immediately deleting it.  `make-frame' runs `ns_term_init', which opens
++    ;; the NS connection and registers the process; deleting that last NS frame
++    ;; runs `ns_delete_terminal', which keeps the app in
++    ;; `ns-frameless-activation-policy' (Regular, hence a tile) rather than
++    ;; tearing it down, and the in-process display lingers -- so the
++    ;; registration persists with no frame left behind.
++    ;;
++    ;; This Elisp trick is fast and reliable, if inelegant.  It deliberately
++    ;; leaves room for a future, cleaner implementation behind this same name:
++    ;; a C primitive that sets up the NS connection + activation policy + Dock
++    ;; icon directly, without ever creating a frame ("solution B").  Until that
++    ;; exists, the frame round-trip is preferred precisely because it is fast
++    ;; and reuses existing, well-tested paths.
++    (delete-frame (make-frame '((window-system . ns) (visibility . nil))))))
++
+ 
+ ;; Set up a number of aliases and other layers to pretend we're using
+ ;; the Choi/Mitsuharu Carbon port.
+@@ -493,6 +565,35 @@ ns-pop-up-frames
+   :version "23.1"
+   :group 'ns)
+ 
++;; Both variables below are defined in C (nsterm.m); these `defcustom's
++;; only attach Customize metadata.  `custom-declare-variable' keeps the
++;; C-initialized value (the symbol is already bound at load time), so the
++;; :value here just documents the C default.
++(defcustom ns-frameless-activation-policy 'regular
++  "Activation policy a daemon adopts after losing its last GUI frame.
++This only matters for an Emacs server/daemon on macOS: when its last NS
++frame is closed the process keeps running but, having no window, waits in
++one of two reactivatable activation policies.  `regular' keeps a live,
++clickable Dock tile (the Mail/Notes model); `accessory' hides the tile
++but stays activatable, so clicking a pinned icon or `open'ing the bundle
++can still reopen it.  The old NSApplicationActivationPolicyProhibited is
++intentionally not offered -- it cannot be reactivated.  A new frame
++restores `regular' automatically.  See also `ns-reopen-creates-frame'."
++  :type '(choice (const :tag "Keep a Dock tile (Regular)" regular)
++                 (const :tag "Hide the Dock tile (Accessory)" accessory))
++  :version "31.1"
++  :group 'ns)
++
++(defcustom ns-reopen-creates-frame t
++  "Non-nil means reopening a frameless Emacs creates a new frame.
++On macOS, clicking the Dock icon or `open'ing the bundle while Emacs has
++no visible window triggers the reopen gesture; when this is non-nil (the
++default) Emacs responds by creating a new frame, like a well-behaved
++macOS app.  Set it to nil to leave the reopen a no-op."
++  :type 'boolean
++  :version "31.1"
++  :group 'ns)
++
+ (declare-function ns-hide-emacs "nsfns.m" (on))
+ 
+ (defun ns-find-file ()
+diff --git a/src/nsterm.m b/src/nsterm.m
+index ab656e5942e..fa0f666b79a 100644
+--- a/src/nsterm.m
++++ b/src/nsterm.m
+@@ -5866,8 +5866,22 @@ static Lisp_Object ns_string_to_lispmod (const char *s)
+ 
+ #ifdef NS_IMPL_COCOA
+   /* Rather than try to clean up the NS environment we can just
+-     disable the app and leave it waiting for any new frames.  */
+-  [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
++     background the app and leave it waiting for any new frames.
++
++     We deliberately never use NSApplicationActivationPolicyProhibited
++     here: it is the one policy that "may not create windows or be
++     activated", so a daemon parked in it cannot be revived by clicking
++     the Dock icon or `open'ing the bundle -- the
++     applicationShouldHandleReopen: contract below could never fire.
++     `ns-frameless-activation-policy' selects between the two
++     reactivatable policies: `regular' keeps a live Dock tile (Mail /
++     Notes model), `accessory' hides the tile but is still activatable,
++     so a pinned-icon / `open' click can still reopen it.  Either way a
++     later frame creation restores Regular (nsfns.m, Fx_create_frame).  */
++  if (EQ (ns_frameless_activation_policy, Qaccessory))
++    [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
++  else
++    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+ #endif
+ 
+   image_destroy_all_bitmaps (dpyinfo);
+@@ -6729,6 +6743,25 @@ - (void)applicationDidResignActive: (NSNotification *)notification
+   ns_send_appdefined (-1);
+ }
+ 
++/* Reopen contract: clicking a pinned Dock icon, or `open'ing the bundle
++   while the app has no visible window, delivers this.  A daemon that has
++   dropped its last GUI frame (ns_delete_terminal) is now frameless but
++   still activatable (Regular or Accessory, never Prohibited), so we can
++   honor the click by creating a fresh frame via the same newFrame: ->
++   make-frame path the Dock "New Frame" item uses.  Without this the
++   click would surface an inert, frameless app -- the defect this fix
++   targets.  Returning YES lets AppKit run its default reopen behavior
++   too (e.g. unminiaturizing an existing window when FLAG is YES).  */
++- (BOOL)applicationShouldHandleReopen: (NSApplication *)sender
++                    hasVisibleWindows: (BOOL)flag
++{
++  NSTRACE ("[EmacsApp applicationShouldHandleReopen:hasVisibleWindows:]");
++
++  if (!flag && !NILP (ns_reopen_creates_frame))
++    [self newFrame:sender];
++  return YES;
++}
++
+ 
+ 
+ /* ==========================================================================
+@@ -11661,6 +11694,32 @@ Convert an X font name (XLFD) to an NS font name.
+     doc: /* Whether to confirm application quit using dialog.  */);
+   ns_confirm_quit = Qnil;
+ 
++  DEFVAR_LISP ("ns-frameless-activation-policy", ns_frameless_activation_policy,
++    doc: /* Activation policy a daemon adopts after losing its last GUI frame.
++This only affects an Emacs server/daemon on macOS: when its last NS
++frame is closed the process stays alive but, having no window, must pick
++a Dock/activation policy to wait in.  The value is a symbol:
++
++  `regular'   -- keep a live, clickable Dock tile (the Mail/Notes model);
++  `accessory' -- hide the Dock tile, but stay activatable so clicking a
++                 pinned icon or `open'ing the bundle can still reopen it.
++
++The previous behavior, NSApplicationActivationPolicyProhibited, is
++deliberately not offered: it cannot be reactivated, so a click on the
++icon could never bring back a frame.  When a new frame is later created
++the app returns to `regular' automatically.  See also
++`ns-reopen-creates-frame'.  */);
++  ns_frameless_activation_policy = Qregular;
++
++  DEFVAR_LISP ("ns-reopen-creates-frame", ns_reopen_creates_frame,
++    doc: /* Non-nil means reopening a frameless Emacs creates a new frame.
++On macOS, clicking the Dock icon or `open'ing the bundle while Emacs has
++no visible window triggers the reopen gesture.  When this is non-nil (the
++default) Emacs responds by creating a new frame, like a well-behaved
++macOS app (Mail, Notes).  Set it to nil to suppress that and leave the
++reopen a no-op.  */);
++  ns_reopen_creates_frame = Qt;
++
+   DEFVAR_LISP ("ns-auto-hide-menu-bar", ns_auto_hide_menu_bar,
+                doc: /* Non-nil means that the menu bar is hidden, but appears when the mouse is near.
+ Only works on Mac OS X.  */);
+@@ -11764,6 +11823,8 @@ Nil means use fullscreen the old (< 10.7) way.  The old way works better with
+   DEFSYM (Qreverse_italic, "reverse-italic");
+   DEFSYM (Qexpanded, "expanded");
+   DEFSYM (Qns_in_echo_area, "ns-in-echo-area");
++  DEFSYM (Qregular, "regular");
++  DEFSYM (Qaccessory, "accessory");
+ 
+ #ifdef NS_IMPL_COCOA
+   Fprovide (Qcocoa, Qnil);

@@ -1,6 +1,7 @@
-# A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
+# A TOML linter such as https://github.com/tombi-toml/tombi can use this schema to validate your config.
 # If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/yazi.json"
+
+#:schema https://yazi-rs.github.io/schemas/yazi.json
 
 [mgr]
 # Manager layout by ratio: [parent, current, preview] panel widths
@@ -78,13 +79,27 @@ ueberzug_offset = [ 0, 0, 0, 0 ]
 # - `url` (String): Glob expression for matching the file URL. Case-insensitive by default, add `\s` to the beginning to make it sensitive.
 # - `mime` (String): Glob expression for matching the mime-type. Case-insensitive by default, add `\s` to the beginning to make it sensitive.
 # - `run` (String): The name of the Lua plugin to be run.
+
+# mux.yazi: cycle folder previews with `M`.
+[[plugin.prepend_previewers]]
+url = "*/"
+run = 'mux eza_tree_1 eza_tree_2 eza_tree_3 eza_tree_4'
+
 [[plugin.prepend_previewers]]
 url = "*.backup.log"
 run = 'faster-piper --rely-on-preloader'
 
 [[plugin.prepend_preloaders]]
 url = "*.backup.log"
-run = 'faster-piper -- bat -p -n --color=always -- "$1"'
+run = 'faster-piper -- bat -p -n --color=always --theme="$t" -- "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*.eml"
+run = 'faster-piper --rely-on-preloader'
+
+[[plugin.prepend_preloaders]]
+url = "*.eml"
+run = 'faster-piper -- bat -p -n --color=always --theme="$t" -- "$1"'
 
 [[plugin.prepend_previewers]]
 url = "*.md"
@@ -111,14 +126,14 @@ url = "*.txt.gz"
 run = 'faster-piper -- gzip -dc "$1"'
 
 [[plugin.prepend_fetchers]]
-id  = "git"
-url = "*"
-run = "git"
+url   = "*"
+run   = "git"
+group = "git"
 
 [[plugin.prepend_fetchers]]
-id  = "git"
-url = "*/"
-run = "git"
+url   = "*/"
+run   = "git"
+group = "git"
 
 # [[opener.edit]]
 # run = "${EDITOR:-vi} %s"

@@ -20,7 +20,7 @@
       "~/.ssh/*": "deny",
       "/etc/": "ask",
       "/opt/homebrew/etc/": "ask"
-    },        
+    },
     "glob": "allow", // file globbing (matches the glob pattern)
     "grep": "allow", // content search (matches the regex pattern)
     "list": "allow", // listing files in a directory (matches the directory path)
@@ -61,6 +61,7 @@
       "/tmp/*": "allow"
     },
     "things_*": "allow",
+    "strava_*": "allow",
     "doom_loop": "ask" // triggered when the same tool call repeats 3 times with identical input
   },
   "agent": {
@@ -112,10 +113,26 @@
       ],
       "enabled": false
     },
+    "dokuwiki": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "mcp-remote",
+        "https://w-mqv-atoms.qm.physik.uni-muenchen.de/lib/plugins/mcp/mcp.php",
+        "--header",
+        "Authorization: Bearer {env:DOKUWIKI_MCP_TOKEN}"
+      ],
+      "enabled": true
+    },
     "strava": {
       "type": "local",
-      "command": ["npx", "-y", "@r-huijts/strava-mcp-server"],
-      "enabled": false
+      "command": [
+        "bash",
+        "-c",
+        "source \"/Users/andrea/.config/envs/strava.sh\" && exec npx -y @r-huijts/strava-mcp-server"
+      ],
+      "enabled": true
     }
   },
   "plugin": [

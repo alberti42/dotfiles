@@ -7,6 +7,14 @@
         "-c",
         "test -f \"$HOME/.config/envs/context7.sh\" && source \"$HOME/.config/envs/context7.sh\" && exec npx -y @upstash/context7-mcp"
       ]
+    },
+    "dokuwiki": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "test -f \"$HOME/.config/envs/mqva-dokuwiki.sh\" && source \"$HOME/.config/envs/mqva-dokuwiki.sh\" && exec npx -y mcp-remote https://w-mqv-atoms.qm.physik.uni-muenchen.de/lib/plugins/mcp/mcp.php --header \"Authorization: Bearer $DOKUWIKI_MCP_TOKEN\""
+      ]
     }
   }
 }

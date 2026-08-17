@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>Disabled</key>
-	<false/>
+	<true/>
 	<key>EnvironmentVariables</key>
 	<dict>
+		<key>MCP_AUTH_TOKEN</key>
+		<string>SECRET_PASSWORD</string>
 		<key>PORT</key>
 		<string>50880</string>
 	</dict>
@@ -22,7 +24,7 @@
 	<array>
 		<string>/bin/zsh</string>
 		<string>-lc</string>
-		<string>exec npx --yes @typingmind/mcp bQzYJsUhmDnU-agOTsK_K</string>
+		<string>exec npx --yes @typingmind/mcp</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

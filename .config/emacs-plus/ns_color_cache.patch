@@ -1,0 +1,92 @@
+diff --git a/src/nsterm.m b/src/nsterm.m
+index a7f3fc292c..4490dadd37 100644
+--- a/src/nsterm.m
++++ b/src/nsterm.m
+@@ -151,6 +151,68 @@
+ 
+ /* ==========================================================================
+ 
++   NSColor cache.
++
++   ========================================================================== */
++/* Cache of NSColor objects keyed by their packed 32-bit pixel value.
++
++   Emacs derives NSColor objects from raw face pixels on every glyph run
++   (see the many callers of +colorWithUnsignedLong: below, in nsfont_draw
++   and ns_draw_glyph_string).  Each call allocates and autoreleases a new
++   NSColor and performs colorspace conversion, which is pure overhead
++   given that faces use a small, bounded set of colors.  This direct-
++   mapped cache returns the same NSColor for a given pixel across the
++   whole process, eliminating the per-glyph allocation and conversion.
++
++   Drawing always happens on the main thread, so no locking is needed.
++   The cache never evicts an entry once claimed, so a pointer handed back
++   to a caller stays valid for the process lifetime; a hash collision on
++   a given slot simply misses the cache for that key (rare for the
++   handful of colors in use).  */
++
++#define NS_COLOR_CACHE_SIZE 32768
++
++static NSColor *ns_color_cache[NS_COLOR_CACHE_SIZE];
++static unsigned long ns_color_cache_keys[NS_COLOR_CACHE_SIZE];
++
++static NSUInteger
++ns_color_cache_index (unsigned long key)
++{
++  /* Fibonacci hashing spreads packed ARGB keys uniformly.
++     Used so that low bits don't dominate the cache.  */
++  return (NSUInteger) ((key * 11400714819323198485ULL)
++		       & (NS_COLOR_CACHE_SIZE - 1));
++}
++
++static NSColor *
++ns_color_cache_lookup (unsigned long key)
++{
++  NSUInteger i = ns_color_cache_index (key);
++  if (ns_color_cache[i] != nil && ns_color_cache_keys[i] == key)
++    return ns_color_cache[i];
++  return nil;
++}
++
++/* Store COL under KEY, retaining it for the cache lifetime when the
++   slot is free.  Returns the object the caller should use: the cached
++   object when stored, or the freshly-created (autoreleased) COL when the
++   slot was already occupied by a colliding key.  */
++static NSColor *
++ns_color_cache_store (unsigned long key, NSColor *col)
++{
++  NSUInteger i = ns_color_cache_index (key);
++  if (ns_color_cache[i] == nil)
++    {
++      ns_color_cache[i] = [col retain];
++      ns_color_cache_keys[i] = key;
++      return ns_color_cache[i];
++    }
++  return col;
++}
++
++
++/* ==========================================================================
++
+    NSColor, EmacsColor category.
+ 
+    ========================================================================== */
+@@ -184,12 +246,17 @@
+ 
+ + (NSColor *)colorWithUnsignedLong:(unsigned long)c
+ {
++  NSColor *cached = ns_color_cache_lookup (c);
++  if (cached != nil)
++    return cached;
++
+   EmacsCGFloat a = (double)((c >> 24) & 0xff) / 255.0;
+   EmacsCGFloat r = (double)((c >> 16) & 0xff) / 255.0;
+   EmacsCGFloat g = (double)((c >> 8) & 0xff) / 255.0;
+   EmacsCGFloat b = (double)(c & 0xff) / 255.0;
+ 
+-  return [NSColor colorForEmacsRed:r green:g blue:b alpha:a];
++  NSColor *col = [NSColor colorForEmacsRed:r green:g blue:b alpha:a];
++  return ns_color_cache_store (c, col);
+ }
+ 
+ - (unsigned long)unsignedLong

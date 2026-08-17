@@ -64,6 +64,7 @@ _widget.shift_enter() { LBUFFER+=$'\n' }
 zle -N _widget.shift_enter
 bindkey '\e[13;2u'  _widget.shift_enter   # Shift+Enter (CSI u sequence)
 bindkey '^[^M'      _widget.shift_enter   # Alt+Enter (legacy ESC+CR)
+bindkey '^J'        _widget.shift_enter   # Ctrl+J → literal LF (Emacs-style), not accept-line
 
 # Shift delete
 bindkey '\e[127;2u'  backward-delete-char

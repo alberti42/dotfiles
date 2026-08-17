@@ -2,7 +2,17 @@
 
 # ("${(@f)$(...)}") — zsh idiom to split command output on newlines into an array
 declare -a claude_paths=("${(@f)$(whence -a claude)}")
-# EDITOR export
-export EDITOR="$HOME/.local/bin/emacsclient -nw -c"
+
+# $EDITOR for Claude's Ctrl-g ("open external editor").  Inside an Emacs
+# terminal emulator (ghostel exports $INSIDE_EMACS) route through `eb` so the
+# file opens (blocking) in the *running* Emacs session — otherwise a stray
+# Ctrl-g spawns a nested Emacs frame inside Emacs.  Outside Emacs, open a fresh
+# emacsclient terminal frame.
+if [[ -n "$INSIDE_EMACS" ]]; then
+  export EDITOR="$DOTFILES_DIR/.config/emacs/etc/bin/eb"
+else
+  export EDITOR="$HOME/.local/bin/emacsclient -t -c"
+fi
+
 # exec $claude_paths[1] — executes the first entry (the real claude binary, not this wrapper)
 exec $claude_paths[1] "$@"

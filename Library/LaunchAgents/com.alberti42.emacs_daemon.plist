@@ -2,17 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>Disabled</key>
+	<false/>
 	<key>KeepAlive</key>
 	<true/>
 	<key>Label</key>
-	<string>com.alberti42.emacs_daemon</string>
-	<key>LowPriorityIO</key>
-	<true/>
+	<string>io.alberti42.emacs-daemon</string>
+	<key>ProcessType</key>
+	<string>Interactive</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/bin/zsh</string>
-        <string>-ld</string>
-        <string>/Users/andrea/.config/dotfiles/.local/bin/emacs_daemon_launcher</string>
+		<string>/Users/andrea/google-drive/dotfiles/.local/bin/zsh_macos_arm_launcher</string>
+		<string>-l</string>
+		<string>-c</string>
+		<string>exec emacs --fg-daemon</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>

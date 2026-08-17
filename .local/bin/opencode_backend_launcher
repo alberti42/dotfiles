@@ -18,9 +18,16 @@ cd /
 # Source shell variable from interactive shell
 . "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/interactive-shell-env.sh"
 
+# Load Nvidia API keys
 . "${XDG_CONFIG_HOME:-$HOME/.config}/envs/nvidia.sh"
 
+# Load MQVA DokuWiki authentication token (user LLM)
+. "${XDG_CONFIG_HOME:-$HOME/.config}/envs/mqva-dokuwiki.sh"
+
+# ("${(@f)$(...)}") — zsh idiom to split command output on newlines into an array
+declare -a oc_paths=("${(@f)$(whence -a opencode)}")
+
 # Serve opencode backend
-exec opencode serve --port 4096
+exec "$oc_paths[1]" serve --port 4096
 
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :

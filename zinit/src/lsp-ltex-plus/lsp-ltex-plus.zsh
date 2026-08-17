@@ -1,6 +1,6 @@
 # https://github.com/ltex-plus/ltex-ls-plus
 
-zinit ice wait'0' lucid from'gh-r' light-mode extract'!' \
+zinit ice wait'0' lucid from'gh-r' ver'nightly' light-mode extract'!' \
   atclone"source '${${(%):-%x}:a:h}/__lsp-ltex-plus_atclone_hook.zsh'" \
   atpull'%atclone'
 zinit light @ltex-plus/ltex-ls-plus

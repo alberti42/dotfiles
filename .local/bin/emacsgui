@@ -1,3 +1,63 @@
-#!/bin/zsh -d -l
+#!/bin/zsh -fd
+#
+# Script used by Sublime Merge to open files in Emacs
+
+EC=${EC:-$HOME/.local/bin/emacsclient}   # overridable via env (e.g. the build pipeline can point elsewhere)
+
+# Remove the current script's directory from the PATH
 path=(${path:#${0:h}})
-emacsclient -n "$@"
+
+# Does a graphical frame already exist?  A running daemon always keeps an
+# invisible *terminal* frame around, so counting `frame-list' would lie;
+# instead we ask whether any frame is on a graphical display.
+reply=$($EC -e \
+  '(if (memq t (mapcar (function display-graphic-p) (frame-list))) t nil)' 2>/dev/null)
+frame_exist=0
+[[ $reply == t ]] && frame_exist=1
+
+# Reuse the existing frame, or create one with -c only when none exists yet.
+# `-n' is non-blocking; `server-window' in init.el places the buffer in the
+# current frame, so -c is needed solely for the cold case of a running server
+# with no window.
+create=()
+(( frame_exist )) || create=(-c)
+
+if (( $# > 0 )); then
+  $EC -n $create "$@"                # open file(s), creating a frame if needed
+elif (( ! frame_exist )); then
+  $EC -n -c                          # no files and no frame: just open a window
+fi
+
+# Raising Emacs on macOS happens in TWO layers, and only one of them still works
+# on its own -- which is why the obvious one-liner below is necessary but not
+# sufficient.
+#
+#   `(select-frame-set-input-focus FRAME)' expands (in lisp/frame.el) to
+#   select-frame + raise-frame + x-focus-frame.  On the NS port x-focus-frame
+#   reaches ns_focus_frame (src/nsfns.m), which calls two Cocoa methods on the
+#   daemon's own NSApplication/NSWindow:
+#
+#     [[view window] makeKeyAndOrderFront:]   <- WINDOW layer (intra-app)
+#     [NSApp activateIgnoringOtherApps:YES]   <- APP layer (inter-app foreground)
+#
+#   It was NEVER shelling out to `open' -- the daemon is itself a Cocoa app and
+#   self-activated through these calls.  That's why it "just worked" for years.
+#
+# What changed: macOS 14+ deprecated and now IGNORES activateIgnoringOtherApps:
+# for a background app (anti focus-stealing).  So makeKeyAndOrderFront: still
+# key-orders the right window *within* Emacs (the daemon does know what to
+# raise), but the Emacs process never becomes the frontmost app -- so nothing
+# visibly comes forward.  Hence: do the window-layer part here...
+$EC -e '(select-frame-set-input-focus (selected-frame))' > /dev/null
+
+# ...and supply the app-layer activation Emacs is no longer allowed to do for
+# itself, via Launch Services (`open'), which macOS still honours because it
+# routes through the OS as a user-initiated foreground request.
+# Activate the EXACT bundle the daemon is running from: this machine has several
+# Emacs.app builds sharing the org.gnu.Emacs id, so `open -a Emacs' / `open -b
+# org.gnu.Emacs' are ambiguous.  Ask the daemon for its own executable path
+# (.../Emacs.app/Contents/MacOS/Emacs) and strip back to the bundle.
+app=$($EC -e '(expand-file-name invocation-name invocation-directory)' 2>/dev/null)
+app=${app//\"/}                 # strip the elisp string quotes
+app=${app%/Contents/MacOS/*}    # .../Emacs.app/Contents/MacOS/Emacs -> .../Emacs.app
+[[ -d $app ]] && open -a "$app"

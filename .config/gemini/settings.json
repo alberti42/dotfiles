@@ -11,7 +11,8 @@
       "maxAge": "30d"
     },
     "defaultApprovalMode": "auto_edit",
-    "enableNotifications": true
+    "enableNotifications": true,
+    "preferredEditor": "emacsclient"
   },
   "ui": {
     "inlineThinkingMode": "full",

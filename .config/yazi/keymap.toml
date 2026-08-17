@@ -1,3 +1,14 @@
+# mux.yazi: cycle previewers of the hovered entry (aliases live in init.lua)
+[[mgr.prepend_keymap]]
+on   = "<A-m>"
+run  = "plugin mux"
+desc = "Switch to the next previewer (mux)"
+
+[[mgr.prepend_keymap]]
+on   = "<A-M>"
+run  = "plugin mux prev"
+desc = "Switch to the previous previewer (mux)"
+
 [[mgr.prepend_keymap]]
 on   = "z"
 run = "plugin fzf-plus -- --fzf-command='fd -t=d -d=1'"
@@ -50,12 +61,12 @@ desc = "Open shell in current directory"
 
 [[mgr.prepend_keymap]]
 on   = "s"
-run  = 'search fd --args="--no-ignore"'
+run  = 'search --via=fd --args="--no-ignore"'
 desc = "Search files by name using fd"
 
 [[mgr.prepend_keymap]]
 on   = "S"
-run  = 'search rg --args "--no-ignore"'
+run  = 'search --via=rg --args="--no-ignore"'
 desc = "Search files by content using ripgrep"
 
 [[mgr.prepend_keymap]]

@@ -3,5 +3,8 @@
 if [ -n "$SSH_CONNECTION" ]; then
   exec rsubl -w "$@"
 else
-  exec subl -n -w "$@"
+  ## Sublime Text Editor
+  # exec subl -n -w "$@"
+  ## Emacs
+  exec emacsclient -t -r "$@"
 fi

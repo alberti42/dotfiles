@@ -4,4 +4,6 @@
     "font_size": 17,
     "line_padding_top": 0,
     "line_padding_bottom": 0,
+    "show_minimap": false,
+    "always_show_minimap_viewport": false,
 }

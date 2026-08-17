@@ -1,0 +1,16 @@
+{
+  "lastChangelogVersion": "0.84.1",
+  "theme": "light",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-5",
+  "defaultThinkingLevel": "medium",
+  "quietStartup": true,
+  "packages": [
+    "git:github.com/pankajudhas81/pi-claude-auth@30d7a44ab2ba7538fc610f437867318a73d05e40",
+    "npm:pi-mcp-adapter@0bc673458e4ae4411b7d1230fc55051ef3723fa0",
+    {
+      "source": "npm:@juicesharp/rpiv-todo@2.3.1",
+      "extensions": []
+    }
+  ]
+}

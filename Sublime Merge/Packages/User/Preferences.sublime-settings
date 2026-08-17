@@ -6,7 +6,7 @@
   "diff_style": "side-by-side",
   "visible_carriage_returns_at_eol": true,
   "editor_argument_format": "+${line}:${col} ${file}",
-  "editor_path": "/Users/andrea/google-drive/dotfiles/.local/bin/emacsgui",
+  "editor_path": "/Users/andrea/Applications/Emacs Launcher.app/Contents/MacOS/EmacsLauncher",
   "font_size": 15,
   "expand_untracked_files_by_default": false,
   "image_diff_style": "side-by-side",

@@ -3,7 +3,7 @@
 # .zshrc is for interactive shells. You set options for the interactive shell there with the setopt
 # and unsetopt commands. You can also load shell modules, set your history options, change your
 # prompt, set up zle and completion, et cetera. You also set any variables that are only used in the
-# interactive shell (e.g. $LS_COLORS).
+# interactive shell (e.g., $LS_COLORS).
 
 ###########################
 # zinit installation      #
@@ -21,12 +21,11 @@ builtin source "$DOTFILES_DIR/zinit/src/zinit/zinit.zsh"
 # INSTANT PROMPT          #
 ###########################
 
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k;/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  __zcompile_if_needed_and_source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# Powerlevel10k instant prompt — disabled: starship has no instant-prompt
+# equivalent. Kept commented for easy rollback to powerlevel10k.
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k;/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   __zcompile_if_needed_and_source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
 
 ###########################
 # ZINIT ANNEXES           #
@@ -68,6 +67,9 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/gnu-utils/gnu-utils.zsh
 # PLUGINS           #
 #####################
 
+# Load starship prompt (https://starship.rs). Replaces powerlevel10k.
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/starship/starship.zsh"
+
 # Manage rust updates
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rust/rust.zsh"
 
@@ -108,16 +110,24 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zsh-completions.zsh"
 # Install jq: a lightweight command-line JSON processor akin to sed,awk,grep for JSON data (https://github.com/jqlang/jq)
 zinit from"gh-r" lbin'jq-* -> jq' null lucid wait light-mode for @jqlang/jq
 
-# Load powerlevel10k and customize prompt with ~/.p10k.zsh.
-() {
-  local XDG_CACHE_HOME=${XDG_CACHE_HOME:-~/.cache}/p10k # Shadow XDG_CACHE_HOME to change the cache folder to ~/.cache/p10k
-  # Make sure to disable Ctrl-D for signaling EOF
-  zinit depth=1 lucid light-mode atload'stty -ixon eof undef start undef stop undef' for @romkatv/powerlevel10k
-  [[ -f $DOTFILES_DIR/.p10k.zsh ]] && __zcompile_if_needed_and_source $DOTFILES_DIR/.p10k.zsh
-}
+# Previous powerlevel10k prompt (kept commented for easy rollback).
+# () {
+#   local XDG_CACHE_HOME=${XDG_CACHE_HOME:-~/.cache}/p10k # Shadow XDG_CACHE_HOME to change the cache folder to ~/.cache/p10k
+#   # Make sure to disable Ctrl-D for signaling EOF
+#   zinit depth=1 lucid light-mode atload'stty -ixon eof undef start undef stop undef' for @romkatv/powerlevel10k
+#   [[ -f $DOTFILES_DIR/.p10k.zsh ]] && __zcompile_if_needed_and_source $DOTFILES_DIR/.p10k.zsh
+# }
 
-# Wrapper function to load pyenv plugin
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
+# Python is managed entirely by uv now (interpreters + venvs).  A global `python3` on PATH comes
+# from `uv python install <ver> --default`.
+#
+# Both version managers below are DISABLED:
+#
+#   - pyenv: an old pyenv virtualenv (ST4, artiq, artiq-py310, qruise) not yet on uv.
+#   - mise:  per-project version switching for non-Python tools (node, go, rust, …)
+#
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/mise/mise.zsh"
 
 # Conda completions
 # zinit depth=1 light-mode lucid nocompile as'completion' from'gh' \
@@ -136,8 +146,10 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/pyenv/pyenv.zsh"
 
     # Import zsh-opencode-tab (make sure to import it after fzf-tab)
     wait'0c' atinit'
-      export Z_OC_TAB_OPENCODE_MODEL="anthropic/claude-3-5-haiku-latest" \
+      export Z_OC_TAB_OPENCODE_MODEL="openai/gpt-5.4-mini-fast" \
       Z_OC_TAB_OPENCODE_BACKEND_URL="http://localhost:4096" \
+      Z_OC_TAB_OPENCODE_VARIANT_GENERATOR="low" \
+      Z_OC_TAB_OPENCODE_VARIANT_EXPLAINER="" \
       Z_OC_TAB_OPENCODE_RUN_MODE="attach" \
       Z_OC_TAB_EXPLAIN_PRINT_CMD="bat --plain --color=always --decorations=always --language markdown --paging=never {}"' \
       $__local_plugin_path/zsh-opencode-tab
@@ -390,11 +402,11 @@ alias 7='cd -7 >/dev/null'
 alias 8='cd -8 >/dev/null'
 alias 9='cd -9 >/dev/null'
 
-alias e='emacsclient -nw -r'         # opens terminal frame, blocking
-alias eg='emacsclient -n -r'         # opens GUI frame, non-blocking due to `-n`; `-r` force reusing existing frames
+alias e='emacsclient -t -r'         # opens terminal frame, blocking
 alias emacs='emacs -nw'
-
-alias oc='EDITOR="emacsclient -nw -c" opencode attach http://localhost:4096 --dir .'
+function eg () {
+  "$HOME/Applications/Emacs Launcher.app/Contents/MacOS/EmacsLauncher" "$@" 2>/dev/null
+}
 
 alias diff='diff --color=auto'
 
@@ -448,28 +460,38 @@ if [[ -n $SSH_CONNECTION ]]; then
   # Remote Sublime Text (new window -n is supported by `randy3k/RemoteSubl` but not by `spamwax/rmate-rs`)
   editor_cmd=(rsubl -w)
 else
-  editor_cmd=(emacsclient '-nw')  # Emacs
+  editor_cmd=(emacsclient '-t')  # Emacs
   # editor_cmd=(subl -nw)
 fi
 
-# Check whether the editor is found in the path
+# Check whether the editor is found in the path.  EDITOR and VISUAL are always
+# set together: VISUAL ("full-screen editor") is what modern callers read first,
+# falling back to EDITOR, so setting one alone lets a stale value of the other
+# win the lookup.  All the editors chosen here drive a full screen anyway.
 if (( $#editor_cmd )) && command -v "$editor_cmd[1]" >/dev/null 2>&1; then
-  export EDITOR="${(j: :)editor_cmd}"
+  export EDITOR="${(j: :)editor_cmd}" VISUAL="${(j: :)editor_cmd}"
 else
   # echo "Warning: '$editor_cmd' not found in the path. Using 'nano' as a fallback."
-  export EDITOR="nano"
+  export EDITOR="nano" VISUAL="nano"
 fi
 
-# Bridge to emacs vterm
-if [[ -n "$INSIDE_EMACS" && "$INSIDE_EMACS" = vterm ]]; then
-  vterm_init_script="$XDG_CONFIG_HOME/emacs/straight/repos/emacs-libvterm/etc/emacs-vterm-zsh.sh"
-  if [[ -f "$vterm_init_script" ]]; then
-    __zcompile_if_needed_and_source "$vterm_init_script"
+if [[ -n "$INSIDE_EMACS" ]]; then
+  # Inside ghostel (Emacs terminal emulator), route $EDITOR through `eb` so files
+  # (git commits, $EDITOR-spawning CLIs, …) open blocking in the *running* Emacs
+  # session instead of spawning a nested Emacs.  `eb` talks to ghostel by writing
+  # an escape sequence to its tty, so it works in a ghostel shell and nowhere
+  # else — not even under `M-x shell`, which also sets INSIDE_EMACS.  Hence the
+  # exact match, and hence EMACS_GHOSTEL_BIN (exported by terminal-config.el's
+  # `ghostel-environment') rather than a symlink on the global PATH: outside
+  # ghostel the command simply does not exist.
+  #
+  # Both variables: VISUAL means "full-screen editor", EDITOR the line-editor
+  # fallback, and callers try VISUAL first.  Setting only one leaves the other
+  # pointing at whatever it held before — a stale value that wins the lookup.
+  if [[ $INSIDE_EMACS == ghostel && -n $EMACS_GHOSTEL_BIN ]]; then
+    path=("$EMACS_GHOSTEL_BIN" $path)
+    export EDITOR="eb" VISUAL="eb"
   fi
-  unset vterm_init_script
-  alias claude='claude'
-  alias oc='opencode attach http://localhost:4096 --dir .'
-  export EDITOR="ev -nw"
 fi
 
 ##########################

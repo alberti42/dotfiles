@@ -4,10 +4,11 @@
   "window.autoDetectColorScheme": true,
 
   // workbench
+  "workbench.editor.useModal": "off",
   "workbench.fontAliasing": "auto",
   "workbench.editor.empty.hint": "hidden",
   "workbench.startupEditor": "none",
-"workbench.localHistory.maxFileEntries": 500,
+  "workbench.localHistory.maxFileEntries": 500,
   "workbench.preferredDarkColorTheme": "Catppuccin Macchiato",
   "workbench.tree.indent": 25,
   "workbench.settings.editor": "json",
@@ -103,8 +104,7 @@
   "editor.fontFamily": "MesloLGS NF",
   "editor.accessibilitySupport": "off",
   "editor.insertSpaces": true,
-  "editor.minimap.showSlider": "always",
-  "editor.minimap.enabled": false,
+"editor.minimap.showSlider": "always",
   "editor.hover.enabled": "on",
   "editor.hover.delay": 500,
   "editor.semanticTokenColorCustomizations": {
@@ -123,19 +123,57 @@
 
   // Terminal
   "terminal.integrated.macOptionIsMeta": true,
+  "terminal.integrated.fontSize": 16,
   "terminal.integrated.commandsToSkipShell": [
     "matlab.interrupt",
     "language-julia.interrupt"
   ],
-  "terminal.integrated.fontSize": 16,
-
+  
+  // File associations
+  "files.associations": {
+    "*.el": "emacs-lisp"
+  },
+  
   // LTeX
+  // "ltex.languageToolHttpServerUri": "https://api.languagetoolplus.com",
+  "ltex.ltex-ls.path": "/Users/andrea/.local/share/zinit/polaris",
+  "ltex.java.path": "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/jdk-21.0.10+7",
+  "ltex.languageToolHttpServerUri": "https://api.languagetoolplus.com",
+  // "ltex.languageToolHttpServerUri": "",
   "ltex.languageToolOrg.username": "...",
   "ltex.languageToolOrg.apiKey": "...",
-  "ltex.language": "auto",
+  "ltex.language": "en-US",
+  "ltex.trace.server": "off",
+  "ltex.completionEnabled": false,
+  // "ltex.enabled": ["bibtex", "context", "context.tex", "html", "latex", "markdown", "mdx", "typst", "asciidoc", "neorg", "org", "quarto", "restructuredtext", "rsweave"],
+  // "ltex.ltex-ls.logLevel": "fine",
   // "ltex.language": "de-DE",
   // "ltex.language": "en-US",
 
+  // Settings for LaTeX documents
+  "[latex-class]": {
+    "editor.quickSuggestions": {
+        "comments": true,
+        "strings": true,
+        "other": true
+    },
+    "editor.quickSuggestionsDelay": 10,
+    "editor.suggest.showWords": true,
+    "editor.wordBasedSuggestions": "matchingDocuments"
+  },
+
+  // Settings for Markdown documents
+  "[markdown]": {
+    "editor.quickSuggestions": {
+        "comments": true,
+        "strings": true,
+        "other": true
+    },
+    "editor.quickSuggestionsDelay": 10,
+    "editor.suggest.showWords": true,
+    "editor.wordBasedSuggestions": "off"
+  },
+  
   // git
   "git.confirmSync": false,
   "git.openRepositoryInParentFolders": "always",
@@ -164,7 +202,7 @@
   "latex-workshop.latex.autoBuild.cleanAndRetry.enabled": false,
   "latex-workshop.synctex.afterBuild.enabled": true,
   "latex-workshop.view.pdf.invert": 0,
-
+  
   // Sublime Merge
   "vscsm.smergeExecutablePath": "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge",
   "editor.detectIndentation": false,
@@ -183,5 +221,6 @@
   // Shell scripts
   "[shellscript]": {
     "editor.tabSize": 2
-  }
+},
+"chat.disableAIFeatures": true
 }

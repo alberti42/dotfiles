@@ -45,7 +45,7 @@
     "LSP-gopls",
     "LSP-json",
     "LSP-julia",
-    "LSP-ltex-ls",
+    "LSP-ltex-ls-plus",
     "LSP-lua",
     "LSP-rust-analyzer",
     "LSP-SourceKit",

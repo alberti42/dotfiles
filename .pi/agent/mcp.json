@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "test -f \"$HOME/.config/envs/context7.sh\" && source \"$HOME/.config/envs/context7.sh\" && exec npx -y @upstash/context7-mcp"
+      ],
+      "lifecycle": "lazy"
+    },
+    "dokuwiki": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "test -f \"$HOME/.config/envs/mqva-dokuwiki.sh\" && source \"$HOME/.config/envs/mqva-dokuwiki.sh\" && exec npx -y mcp-remote https://w-mqv-atoms.qm.physik.uni-muenchen.de/lib/plugins/mcp/mcp.php --header \"Authorization: Bearer $DOKUWIKI_MCP_TOKEN\""
+      ],
+      "lifecycle": "lazy",
+      "excludeTools": [
+        "core_login",
+        "core_logoff",
+        "dokuwiki_login",
+        "dokuwiki_logoff",
+        "dokuwiki_createUser",
+        "dokuwiki_deleteUsers",
+        "plugin_usermanager_createUser",
+        "plugin_usermanager_deleteUser",
+        "plugin_acl_addAcl",
+        "plugin_acl_delAcl",
+        "core_deleteMedia",
+        "wiki_deleteAttachment"
+      ]
+    }
+  }
+}

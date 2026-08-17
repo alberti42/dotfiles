@@ -1,113 +1,129 @@
 # ~/.config/ghostty/config
+# Migrated from WezTerm (wezterm.lua). macOS-focused.
 
 # --- Font ---
-font-family = "MesloLGS NF"
+# WezTerm: JetBrainsMonoNL Nerd Font Mono, Regular, size 17 (mac)
+font-family = "JetBrainsMonoNL Nerd Font Mono"
+font-style  = Regular
 font-size   = 17
 
-# --- Colors (WezTerm → Ghostty theme overrides) ---
-foreground = #ffffff
-background = #111111
+# --- Colors / theme ---
+# WezTerm switched Catppuccin Frappe (dark) / Latte (light) with the OS appearance.
+# Ghostty does the same automatically via the light:/dark: theme syntax.
+theme = light:Catppuccin Latte,dark:Catppuccin Frappe
 
-cursor-color = #ffffff
-cursor-text  = #000000
-
-# ANSI 0–15
-# palette = 0  = #000000
-# palette = 1  = #c91b00
-# palette = 2  = #00c300
-# palette = 3  = #c7c400
-# palette = 4  = #0226c8
-# palette = 5  = #ca30c7
-# palette = 6  = #00c5c8
-# palette = 7  = #c7c7c7
-# palette = 8  = #686868
-# palette = 9  = #ff6e68
-# palette = 10 = #60fa67
-# palette = 11 = #fffc67
-# palette = 12 = #6872ff
-# palette = 13 = #ff77ff
-# palette = 14 = #5ffdff
-# palette = 15 = #ffffff
+# WezTerm set cursor_bg/cursor_border to the Catppuccin "text" color (#cad3f5),
+# which is just the foreground. cell-foreground reproduces that and also adapts
+# to the light (Latte) theme instead of being a fixed light-lavender.
+cursor-color = cell-foreground
 
 # --- Cursor ---
-# cursor-style       = bar      # WezTerm SteadyBar
-# cursor-style-blink = false    # WezTerm blink_rate=250 → “no blink”
+# WezTerm: BlinkingBlock, blink rate 250ms (rate isn't configurable in Ghostty).
+cursor-style       = block
+cursor-style-blink = true
 
 # --- Scrollback ---
-scrollback-limit = 10000
+# NOTE: Ghostty's scrollback-limit is in BYTES (not lines like WezTerm's 10000).
+# ~10 MB is roughly comparable and is also Ghostty's default.
+scrollback-limit = 10000000
+
+# --- Terminal type ---
+# Match WezTerm's config.term for tmux/SSH compatibility.
+term = xterm-256color
 
 # --- Window / appearance ---
 background-opacity = 1
-# window-decoration  = auto     # closest to WezTerm 'RESIZE'
-window-padding-x   = 15
-window-padding-y   = 15
-# confirm-close-surface = false # WezTerm NeverPrompt
+# WezTerm window_padding: left/right 15pt, top/bottom 10pt
+window-padding-x = 15
+window-padding-y = 10
+# WezTerm window_decorations = "RESIZE|MACOS_DISABLE_TITLEBAR_DRAG" -> hide titlebar.
+macos-titlebar-style = hidden
+# WezTerm window_close_confirmation = "NeverPrompt"
+confirm-close-surface = false
 
-# Start roughly centered and sized.
-# Ghostty sizes by GRID CELLS, not pixels. Tweak to taste.
-# (These two only take effect together.)
-window-width  = 120
-window-height = 50
+# WezTerm centered the window at 70% x 85% of the screen on startup. Ghostty has
+# no percentage sizing or auto-center; it sizes in GRID CELLS. Tune to taste.
+# window-width  = 120
+# window-height = 50
 
-# Optional explicit placement (pixels from top-left of primary monitor).
-# Uncomment and set if you want a fixed position.
-# window-position-x = 200
-# window-position-y = 120
-
-# --- Tabs / bar ---
-# Ghostty shows tabs only when you open them; there isn't a global "hide all tabs" switch.
-
-# --- Bell ---
-# Newer Ghostty builds allow disabling bell UI entirely on macOS:
-# app-notifications = false
-# (and keep confirm-close-surface=false above)
-
-# --- Clipboard / mouse ---
-# clipboard-read  = true
-# clipboard-write = true
+# --- Mouse ---
+# WezTerm hide_mouse_cursor_when_typing = false
 mouse-hide-while-typing = false
 
 # --- macOS Option/Alt behavior ---
-# WezTerm: left Alt = composed (false), right Alt = Alt (true)
-macos-option-as-alt = right
+# WezTerm: LEFT alt = Alt modifier (send_composed = false),
+#          RIGHT alt = compose special chars (send_composed = true).
+# So only the LEFT option should act as Alt.
+macos-option-as-alt = left
 
-# --- Default program (tmux launcher) ---
-# Runs ONLY for the first surface; use `command` to apply to all windows.
-# Prefer absolute paths; tilde/$HOME isn’t expanded by Ghostty.
-initial-command = "$HOME/.config/dotfiles/.local/bin/tmux_launcher -l new-session -A -D -s main"
+# --- Clipboard ---
+# WezTerm had kitty-keyboard clipboard integration enabled.
+clipboard-read  = allow
+clipboard-write = allow
+
+# --- Default program (tmux) ---
+# Replicates WezTerm's default_prog inline: run tmux under `env` with an explicit,
+# minimal PATH, then seed tmux's @dark_appearance from the current macOS appearance.
+#
+# The PATH is REQUIRED, not cosmetic: Ghostty is a GUI app (minimal launchd PATH)
+# and runs a command-with-args via `/bin/sh -c` (non-login, does NOT source your
+# zsh rc), so a bare `tmux` would not be found — tmux lives only in polaris/bin.
+# `$HOME` is expanded by that `/bin/sh -c`. TERM is already exported by the
+# `term =` line above and inherited here, so (unlike WezTerm) it's not set in env.
+# The zsh started inside tmux rebuilds the full interactive PATH.
+#
+# `\;` is passed literally to tmux as its command separator (`/bin/sh -c` turns
+# `\;` into a `;` argument), so tmux runs new-session AND set-option in one go.
+# `$(defaults read -g AppleInterfaceStyle …)` prints "Dark" (exit 0) in dark mode
+# and errors (exit 1) in light mode -> the flag becomes 1 (dark) or 0 (light).
+#
+# Runs for the first surface only (matches the single-window tmux workflow).
+initial-command = /usr/bin/env PATH=$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin tmux new-session -A -D -s main \; set-option -g @dark_appearance $(defaults read -g AppleInterfaceStyle >/dev/null 2>&1 && echo 1 || echo 0)
+
+# NOTE / limitation: this only seeds @dark_appearance ONCE, at launch. WezTerm's
+# zsh-appearance-control dispatcher also re-pushed it on every live light<->dark
+# switch; Ghostty has no "on appearance change" hook, so keeping @dark_appearance
+# in sync after launch is still the job of the standalone dispatcher (TODO).
+# Ghostty's own colors do follow the OS live via the theme = line above.
 
 # --- Keybindings ---
-# Syntax: keybind = <modifiers+key>=<action>
-# To send raw bytes, use text:\x.. (Zig string literal escapes).
+# WezTerm had disable_default_key_bindings = true; `keybind = clear` is the equivalent
+# (drops all Ghostty defaults) and we re-add only what WezTerm defined.
+keybind = clear
 
-# Word-wise movement with Alt+←/→ (esc+b, esc/f)
-# keybind = alt+left  = text:\x1bb
-# keybind = alt+right = text:\x1bf
+# tmux prev/next pane: Ctrl-b p / Ctrl-b n  (WezTerm sent \x02p / \x02n)
+keybind = ctrl+alt+left_bracket=text:\x02p
+keybind = ctrl+alt+right_bracket=text:\x02n
 
-# tmux pane cycling: send Ctrl-b p / Ctrl-b n
-# keybind = alt+super+left  = text:\x02p
-# keybind = alt+super+right = text:\x02n
-# keybind = ctrl+alt+[ = text:\x02p
-# keybind = ctrl+alt+] = text:\x02n
-# keybind = alt+super+[ = text:\x02p
-# keybind = alt+super+] = text:\x02n
+# Send arrow keys with modifiers (WezTerm SendKey -> xterm CSI 1;<mod><dir>).
+# mod = 1 + shift(1) + alt(2) + ctrl(4).  D=Left C=Right A=Up B=Down.
+keybind = ctrl+shift+left_bracket=text:\x1b[1;6D
+keybind = ctrl+shift+right_bracket=text:\x1b[1;6C
+keybind = alt+shift+left_bracket=text:\x1b[1;4D
+keybind = alt+shift+right_bracket=text:\x1b[1;4C
+keybind = alt+shift+equal=text:\x1b[1;4A
+keybind = alt+shift+quote=text:\x1b[1;4B
 
-# Disable Alt+Enter (WezTerm used this for fullscreen)
-# keybind = alt+enter = ignore
+# Disable Alt+Enter (WezTerm disabled its fullscreen toggle here)
+keybind = alt+enter=ignore
 
-# Copy / Paste
-# keybind = cmd+c = copy_to_clipboard
-# keybind = cmd+v = paste_from_clipboard
+# CSI u encodings (enable in tmux with: printf '\e[>4;1m')
+keybind = ctrl+tab=text:\x1b[9;5u
+keybind = shift+enter=text:\x1b[13;2u
 
-# Close window (WezTerm Cmd+w)
-# keybind = cmd+w = close_window
+# Copy / paste
+keybind = cmd+c=copy_to_clipboard
+keybind = cmd+v=paste_from_clipboard
+
+# Quit / close window
+keybind = cmd+q=quit
+keybind = cmd+w=close_surface
 
 # Disable Cmd+n (new window)
-# keybind = cmd+n = ignore
+keybind = cmd+n=ignore
 
-# Quit app (like WezTerm Cmd+q)
-# keybind = cmd+q = quit
+# Debug: WezTerm ShowDebugOverlay (Cmd+Shift+L) -> Ghostty terminal inspector
+keybind = cmd+shift+l=inspector:toggle
 
-# Find/search: Ghostty doesn't have an in-terminal "find" UI yet, so Cmd+F is left unmapped.
-# If you prefer, you can block it to avoid accidental app-level search in some envs:
-# keybind = cmd+f = ignore
+# Fullscreen (WezTerm Cmd+Shift+F)
+keybind = cmd+shift+f=toggle_fullscreen

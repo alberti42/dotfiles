@@ -21,9 +21,6 @@ local is_dark=${1:-}
 # ls_colors symlink — points to the active appearance file
 local vivid_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/vivid"
 
-# fzf default config
-__zcompile_if_needed_and_source $DOTFILES_DIR/zinit/src/fzf/__fzf_atinit_hook.zsh
-
 if (( is_dark )); then
   # yazi
   sed -E 's/^(dark|light)[[:space:]]*=.*$/\1 = "catppuccin-frappe"/' \
@@ -62,9 +59,6 @@ if (( is_dark )); then
 
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_dark" "$vivid_cache_dir/ls_colors" || exit 1
-
-  # tmux-fzf-links
-  tmux set-option -g @fzf-links-fzf-display-options "$(printf '%s' "$FZF_DEFAULT_OPTS" | sed -E 's/--border(=[^[:space:]]+)?[[:space:]]*//g') --color=preview-bg:#232634,gutter:#232634 -w 100% --maxnum-displayed 20 --multi --track --no-preview"
 
   # btop
   sed -E 's/^(color_theme[[:space:]]*=[[:space:]]*\").*\"$/\1catppuccin_frappe\"/' \
@@ -113,9 +107,6 @@ else
   # LS_COLORS for tmux-fzf-links
   ln -sf -- "ls_colors_light" "$vivid_cache_dir/ls_colors" || exit 1
 
-  # tmux-fzf-links
-  tmux set-option -g @fzf-links-fzf-display-options "$(printf '%s' "$FZF_DEFAULT_OPTS" | sed -E 's/--border(=[^[:space:]]+)?[[:space:]]*//g') --color=preview-bg:#dce0e8,gutter:#dce0e8 -w 100% --maxnum-displayed 20 --multi --track --no-preview"
-
   # btop
   sed -E 's/(color_theme[[:space:]]*=[[:space:]]*\").*\"$/\1catppuccin_latte\"/' \
       "$DOTFILES_DIR/.config/btop/btop.conf" > "$DOTFILES_DIR/.config/btop/btop.conf.tmp" && \
@@ -125,3 +116,8 @@ else
   ln -f -s "$DOTFILES_DIR/.config/git/theme-light.gitconfig" "$XDG_CONFIG_HOME/git/theme.gitconfig"
 
 fi
+
+# tmux-server-resident settings (the @fzf-links-* option), which a fresh tmux
+# server loses on restart. Delegated to a small co-located helper that tmux.conf
+# also runs at server start, so the value has a single source of truth.
+"${${(%):-%x}:a:h}/zac-tmux-cmd.zsh" "$is_dark" || exit 1

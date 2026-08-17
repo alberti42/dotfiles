@@ -1,12 +1,6 @@
-// Settings in here override those in "LSP-ltex-ls/LSP-ltex-ls.sublime-settings"
+// Settings in here override those in "LSP-ltex-ls-plus/LSP-ltex-ls-plus.sublime-settings"
+
 {
-    // We start this language server when we open LaTex, BibTex and Markdown files.
-    "selector": "text.tex, text.bibtex, text.html.markdown, text.restructuredtext",
-    // The startup command.
-    // Do not change this unless you know what you do!
-    "command": [
-        "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/bin/${script}"
-    ],
     // Extra variables to override/add to language server's environment.
     "env": {
         "JAVA_OPTS": "-Xms64m -Xmx512m",
@@ -15,13 +9,13 @@
     // "" uses the latest release available or the last downloaded version
     // if no internet connection is available.
     "version": "",
-    // By default LSP-ltex-ls downloads the latest release tested by the developer,
+    // By default LSP-ltex-ls-plus downloads the latest release tested by the developer,
     // if no version is explicitly set.
     // By setting allow_untested to true this behavior gets overwritten and 
     // the latest release gets downloaded.
     "allow_untested": false,
     // The server-specific settings.
-    // @see https://valentjn.github.io/vscode-ltex/docs/settings.html
+    // @see https://ltex-plus.github.io/ltex-plus/settings.html
     "settings": {
         "ltex.enabled": [
             "bibtex",
@@ -33,25 +27,21 @@
             "org",
             "restructuredtext",
             "rsweave",
-            "tex"
+            "tex",
+            "lisp",
+            "elisp"
         ],
         // Enable completition
-        // @see https://valentjn.github.io/ltex/settings.html#ltexcompletionenabled
+        // @see https://ltex-plus.github.io/ltex-plus/settings.html#ltexcompletionenabled
         "ltex.completionEnabled": false,
         // Default language. 
-        // @see https://valentjn.github.io/vscode-ltex/docs/advanced-usage.html#magic-comments
-        // @see https://valentjn.github.io/ltex/settings.html#ltexlanguage
+        // @see https://ltex-plus.github.io/ltex-plus/advanced-usage.html#magic-comments
+        // @see https://ltex-plus.github.io/ltex-plus/settings.html#ltexlanguage
         // new: "auto" but not recommended
         "ltex.language":"en-US",
         //Lists of additional words that should not be counted as spelling errors.
-        // @see https://valentjn.github.io/vscode-ltex/docs/settings.html#ltexdictionary
-        "ltex.dictionary": {
-            "en-US":
-            [
-				"adiabatically",
-                "qubits",
-            ],
-        },
+        // @see https://ltex-plus.github.io/ltex-plus/settings.html#ltexdictionary
+        "ltex.dictionary": {},
         // Lists of rules that should be disabled (if enabled by default by LanguageTool).
         "ltex.disabledRules": {},
         // Lists of rules that should be enabled (if disabled by default by LanguageTool).
@@ -67,12 +57,12 @@
         "ltex.markdown.nodes": [],
         "ltex.markdown.ignore": [],
         "ltex.markdown.dummy": [],
-        // @see https://valentjn.github.io/vscode-ltex/docs/settings.html#ltexconfigurationtarget
+        // @see https://ltex-plus.github.io/ltex-plus/settings.html#ltexconfigurationtarget
         // vscode-only. Sublime will ignore the settings (for now)
         "ltex.configurationTarget": {
             "dictionary": "user", 
             "disabledRules": "user", 
-            "hiddenFalsePositives": "user",
+            "hiddenFalsePositives": "user"
         },
         // Optional mother tongue of the user (e.g., "de-DE").
         "ltex.additionalRules.motherTongue": "",
@@ -90,11 +80,11 @@
         // set API key on languagetool.org for Premium API access
         "ltex.ltex-ls.languageToolOrgApiKey": "...",
         // Logging level (verbosity) of the ltex-ls server log
-        "ltex.ltex-ls.logLevel": "fine",
+        "ltex.ltex-ls.logLevel": "warning",
         // Debug setting to log the communication between language client and server.
         "ltex.trace.server": "off",
         // Size of the LanguageTool ResultCache in sentences (must be a positive integer).
-        "ltex.sentenceCacheSize": 2000,
+        "ltex.sentenceCacheSize": 0,
         // Severity of the diagnostics corresponding to the grammar and spelling errors.
         "ltex.diagnosticSeverity": "information",
 
@@ -104,8 +94,16 @@
         // If set to true, diagnostics of a file are cleared when the file is closed
         "ltex.clearDiagnosticsWhenClosingFile": true,
         // Java path to use. Should point to the JAVA_HOME/bin directory. Currently disabled.
-        "ltex.java.path": "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/jdk-21.0.8+9",
+        "ltex.java.path": "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/jdk-21.0.10+7",
     },
+    // We start this language server when we open LaTex, BibTex and Markdown files.
+    "selector": "text.tex, text.bibtex, text.html.markdown, text.restructuredtext, source.lisp",
+    // The path to the server binary used to start the language server.
+    // Use `auto` for the package to manage (install/update) the server automatically.
+    // NOTE: Change this instead of directly updating `command` - the `${server_path}` variable is dynamically resolved based on this setting.
+    // WARNING: Override at your own risk - using a custom binary can cause compatibility issues with server settings.
+    "server_path": "/Users/andrea/.local/share/zinit/plugins/ltex-plus---ltex-ls-plus/bin/ltex-ls-plus",
+    "command": [
+        "${server_path}",
+    ],
 }
-
-// # vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 :

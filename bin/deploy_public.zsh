@@ -261,12 +261,12 @@ sanitize_vscode_settings() {
 sanitize_sublime_ltex() {
   # 3) Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings
   strict_redact_and_stage \
-    "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings" \
+    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
     '("ltex\.languageToolOrg\.username"\s*:\s*")[^"]*(")' \
     's/("ltex\.languageToolOrg\.username"\s*:\s*")[^"]*(")/\1...\2/g' \
     '("ltex\.languageToolOrg\.username"\s*:\s*")\.\.\.(")'
   strict_redact_and_stage \
-    "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings" \
+    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
     '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")[^"]*(")' \
     's/("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")[^"]*(")/\1...\2/g' \
     '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")\.\.\.(")'
@@ -314,13 +314,13 @@ verify_sanitization() {
     "Library/Application Support/Code/settings.json" \
     || die "Redacted ltex.languageToolOrg.apiKey not found in Library/Application Support/Code/settings.json"
 
-  assert_file_exists "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings"
+  assert_file_exists "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings"
   sed_has_match '("ltex\.languageToolOrg\.username"\s*:\s*")\.\.\.(")' \
-    "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings" \
-    || die "Redacted ltex.languageToolOrg.username not found in Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings"
+    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
+    || die "Redacted ltex.languageToolOrg.username not found in Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings"
   sed_has_match '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")\.\.\.(")' \
-    "Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings" \
-    || die "Redacted ltex.ltex-ls.languageToolOrgApiKey not found in Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings"
+    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
+    || die "Redacted ltex.ltex-ls.languageToolOrgApiKey not found in Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings"
 
   # Verify private-only paths are no longer tracked.
   if git ls-files --error-unmatch -- "Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json" >/dev/null 2>&1; then

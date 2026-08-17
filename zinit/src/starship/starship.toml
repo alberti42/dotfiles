@@ -1,0 +1,154 @@
+#format = """
+#[╭─user───❯](bold blue) $username
+#[├ ─system─❯](bold yellow) $hostname
+#[├ ─project❯](bold red) $directory$rust$git_branch$git_status$package$golang$terraform$docker_context$python$docker_context$nodejs
+#[╰─cmd────❯](bold green) 
+#"""
+#format = '$all'
+
+[localip]
+ssh_only = false
+format = '📟 [$localipv4](bold red) '
+disabled = true
+
+[username]
+style_user = "green bold"
+style_root = "red bold"
+format = "[$user]($style) "
+disabled = false
+show_always = true
+
+[hostname]
+ssh_only = false
+format = 'on [$hostname](bold yellow) '
+trim_at = "."
+disabled = false
+
+# Replace the "❯" symbol in the prompt with "➜"
+[character]                            # The name of the module we are configuring is "character"
+success_symbol = "[»](bold green)"     # The "success_symbol" segment is being set to "➜" with the color "bold green"
+error_symbol = "[✗](bold red)"
+#  
+# configure directory
+[directory]
+read_only = " "
+truncation_length = 3                  # keep the last 3 path components
+truncation_symbol = "…/"               # prepend an ellipsis when the path is truncated (p10k style)
+truncate_to_repo = true # truncates directory to root folder if in github repo
+style = "bold italic blue"
+
+[cmd_duration]
+min_time = 4
+show_milliseconds = false
+disabled = false
+style = "bold italic red"
+
+[aws]
+symbol = "  "
+
+[conda]
+symbol = " "
+
+[dart]
+detect_extensions = []
+symbol = " "
+
+[docker_context]
+symbol = " "
+format = "via [$symbol$context]($style) "
+style = "blue bold"
+only_with_files = true
+detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
+detect_folders = []
+disabled = false
+
+[elixir]
+symbol = " "
+detect_extensions = []
+
+[elm]
+detect_extensions = []
+symbol = " "
+
+[git_branch]
+symbol = " "
+
+[golang]
+symbol = " "
+detect_extensions = []
+
+[hg_branch]
+symbol = " "
+
+[java]
+detect_extensions = []
+symbol = " "
+
+[julia]
+detect_extensions = []
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[nim]
+detect_extensions = []
+symbol = " "
+
+[nix_shell]
+symbol = " "
+
+[package]
+symbol = "󰏗 "
+
+[perl]
+symbol = " "
+detect_extensions = []
+
+[php]
+symbol = " "
+detect_extensions = []
+
+[python]
+symbol = " "
+#pyenv_version_name = true
+format = 'via [${symbol}python (${version} )(\($virtualenv\) )]($style)'
+style = "bold yellow"
+pyenv_prefix = "venv "
+python_binary = ["./venv/bin/python", "python", "python3", "python2"]
+# Only activate in real Python projects, not on a loose *.py / notebook file.
+# Dropping detect_extensions stops a bare script from triggering the slow
+# `python --version` lookup in junk-drawer dirs like ~/Downloads.
+detect_extensions = []
+detect_files = [".python-version", "pyproject.toml", "Pipfile", "requirements.txt", "setup.py", "tox.ini"]
+detect_folders = [".venv"]
+version_format = "v${raw}"
+
+[ruby]
+symbol = " "
+detect_extensions = []
+
+[rust]
+symbol = " "
+detect_extensions = []
+
+[scala]
+detect_extensions = []
+symbol = " "
+
+[shlvl]
+symbol = " "
+
+[swift]
+symbol = "ﯣ "
+# Require a real Swift package (Package.swift), not a loose *.swift file, so a
+# stray test.swift in ~/Downloads no longer forks the slow `swift --version`.
+detect_extensions = []
+
+[nodejs]
+format = "via [ Node.js $version](bold green) "
+# detect_extensions is NOT specified by default => inherits ["js","ts",...], so a
+# loose *.ts/*.js triggers it. Empty it so only the real markers below activate it.
+detect_extensions = []
+detect_files = ["package.json", ".node-version"]
+detect_folders = ["node_modules"]

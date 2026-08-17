@@ -2,16 +2,79 @@
 icon: dragon-plus
 
 patches:
-  - aggressive-read-buffering
-  - left-margin-background-fix:
-      url: https://github.com/emacs-mirror/emacs/commit/24597e1bbd3d1476dcd126a4f4308832adace36f.patch
-      # curl -sL https://github.com/alberti42/fork-emacs/commit/a25f72104bc7ddc64dd3403536effa0a7020838a.patch | shasum -a 256
-      sha256: 3c16b184072b889b30f5eb2c511fa2b1e6a114f93ae8b3936fc45b3b0899a7b3
+  # emacs-plus baseline patches. NOTE: patches/emacs-32/*.patch are symlinks to
+  # ../emacs-31/*.patch, and GitHub raw serves the symlink target text (not the
+  # patch) -- so point at the real emacs-31 files. Pinned to a commit SHA so the
+  # content (and thus sha256) is frozen.
+  - round-undecorated-frame:
+      url: https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/b7f47101868eeda09ec75251eabb0cce7446abb2/patches/emacs-31/round-undecorated-frame.patch
+      sha256: c9430a1ead81e313b3d2877ff6f8044fb29441eecc7cc42000515d7c8ec6380f
+  - system-appearance:
+      url: https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/b7f47101868eeda09ec75251eabb0cce7446abb2/patches/emacs-31/system-appearance.patch
+      sha256: 53283503db5ed2887e9d733baaaf80f2c810e668e782e988bda5855a0b1ebeb4
+  - fix-ns-x-colors:
+      url: https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/b7f47101868eeda09ec75251eabb0cce7446abb2/patches/emacs-31/fix-ns-x-colors.patch
+      sha256: 9e5d3e26a8d388d3a000b697d582769645ca93ad597b4113744deba4b89a8b9e
+  - ns-color-cache:
+      # https://lists.gnu.org/archive/html/emacs-devel/2026-06/msg00515.html
+      # https://github.com/exlee/emacs-patches/blob/master/ns_color_cache_0001.patch
+      url: ./ns_color_cache.patch
+      sha256: 115bb1022d11779d8fd46e45a252f6ba6fd97092d98ad82f24ab78343a487423
+  # Fix problem with margin-scroll in scroll-config-smooth-scroll
+  - fix/pixel-scroll-precision-margin-settle:
+      # Pin the compare BASE to the branch's fork point (== branch~4), NOT `master`:
+      # the GitHub remote `master` lags local, so `master...branch` picks a stale
+      # merge-base and sweeps in dozens of unrelated upstream commits. The fork-point
+      # SHA is on the branch itself, so the diff is exactly the 4 pixel-scroll commits
+      # regardless of where master points. Use `.diff` (net diff), NOT `.patch` (a
+      # 4-commit format-patch series whose overlapping hunks fail under plain `patch`).
+      url: https://github.com/emacs-mirror/emacs/compare/badce2d952db81c91521ddc988a925154370d56a...alberti42:fork-emacs:bug%2364252/pixel-scroll-linear.patch
+      sha256: bf7230c1f3802b6dcdd86f9dc8e3a1425bcfdaf9b5942f935441163834735e63
+  # - ensure-scroll-margin:
+  #     url: https://github.com/alberti42/fork-emacs/commit/6026976ab014286e0a287b9046347c98a949569a.patch
+  #     sha256: 35406625dd8cf6389097c57f232d3976db915c49b02e2567f5a2228bbad74c6e
+  # - aggressive-read-buffering
+  # - fix-list-hidden-indent:
+  #     url: /Users/andrea/google-drive/dotfiles/.config/emacs-plus/fix-list-hidden-indent.patch
+  #     sha256: 86675cd6ddd49daa94b85125fbb4a60682f4460a33a9347061642dad68db43fc
+  - fix-word-wrap:
+      url: https://github.com/alberti42/fork-emacs/commit/6c1dfeac3b2a8bd0910b01ec1a5304d9e52704c2.patch
+      sha256: bb36d8e8df497768ace3d7e6ea2e27dfc19fe3bfa7afc2dd28b136a138366c49
   - exit-strategy-fix:
-      url: https://github.com/emacs-mirror/emacs/commit/949f79113556ed1052a0f319ad8edc4c21a22c30.patch
-      sha256: 3798f491be0d0b99951f2eb7ab1c93e2a239dbc2feba2b6283eaee460b418cc7
+      url: https://github.com/emacs-mirror/emacs/commit/d9abb3b9f79f0a0470442e7d6567036f76c4380d.patch
+      sha256: f4c48017e994959b959aed92aa3266d78062b1e34bce79c59ec493babba634d6
   - ttys-emoji-icons-fix:
-      url: https://github.com/emacs-mirror/emacs/commit/4d789ea0d145a3c752a7930fa8fd3bcddd624c50.patch
-      sha256: bd81fc691eb4017cb967e0751a94c1763f38affdcb4f546f17d551cfdc0ca34b
-
+      url: https://github.com/emacs-mirror/emacs/commit/85cc02acd97a87324f7fc5e6e5e0e14c29f40469.patch
+      sha256: 6a40a240dd8be33418c33baa003b31f7deada265f457b6f1a92a7215a7bf82eb
+  - flag-truncation:
+      url: https://github.com/alberti42/fork-emacs/commit/547ee0675b9f156049197d1e520867efcbbcc54e.patch
+      sha256: c9fc0c1b594ce5d1590901acb42cbd17a1281ad80740faa5ab19be36b1ccd90c
+  - fix-merge_faces_sizeof_bug:
+      url: https://github.com/alberti42/fork-emacs/commit/2f779162ae19132c956ff0b5c7e18f7b01af9604.patch
+      sha256: 973626e01c17e603c220155d8c969a546d60db0a56903ed98844e6efe36e2cad
+  # Make an Emacs daemon reopenable from the Dock (no more parking in the
+  # un-reactivatable Prohibited policy) + implement applicationShouldHandleReopen:.
+  # Local patch (lives next to this build.yml); see ns-frameless-activation-policy
+  # and ns-reopen-creates-frame. Generated from fork-emacs branch fix-macos-lifecycle.
+  - ns-daemon-reopen:
+      url: ./ns-daemon-reopen.patch
+      sha256: dbf34521874a94edd7eda92855f466114b2e6108ef2cf1bed5838998596ad154
+  # bug#81039
+  # - fix-remove-min-width:
+  #     url: https://github.com/alberti42/fork-emacs/commit/67337bda6dc2d2108c4c092d4c38601c749c72af.patch
+  #     sha256: 748cf3e6425d3f49899e2cc751298de4e668b06eb8240e8f3e74f658c82dc4b6
+  # bug#80693
+  # - fix-underlying-face-margin-strings:
+  #     url: https://github.com/emacs-mirror/emacs/compare/master...alberti42:fork-emacs:bug%2380693/underlying_face_id.patch
+  #     sha256: 77d1d8f8e2de3c23c3d48ed748e2e00aad1fa3f4426534e03bf95bb59f07f8b2
+  # - bug#80693/underlying_face_id-eli-suggestion:
+  #     url: https://github.com/alberti42/fork-emacs/commit/d791f17e47a4cafd98f6d96f64dda632f568ea43.patch
+  #     sha256: b5a3ae8e4bdd66851c6af5cf31cf28d1862212c56ea475c1385b52d8fcb9123e
+  # - fix-ns-invisible-child-frame-resurrection:
+  #     # url: https://github.com/alberti42/fork-emacs/commit/ea886314e0e96adec9e03adde83861197a4a17af.patch
+  #     url: https://github.com/emacs-mirror/emacs/compare/master...alberti42:fork-emacs:fix-ns-invisible-child-frame-resurrection.patch
+  #     sha256: a027f181acb29a2c88069eb8c69fa30ab7fc0e61f2acf75c6e2f3cc5a0ca7dae
+  # - fix-round-undecorated-frame:
+  #     url: https://github.com/alberti42/fork-emacs/commit/b3ab4dd48fa2c86810d678e20b41b4cc214d006e.patch
+  #     sha256: 056b082b8bda1550b3a6e2419fcf0733ac70e68f62160f8d947c74e7c0982f59
 inject_path: false # optional: skip injecting PATH into Info.plist,

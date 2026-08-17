@@ -1,27 +1,27 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "56971d0"
-hash = "36a484acf6a0a0219c543ccb4cee218f"
+rev = "3f2b882"
+hash = "336548d9f67926e12d5584f60b790f1"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "56971d0"
-hash = "3996fc74044bc44144b323686f887e1"
+rev = "3f2b882"
+hash = "7b625412411be411153886894d9acaf"
 
 [[plugin.deps]]
 use = "alberti42/faster-piper"
-rev = "419c04f"
-hash = "e954f3d314ba732336592101bb47dd03"
+rev = "5072e28"
+hash = "857deac4f0ff48a836458cbc875e2d6c"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:types"
-rev = "56971d0"
-hash = "daf9e3d12688cf855fce665839efcd6d"
+rev = "3f2b882"
+hash = "9105494e98299f392aee95340066da9f"
 
 [[plugin.deps]]
 use = "alberti42/fzf-plus"
-rev = "60829da"
-hash = "a604d01f4548a9eb6a69cefa57a7149b"
+rev = "74cd546"
+hash = "fa94bd7576f5b410094e75378bdef087"
 
 [flavor]
 deps = []

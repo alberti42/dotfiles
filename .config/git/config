@@ -1,58 +1,99 @@
+# Identity used for authoring commits
 [user]
 	name = Andrea Alberti
 	email = a.alberti82@gmail.com
+	# SSH private key used to sign commits (see [gpg] below)
 	signingkey = ~/.ssh/git_sign_Ed25519
+# Sign commits with SSH keys rather than GPG
 [gpg]
 	format = ssh
+# Sign every commit by default
 [commit]
 	gpgsign = true
 [gpg "ssh"]
+    # List of SSH public keys trusted to verify signatures
     allowedSignersFile = ~/.config/git/allowed_signers
 [core]
+	# Path-based attributes (e.g. the plist diff driver below)
 	attributesfile = ~/.config/git/attributes
+	# Wrapper that picks the right editor for commit messages
 	editor = ~/.config/dotfiles/.local/bin/git_editor_launcher
+# `git push` only pushes the current branch to its matching upstream
 [push]
 	default = simple
+# git-media filter — smudge/clean binary blobs out of history
 [filter "media"]
 	required = true
 	clean = git media clean %f
 	smudge = git media smudge %f
+# git-hawser filter (git-media's successor) — same idea
 [filter "hawser"]
 	clean = git hawser clean %f
 	smudge = git hawser smudge %f
 	required = true
+# Git LFS — store large files out-of-band, keep pointers in the repo
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	required = true
 	process = git-lfs filter-process
 [http]
+	# Larger HTTP buffer (500 MB) to avoid failures pushing big objects
 	postBuffer = 524288000
+# `git pull` merges instead of rebasing
 [pull]
 	rebase = false
+	# Refuse to pull when histories diverge — decide merge vs rebase yourself
+	ff = only
+[merge]
+	# 3-way conflict markers: show the common ancestor (base) between the
+	# two sides, with lines both sides share hoisted out of the conflict
+	conflictStyle = zdiff3
 [alias]
+  # Print the full SHA of HEAD
   lastcommit = rev-parse HEAD
+  # reflog rendered with the custom `reflog` pretty format below
   reflogp = reflog --pretty=reflog
+	# List only the changed files in a commit, with status letters
 	showfiles = diff-tree --no-commit-id --name-status -r
+	# diff rendered with difftastic (structural, syntax-aware diff)
+	ddiff = !GIT_EXTERNAL_DIFF=difft git diff
+	# `git show` via difftastic (--ext-diff opts show into external diff)
+	dshow = !GIT_EXTERNAL_DIFF=difft git show --ext-diff
+	# `git log -p` via difftastic (--ext-diff required for log too)
+	dlog = !GIT_EXTERNAL_DIFF=difft git log -p --ext-diff
+# Follow file history across renames in `git log`
 [log]
   follow = true
+# View man pages through the `catman` config below
 [man]
 	viewer = catman
 [man "catman"]
+	# Strip backspace/overstrike sequences so man renders cleanly
 	cmd = man -P \"col -b\"
+# Enable colored output where git supports it
 [color]
 	ui = true
 [diff]
+	# Highlight moved lines distinctly from added/removed ones
 	colorMoved = zebra
+# Diff driver for macOS plist files — convert to readable XML first
 [diff "plist"]
 	textconv = plutil -convert xml1 -o - --
 [pretty]
+    # Named pretty format used by the `reflogp` alias above
     reflog = %C(auto)%h %<|(20)%gd %C(blue)%cr%C(reset) %gs (%s)
+# Cache credentials on disk (unencrypted) via the store helper
 [credential]
 	helper = store
+# New repos start on `main` instead of `master`
 [init]
 	defaultBranch = main
+# Verify object integrity on fetch/receive
 [transfer]
 	fsckObjects = true
+# Pull in the color/theme settings from a separate file
 [include]
   path = ~/.config/git/theme.gitconfig
+[github]
+	user = alberti42
