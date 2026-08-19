@@ -27,25 +27,19 @@ wezterm.on("gui-startup", function(cmd)
 	-- window:gui_window():toggle_fullscreen()
 end)
 
+-- Appearance dispatching is NOT done here any more.
+--
+-- The zsh-appearance-control watcher owns it: a launchd agent
+-- (com.github.alberti42.zac-watch-macos) observes the OS appearance change and
+-- calls bin/appearance-dispatch with ZAC_IO_CMD and PATH taken from its plist.
+-- See dotfiles/oh-my-zsh/custom/plugins/zsh-appearance-control/watchers/macos.
+--
+-- Keeping a wezterm.run_child_process() call here as well would only duplicate
+-- the dispatch (harmless, but pointless) and would tie appearance handling to
+-- WezTerm being the running terminal. This function now only picks the WezTerm
+-- color scheme.
 function scheme_for_appearance(appearance)
-	-- tmux_dir must be on PATH explicitly: WezTerm is a GUI app and does not
-	-- inherit the shell PATH, so system tmux (or Homebrew/zinit-installed tmux)
-	-- would not be found otherwise.
-	local tmux_dir = home .. "/.local/share/zinit/polaris/bin"
-	local dotfiles_dir = home .. "/.config/dotfiles"
-	local zac_dispatcher = dotfiles_dir .. "/oh-my-zsh/custom/plugins/zsh-appearance-control/bin/appearance-dispatch"
-	local zac_io_cmd = dotfiles_dir .. "/zinit/src/zac/zac-io-cmd.zsh"
 	local is_dark = (appearance:find("Dark") ~= nil)
-	local dark = is_dark and "1" or "0"
-
-	wezterm.run_child_process({
-		"env",
-		"PATH=" .. tmux_dir .. ":" .. os.getenv("PATH"),
-		"ZAC_IO_CMD=" .. zac_io_cmd,
-		zac_dispatcher,
-		"dispatch",
-		dark,
-	})
 
 	-- Return the wezterm color scheme
 	if is_dark then
@@ -221,10 +215,6 @@ config.default_prog = {
 	"-D",
 	"-s",
 	"main",
-	";",
-	"set-option",
-	"-g",
-	"@dark_appearance",
 	(wezterm.gui.get_appearance():find("Dark") ~= nil) and "1" or "0",
 }
 

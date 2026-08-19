@@ -29,6 +29,8 @@
 
 set -euo pipefail
 
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
 UA="arxiv-paper-skill/1.0 (mailto:a.alberti82@gmail.com)"
 API="https://export.arxiv.org/api/query"
 EPRINT="https://arxiv.org/e-print"
@@ -75,7 +77,8 @@ emit() {
   echo "CACHE_DIR=$dir"
   echo "STATUS=$1"
   convert_figures
-  echo "SVG=$SVG_STATUS"
+  normalize_svgs
+  echo "SVG=$SVG_STATUS$SVG_NORMALIZE_NOTE"
   detect_main
 }
 
@@ -90,65 +93,34 @@ emit() {
 # tool is missing, report it so the user can install it and re-run.
 SVG_STATUS=none
 
-# agent-shell renders an SVG at its intrinsic width (capped by
-# `agent-shell-markdown-image-max-width`, never upscaled), and arXiv figure
-# sources are frequently tiny — so they show up too small.  Normalize every
-# converted SVG to a fixed on-screen width by rewriting the root `<svg>' tag's
-# `width'/`height' (height follows the aspect ratio; the `viewBox' is left
-# untouched so the vector content simply scales).  Override with the
-# SVG_TARGET_WIDTH env var.  Idempotent; a no-op if perl is unavailable or the
-# root tag lacks unitless width/height.
-#
-# Figures produced from LaTeX sources almost always have a *transparent*
-# background with black ink, which is unreadable on a dark-mode chat buffer.
-# So an opaque background rectangle is injected as the first child of the root
-# `<svg>' element (colour from SVG_BG, default `white'; set SVG_BG=none to
-# disable).  The rect carries id="arxiv-bg" so re-runs are idempotent.
+# Post-processing of every SVG in the cache dir (converted ones *and* SVGs the
+# authors shipped) is delegated to `normalize_svg.py' next to this script — one
+# batch call, no backups (the original PDF/EPS is kept and the SVG is
+# regenerable).  It does two idempotent things:
+#   - injects an opaque background rect (SVG_BG, default `white'; `none' to skip)
+#     since LaTeX figures are transparent black-on-nothing and vanish on a dark
+#     background;
+#   - rewrites the root `width'/`height' to SVG_TARGET_WIDTH px (viewBox kept, so
+#     content just scales), because agent shells render an SVG at its intrinsic
+#     width and arXiv sources are frequently tiny.
+# Requires python3; if it is missing, figures are left as converted and the SVG=
+# status line says so instead of failing the fetch.
 SVG_TARGET_WIDTH=${SVG_TARGET_WIDTH:-600}
 SVG_BG=${SVG_BG:-white}
-normalize_svg_width() {
-  local svg="$1"
-  command -v perl >/dev/null 2>&1 || return 0
-  add_svg_background "$svg"
-  # Already at the target width -> skip (keeps re-runs churn-free / idempotent).
-  if head -c 1000 "$svg" 2>/dev/null | grep -q "width=\"${SVG_TARGET_WIDTH}\""; then
+SVG_NORMALIZE_NOTE=""
+
+normalize_svgs() {
+  [ -d "$dir" ] || return 0
+  if ! command -v python3 >/dev/null 2>&1; then
+    SVG_NORMALIZE_NOTE=" unnormalized:no-python3"
+    echo "WARNING: python3 not found — figures not resized/background-filled." >&2
     return 0
   fi
-  TW="$SVG_TARGET_WIDTH" perl -0777 -i -pe '
-    s{(<svg\b[^>]*?>)}{
-      my $t = $1;
-      my ($w) = $t =~ /\bwidth="([\d.]+)"/;
-      my ($h) = $t =~ /\bheight="([\d.]+)"/;
-      if (defined $w && defined $h && $w > 0) {
-        my $tw = $ENV{TW};
-        my $nh = $tw * $h / $w;
-        $t =~ s/\bwidth="[\d.]+"/sprintf(q{width="%g"}, $tw)/e;
-        $t =~ s/\bheight="[\d.]+"/sprintf(q{height="%g"}, $nh)/e;
-      }
-      $t;
-    }e;
-  ' "$svg" 2>/dev/null || true
-}
-
-# Insert an opaque background rect right after the root <svg> tag.  Sized from
-# the viewBox when present (so a non-zero origin is covered too), otherwise
-# 0,0 100%x100%.  Idempotent via the id="arxiv-bg" marker.
-add_svg_background() {
-  local svg="$1"
-  command -v perl >/dev/null 2>&1 || return 0
-  [ -n "$SVG_BG" ] && [ "$SVG_BG" != none ] || return 0
-  grep -q 'id="arxiv-bg"' "$svg" 2>/dev/null && return 0
-  BG="$SVG_BG" perl -0777 -i -pe '
-    s{(<svg\b[^>]*?>)}{
-      my $t = $1;
-      my ($x, $y, $w, $h) = (q{0}, q{0}, q{100%}, q{100%});
-      if ($t =~ /\bviewBox="\s*([-\d.eE]+)[,\s]+([-\d.eE]+)[,\s]+([-\d.eE]+)[,\s]+([-\d.eE]+)\s*"/) {
-        ($x, $y, $w, $h) = ($1, $2, $3, $4);
-      }
-      $t . sprintf(q{<rect id="arxiv-bg" x="%s" y="%s" width="%s" height="%s" fill="%s"/>},
-                   $x, $y, $w, $h, $ENV{BG});
-    }e;
-  ' "$svg" 2>/dev/null || true
+  if ! python3 "$script_dir/normalize_svg.py" "$dir" \
+        --width "$SVG_TARGET_WIDTH" --color "$SVG_BG" -q >/dev/null 2>&1; then
+    SVG_NORMALIZE_NOTE=" unnormalized:failed"
+    echo "WARNING: normalize_svg.py failed; figures kept as converted." >&2
+  fi
 }
 
 convert_figures() {
@@ -162,13 +134,8 @@ convert_figures() {
   need=0
   while IFS= read -r f; do
     base="${f%.*}"
-    if [ -f "$base.svg" ] || [ -f "${base}-1.svg" ]; then
-      # Already converted -> self-heal its size (no-op once normalized).
-      for e in "$base.svg" "$base"-*.svg; do
-        [ -f "$e" ] && normalize_svg_width "$e"
-      done
-      continue
-    fi
+    # Already converted -> nothing to do here; normalize_svgs() self-heals it.
+    if [ -f "$base.svg" ] || [ -f "${base}-1.svg" ]; then continue; fi
     need=$((need + 1))
   done < "$listf"
   if [ "$need" -eq 0 ]; then SVG_STATUS="ok:$total/$total"; rm -f "$listf"; return; fi
@@ -202,11 +169,10 @@ convert_figures() {
       n=$(find "$td" -name 'p-*.svg' | grep -c . || true)
       if [ "$n" -eq 1 ]; then
         mv "$td/p-1.svg" "$base.svg"
-        normalize_svg_width "$base.svg"
       else
         i=1
         for s in $(find "$td" -name 'p-*.svg' | sort -t- -k2 -n); do
-          mv "$s" "${base}-${i}.svg"; normalize_svg_width "${base}-${i}.svg"; i=$((i + 1))
+          mv "$s" "${base}-${i}.svg"; i=$((i + 1))
         done
       fi
       converted=$((converted + 1))

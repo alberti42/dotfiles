@@ -46,16 +46,14 @@ TEX_CANDIDATES:
   `epstopdf` → `mutool`). Raster formats that already render (`png`, `jpeg`/`jpg`,
   `gif`, `tiff`/`tif`, `xbm`, `xpm`, `pbm`/`pgm`/`ppm`/`pnm`, `svg`, `webp`) are
   left untouched. Single-page sources become `<base>.svg`; multipage ones become
-  `<base>-1.svg`, `<base>-2.svg`, … Each converted SVG is normalized to a fixed
-  on-screen width (600 px by default; override with the `SVG_TARGET_WIDTH` env
-  var) by rewriting the root `<svg>` `width`/`height` and keeping the `viewBox`,
-  since agent-shell renders an SVG at its intrinsic width and arXiv sources are
-  often too small otherwise. Each SVG also gets an **opaque background rect**
-  inserted as the first child of the root `<svg>` (white by default; override
-  with the `SVG_BG` env var, e.g. `SVG_BG=none` to keep transparency), because
-  LaTeX figures are transparent with black ink and become unreadable on a dark
-  background. The step is idempotent and self-heals older caches (re-running
-  the script adds backgrounds to already-converted figures). Originals are kept.
+  `<base>-1.svg`, `<base>-2.svg`, … Originals are kept.
+- **Figures normalized for display.** Every SVG in the cache dir is then post-
+  processed by `normalize_svg.py` (see below): a fixed on-screen width (600 px,
+  override with `SVG_TARGET_WIDTH`) and an opaque **white background** (override
+  with `SVG_BG`, e.g. `SVG_BG=none`). Both steps are idempotent and self-heal
+  older caches, so re-running the fetch script fixes previously imported papers.
+  Needs `python3`; if absent, the `SVG=` line gains ` unnormalized:no-python3`
+  and the figures are simply left as converted.
 
 ## After running
 
@@ -75,7 +73,9 @@ TEX_CANDIDATES:
    converter. `ok`/`none` need no action; `partial:...` means some sources failed
    to convert despite the tools being present — mention it if a figure is missing.
 
-3. **Read the main `.tex`** into context. Papers commonly `\input{}` / `\include{}`
+3. **Read the main `.tex`** into context. (If `SVG=` carries an
+   `unnormalized:no-python3` suffix, figures still render — just small and with a
+   transparent background; mention it only if the user complains.) Papers commonly `\input{}` / `\include{}`
    section files and a `.bib` — read those referenced files too if you need them to
    answer. Figures are images and need no reading.
 
@@ -153,6 +153,20 @@ page: `<base>-<n>.svg`.
 **Math delimiters:** write inline math with `\(` … `\)` delimiters, e.g.
 `\(\hat{H}\lvert\psi\rangle = E\lvert\psi\rangle\)` — **not** markdown inline-code
 backticks. Use `\[` … `\]` (or `$$`) for displayed equations.
+
+## Fixing figures in an existing cache
+
+`normalize_svg.py` (next to this file) is also a standalone CLI, useful to
+retrofit every already-imported paper in one go:
+
+```bash
+python3 <skill-dir>/normalize_svg.py "${XDG_CACHE_HOME:-$HOME/.cache}/arXiv" --width 600
+```
+
+It takes files and/or directories (recursive `*.svg`), plus `--color`
+(default `white`, `none` disables), `--width N` (omit to leave sizes alone),
+`--dry-run`, `-q`, and `--backup` (off by default; writes `<file>.svg.bak`,
+never overwriting an existing backup).
 
 ## Notes
 

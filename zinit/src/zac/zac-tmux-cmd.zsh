@@ -35,6 +35,14 @@ local is_dark=${1:-}
 (( ${+FZF_DEFAULT_OPTS_CATPPUCCIN} )) || \
   __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fzf/__fzf_atinit_hook.zsh"
 
+# The appearance flag itself.
+#
+# Since zsh-appearance-control 2.0.0, bin/appearance-dispatch no longer sets
+# @dark_appearance: tmux is a consumer like any other tool. The catppuccin theme
+# reads this option, so we own it here — in the one helper that runs both on a
+# transition and at tmux server start.
+tmux set-option -gq @dark_appearance "$is_dark"
+
 if (( is_dark )); then
   # tmux-fzf-links
   tmux set-option -g @fzf-links-fzf-display-options "$(printf '%s' "${FZF_DEFAULT_OPTS_CATPPUCCIN[frappe]}" | sed -E 's/--border(=[^[:space:]]+)?[[:space:]]*//g') --color=preview-bg:#232634,gutter:#232634 -w 100% --maxnum-displayed 20 --multi --track --no-preview"
