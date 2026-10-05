@@ -21,7 +21,12 @@
       latest-release   # Select the latest release (this is not automatic for source code).
     )
   else
-    # On Linux, the gh-r method remains the simplest choice.
+    # On Linux, use the static (musl) release binary: building needs a C++23
+    # compiler (GCC >= 12 for <expected>), which older distributions lack.
+    _ices+=(
+      from'gh-r'
+      lbin'btop/bin/btop -> btop'
+    )
   fi
   zinit ice "${_ices[@]}"
   zinit light aristocratos/btop
