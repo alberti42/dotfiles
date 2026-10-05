@@ -6,7 +6,6 @@ Sublime Text/Packages/User/ApplySyntax.ext-list
 **/*.elc
 **/*.pyc
 **/__pycache__/
-.local/share/tmux/resurrect/*
 Sublime Text/Packages/User/sftp/*.sublime-color-scheme
 Sublime Text/Packages/User/Terminus/Terminus.hidden-color-scheme
 **/CLAUDE.md
