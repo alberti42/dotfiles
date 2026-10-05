@@ -120,7 +120,7 @@ else
   # Linux
   # export JAVA_HOME="/usr/lib/jvm/java-8-oracle"
 fi
-export PATH="$JAVA_HOME/bin:$PATH"
+[[ -n ${JAVA_HOME-} ]] && path=("$JAVA_HOME/bin" $path)
 
 ###########################
 # os default paths        #
