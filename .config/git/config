@@ -99,3 +99,5 @@
 	user = alberti42
 [tag]
 	gpgsign = true
+[url "git@github.com:"]
+	pushInsteadOf = https://github.com/

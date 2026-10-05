@@ -1,17 +1,17 @@
 [submodule "oh-my-zsh/custom/plugins/zsh-misc-completions"]
 	path = oh-my-zsh/custom/plugins/zsh-misc-completions
-	url = git@github.com:alberti42/zsh-misc-completions.git
+	url = https://github.com/alberti42/zsh-misc-completions.git
 	branch = main
 [submodule "oh-my-zsh/custom/plugins/tmux-ssh-syncing"]
 	path = oh-my-zsh/custom/plugins/tmux-ssh-syncing
-	url = git@github.com:alberti42/tmux-ssh-syncing.git
+	url = https://github.com/alberti42/tmux-ssh-syncing.git
 	branch = main
 [submodule "Sublime Text/Packages/Recent Files Tracker"]
 	path = Sublime Text/Packages/Recent Files Tracker
 	url = https://github.com/alberti42/sublime-recent-files-tracker
 [submodule "Sublime Text/Packages/VirtualenvSelector"]
 	path = Sublime Text/Packages/VirtualenvSelector
-	url = git@github.com:alberti42/sublime-virtualenv-selector.git
+	url = https://github.com/alberti42/sublime-virtualenv-selector.git
 [submodule ".config/yazi/plugins/bat.yazi"]
 	path = .config/yazi/plugins/bat.yazi
 	url = https://github.com/mgumz/yazi-plugin-bat.git
@@ -23,7 +23,7 @@
 	url = https://github.com/titoBouzout/Dictionaries.git
 [submodule ".config/yazi/plugins/fazif.yazi"]
 	path = .config/yazi/plugins/fazif.yazi
-	url = git@github.com:alberti42/fork-fazif.yazi.git
+	url = https://github.com/alberti42/fork-fazif.yazi.git
 [submodule ".config/eza/eza-themes"]
 	path = .config/eza/eza-themes
 	url = https://github.com/eza-community/eza-themes.git
@@ -35,31 +35,31 @@
 	url = https://github.com/alberti42/zinit-annex-latest-release.git
 [submodule ".config/yazi/plugins/faster-piper"]
 	path = .config/yazi/plugins/faster-piper
-	url = git@github.com:alberti42/faster-piper.yazi.git
+	url = https://github.com/alberti42/faster-piper.yazi.git
 [submodule ".config/yazi/plugins/faster-piper.yazi"]
 	path = .config/yazi/plugins/faster-piper.yazi
-	url = git@github.com:alberti42/faster-piper.yazi.git
+	url = https://github.com/alberti42/faster-piper.yazi.git
 [submodule ".local/share/EXIF-Syntax"]
 	path = .local/share/EXIF-Syntax
-	url = git@github.com:alberti42/EXIF-Syntax.git
+	url = https://github.com/alberti42/EXIF-Syntax.git
 [submodule "oh-my-zsh/custom/plugins/zsh-opencode-tab"]
 	path = oh-my-zsh/custom/plugins/zsh-opencode-tab
-	url = git@github.com:alberti42/zsh-opencode-tab.git
+	url = https://github.com/alberti42/zsh-opencode-tab.git
 [submodule "oh-my-zsh/custom/plugins/zsh-indent-control"]
 	path = oh-my-zsh/custom/plugins/zsh-indent-control
-	url = git@github.com:alberti42/zsh-indent-control
+	url = https://github.com/alberti42/zsh-indent-control
 [submodule "oh-my-zsh/custom/plugins/zsh-appearance-control"]
 	path = oh-my-zsh/custom/plugins/zsh-appearance-control
-	url = git@github.com:alberti42/zsh-appearance-control.git
+	url = https://github.com/alberti42/zsh-appearance-control.git
 [submodule "oh-my-zsh/custom/plugins/tmux-fzf-links"]
 	path = oh-my-zsh/custom/plugins/tmux-fzf-links
-	url = git@github.com:alberti42/tmux-fzf-links.git
+	url = https://github.com/alberti42/tmux-fzf-links.git
 [submodule ".config/emacs"]
 	path = .config/emacs
-	url = git@github.com:alberti42/emacs-config.git
+	url = https://github.com/alberti42/emacs-config.git
 [submodule ".config/yazi/plugins/fzf-plus.yazi"]
 	path = .config/yazi/plugins/fzf-plus.yazi
-	url = git@github.com:alberti42/fzf-plus.yazi.git
+	url = https://github.com/alberti42/fzf-plus.yazi.git
 [submodule "oh-my-zsh/custom/plugins/fzf-recent-dirs"]
 	path = oh-my-zsh/custom/plugins/fzf-recent-dirs
-	url = git@github.com:alberti42/fzf-recent-dirs.git
+	url = https://github.com/alberti42/fzf-recent-dirs.git
