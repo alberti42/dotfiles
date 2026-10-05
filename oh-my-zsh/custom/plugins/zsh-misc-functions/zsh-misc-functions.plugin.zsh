@@ -116,10 +116,8 @@ wrap_restore_tty() {
       functions -c -- "$cmd" "$orig"
     else
       # Not a function: treat as command/builtin (also avoids aliases due to no_aliases)
-      if ! whence -w -- "$cmd" >/dev/null; then
-        print -u2 -- "wrap_restore_tty: not found: $cmd"
-        continue
-      fi
+      # Not installed on this machine: skip it without a wrapper
+      whence -w -- "$cmd" >/dev/null || continue
 
       # Create a small trampoline that dispatches via `command`
       eval "function $orig() { command $cmd \"\$@\" }"
