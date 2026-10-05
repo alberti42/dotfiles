@@ -13,18 +13,44 @@ These are my personal dotfiles, which include configurations for zsh shell, vari
 - **Custom Scripts**: Various utility scripts for workflow automation.
 
 ## Installation
-To install these dotfiles, clone the repository and symlink the relevant files into your home directory:
+Clone the repository with its submodules, then create the symlinks from `$HOME` into the repository with `bin/links.zsh`:
 
 ```sh
-# Clone the repository
 git clone https://github.com/alberti42/dotfiles.git ~/dotfiles
-
-# Initialize and update all submodules
 cd ~/dotfiles
 git submodule update --init --recursive
 
-# Symlink the required files (example for zshrc)
-ln -s ~/dotfiles/zsh/.zshrc ~/.zshrc
+bin/links.zsh install -n   # print the actions only
+bin/links.zsh install
+```
+
+`install` first creates `~/.config/dotfiles` pointing at the clone, then creates the links for this OS through that path. Anything already at a link's path is moved to `<name>.bak-<timestamp>`.
+
+The submodules must be downloaded before `install`: some files in the repository are symlinks into them.
+
+### The list of links
+[`links.conf`](links.conf) lists the links, one per line:
+
+```
+<os>  <link, relative to $HOME>  ->  <target, relative to the repo>
+```
+
+`<os>` is `all`, `macos` or `linux`. Alternative targets are separated by ` | `: `install` links the first, `check` accepts any (for links switched at runtime). An `ignore <path>` line makes `check` skip links at or under that path.
+
+```sh
+bin/links.zsh check
+```
+
+`check` reports entries whose link is missing or wrong, and prints the links in `$HOME` that point into the repository but are not in `links.conf`, in `links.conf` format, ready to paste.
+
+### Systems where the login shell cannot be changed
+Where `chsh` is not allowed, the linked `~/.bashrc` (`bash/.bashrc`) starts zsh for interactive top-level shells. Non-interactive shells (`scp`, `rsync`, `ssh host cmd`) and `bash` typed from another shell stay in bash.
+
+### Committing from a clone
+If you commit to this repository, include `.git-dotfiles.conf` in the clone's git configuration once. It defines the git clean filters that redact secrets:
+
+```sh
+git config include.path ../.git-dotfiles.conf
 ```
 
 ## Submodules
