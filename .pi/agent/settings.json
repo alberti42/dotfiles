@@ -1,9 +1,6 @@
 {
   "lastChangelogVersion": "0.85.0",
   "theme": "light",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-terra",
-  "defaultThinkingLevel": "medium",
   "quietStartup": true,
   "packages": [
     "git:github.com/pankajudhas81/pi-claude-auth@30d7a44ab2ba7538fc610f437867318a73d05e40",
