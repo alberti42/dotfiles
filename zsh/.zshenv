@@ -61,9 +61,12 @@ skip_global_compinit=1
      }
      path=("${brew_path:h}" $path)
    fi
-   # make fpath a unique array to avoid duplicates  
+   # make fpath a unique array to avoid duplicates
    typeset -U fpath
- fi
+  # Detect HomeBrew (Linux)
+  elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  fi
 }
 
 #########################

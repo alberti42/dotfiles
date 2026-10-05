@@ -74,10 +74,10 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/starship/starship.zsh"
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rust/rust.zsh"
 
 # Manage OpenAI codex updates
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/codex/codex.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/codex/codex.zsh"
 
 # Manage Zen OpenCode updates
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/opencode/opencode.zsh"
+# __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/opencode/opencode.zsh"
 
 # Load vivid utility with automatic fast, loading of color scheme
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/vivid/vivid.zsh"
