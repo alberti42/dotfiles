@@ -1,0 +1,293 @@
+From 3a591f550e3562510a36a4c2d29b3530dde2cc41 Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Fri, 18 Sep 2026 19:24:40 +0200
+Subject: [PATCH] Fix crash by not adjusting the glyph matrix while building
+ the mode line
+
+---
+ src/dispnew.c |  13 +++++
+ src/frame.h   |   4 ++
+ src/xdisp.c   | 141 +++++++++++++++++++++++++++++++++++---------------
+ 3 files changed, 116 insertions(+), 42 deletions(-)
+
+diff --git a/src/dispnew.c b/src/dispnew.c
+index dd799c62d02..4354856d3d4 100644
+--- a/src/dispnew.c
++++ b/src/dispnew.c
+@@ -1849,6 +1849,19 @@ allocate_matrices_for_window_redisplay (struct window *w)
+ void
+ adjust_frame_glyphs (struct frame *f)
+ {
++  if (f->dont_adjust_matrices > 0)
++    {
++      /* Not allowed to reallocate the glyph matrices when there is
++	 at least another function holding a pointer to an element in
++	 the matrix of one window in this frame.  Before returning,
++	 flag that a new redisplay is needed, so that when the pointer
++	 is released, redisplay can take place.  To state that a
++	 redisplay is needed, we reuse the same flag that is used when
++	 the font in one of the frame's windows has changed.  */
++      f->fonts_changed = true;
++      return;
++    }
++
+   /* Block input so that expose events and other events that access
+      glyph matrices are not processed while we are changing them.  */
+   block_input ();
+diff --git a/src/frame.h b/src/frame.h
+index 64d8a74f36e..71bcbb90f1b 100644
+--- a/src/frame.h
++++ b/src/frame.h
+@@ -745,6 +745,10 @@ #define EMACS_FRAME_H
+ 
+   /* Z-order of child frames.  */
+   int z_order;
++
++  /* Counter.  When positive, there is at least one window in this
++     frame for which adjusting its glyph matrix is not allowed.  */
++  int dont_adjust_matrices;
+ } GCALIGNED_STRUCT;
+ 
+ /* Most code should use these functions to set Lisp fields in struct frame.  */
+diff --git a/src/xdisp.c b/src/xdisp.c
+index 6d3fa2fbe4f..7c40e5092fb 100644
+--- a/src/xdisp.c
++++ b/src/xdisp.c
+@@ -13941,19 +13941,33 @@ #define MODE_LINE_NOPROP_LEN(start) \
+ 
+ static Lisp_Object
+ format_mode_line_unwind_data (struct frame *target_frame,
+-			      struct buffer *obuf,
+-			      Lisp_Object owin,
+-			      bool save_proptrans)
++			      struct buffer *obuf, Lisp_Object owin,
++			      bool save_proptrans,
++			      bool restore_point,
++			      bool unwind_dont_adjust_matrices)
+ {
+   Lisp_Object vector, tmp;
+ 
++  /* By contract, when unwind_dont_adjust_matrices is true (i.e., when
++     dont_adjust_matrices needs to be unwound), target_frame must be
++     provided.  */
++  eassert (!unwind_dont_adjust_matrices || target_frame);
++
++  /* By contract, when restore_point is true, target_frame must be
++     provided.  */
++  eassert (!restore_point || target_frame);
++
++  /* By contract, when restore_point is true, old window must be
++     provided.  */
++  eassert (!restore_point || !NILP (owin));
++
+   /* Reduce consing by keeping one vector in
+      Vwith_echo_area_save_vector.  */
+   vector = Vmode_line_unwind_vector;
+   Vmode_line_unwind_vector = Qnil;
+ 
+   if (NILP (vector))
+-    vector = make_nil_vector (12);
++    vector = make_nil_vector (14);
+ 
+   ASET (vector, 0, make_fixnum (mode_line_target));
+   ASET (vector, 1, make_fixnum (MODE_LINE_NOPROP_LEN (0)));
+@@ -13969,6 +13983,8 @@ format_mode_line_unwind_data (struct frame *target_frame,
+   ASET (vector, 6, tmp);
+   ASET (vector, 7, owin);
+   if (target_frame)
++    ASET (vector, 8, target_frame->selected_window);
++  if (restore_point)
+     {
+       Lisp_Object buffer = XWINDOW (target_frame->selected_window)->contents;
+       struct buffer *b = XBUFFER (buffer);
+@@ -13977,7 +13993,6 @@ format_mode_line_unwind_data (struct frame *target_frame,
+       /* Similarly to `with-selected-window', if the operation selects
+ 	 a window on another frame, we must restore that frame's
+ 	 selected window, and (for a tty) the top-frame.  */
+-      ASET (vector, 8, target_frame->selected_window);
+       if (FRAME_TERMCAP_P (target_frame))
+ 	ASET (vector, 9, FRAME_TTY (target_frame)->top_frame);
+ 
+@@ -13990,6 +14005,9 @@ format_mode_line_unwind_data (struct frame *target_frame,
+       current_buffer = cb;
+     }
+ 
++  ASET (vector, 12, restore_point ? Qt : Qnil);
++  ASET (vector, 13, unwind_dont_adjust_matrices ? Qt : Qnil);
++
+   return vector;
+ }
+ 
+@@ -14008,44 +14026,48 @@ unwind_format_mode_line (Lisp_Object vector)
+   mode_line_string_face = AREF (vector, 4);
+   mode_line_string_face_prop = AREF (vector, 5);
+ 
+-  /* Select window before buffer, since it may change the buffer.  */
+-  if (WINDOW_LIVE_P (old_window))
++  bool restore_point = EQ (AREF (vector, 12), Qt);
++  if (restore_point)
+     {
+-      /* If the operation that we are unwinding had selected a window
+-	 on a different frame, reset its frame-selected-window.  For a
+-	 text terminal, reset its top-frame if necessary.  */
+-      if (WINDOW_LIVE_P (target_frame_window))
++      /* Select window before buffer, since it may change the buffer.  */
++      if (WINDOW_LIVE_P (old_window))
+ 	{
+-	  Lisp_Object frame
+-	    = WINDOW_FRAME (XWINDOW (target_frame_window));
+-
+-	  if (!EQ (frame, WINDOW_FRAME (XWINDOW (old_window))))
+-	    Fselect_window (target_frame_window, Qt);
++	  /* If the operation that we are unwinding had selected a window
++	     on a different frame, reset its frame-selected-window.  For a
++	     text terminal, reset its top-frame if necessary.  */
++	  if (WINDOW_LIVE_P (target_frame_window))
++	    {
++	      Lisp_Object frame
++		= WINDOW_FRAME (XWINDOW (target_frame_window));
+ 
+-	  if (!NILP (old_top_frame) && !EQ (old_top_frame, frame)
+-	      /* This could've been destroyed during the formatting,
+-		 possibly because the terminal was deleted.  */
+-	      && FRAME_LIVE_P (XFRAME (old_top_frame)))
+-	    Fselect_frame (old_top_frame, Qt);
+-	}
++	      if (!EQ (frame, WINDOW_FRAME (XWINDOW (old_window))))
++		Fselect_window (target_frame_window, Qt);
+ 
+-      Fselect_window (old_window, Qt);
++	      if (!NILP (old_top_frame) && !EQ (old_top_frame, frame)
++                  /* This could've been destroyed during the formatting,
++                     possibly because the terminal was deleted.  */
++		  && FRAME_LIVE_P (XFRAME (old_top_frame)))
++		Fselect_frame (old_top_frame, Qt);
++	    }
+ 
+-      /* Restore point of target_frame_window's buffer (Bug#32777).
+-	 But do this only after old_window has been reselected to
+-	 avoid that the window point of target_frame_window moves.  */
+-      if (WINDOW_LIVE_P (target_frame_window))
+-	{
+-	  Lisp_Object buffer = AREF (vector, 10);
++	  Fselect_window (old_window, Qt);
+ 
+-	  if (BUFFER_LIVE_P (XBUFFER (buffer)))
++	  /* Restore point of target_frame_window's buffer (Bug#32777).
++	     But do this only after old_window has been reselected to
++	     avoid that the window point of target_frame_window moves.  */
++	  if (WINDOW_LIVE_P (target_frame_window))
+ 	    {
+-	      struct buffer *cb = current_buffer;
++	      Lisp_Object buffer = AREF (vector, 10);
++
++	      if (BUFFER_LIVE_P (XBUFFER (buffer)))
++		{
++		  struct buffer *cb = current_buffer;
+ 
+-	      current_buffer = XBUFFER (buffer);
+-	      set_point_from_marker (AREF (vector, 11));
+-	      ASET (vector, 11, Qnil);
+-	      current_buffer = cb;
++		  current_buffer = XBUFFER (buffer);
++		  set_point_from_marker (AREF (vector, 11));
++		  ASET (vector, 11, Qnil);
++		  current_buffer = cb;
++		}
+ 	    }
+ 	}
+     }
+@@ -14060,6 +14082,19 @@ unwind_format_mode_line (Lisp_Object vector)
+ 
+   if (dont_resize_frames > 0)
+     dont_resize_frames--;
++
++  bool unwind_dont_adjust_matrices = EQ (AREF (vector, 13), Qt);
++  if (unwind_dont_adjust_matrices)
++    {
++      struct frame *f
++	= XFRAME (WINDOW_FRAME (XWINDOW (target_frame_window)));
++      /* The lifecycle of the counter `dont_adjust_matrices' is arranged
++	 so that it cannot take a zero value at this point; however, a
++	 safety clamp is added to ensure that even if the contract
++	 breaks in the future, the counter will never go negative.  */
++      if (FRAME_LIVE_P (f) && f->dont_adjust_matrices > 0)
++	f->dont_adjust_matrices--;
++    }
+ }
+ 
+ 
+@@ -14184,7 +14219,7 @@ gui_consider_frame_title (Lisp_Object frame)
+ 
+       format_data = format_mode_line_unwind_data (f, current_buffer,
+ 						  selected_window,
+-						  false);
++						  false, true, false);
+       record_unwind_protect (unwind_format_mode_line, format_data);
+ 
+       Fselect_window (f->selected_window, Qt);
+@@ -28226,13 +28261,25 @@ display_mode_line (struct window *w, enum face_id face_id, Lisp_Object format)
+   it.paragraph_embedding = L2R;
+ 
+   record_unwind_protect (unwind_format_mode_line,
+-			 format_mode_line_unwind_data (NULL, NULL,
+-						       Qnil, false));
++			 format_mode_line_unwind_data (it.f, NULL,
++						       Qnil, false,
++						       false, true));
+ 
+   /* We cannot allow frame-resizing as long as the code below runs,
+      because that could invalidate the it.glyph_row->glyphs pointers.  */
+   dont_resize_frames++;
+ 
++  /* We cannot allow the glyph matrix of this window to be reallocated
++     while we hold a pointer to its last row, which carries the mode
++     line; otherwise Emacs crashes.  Instead of selectively preventing
++     adjustment of the glyph matrix for this window only, we take the
++     simpler approach and prevent adjusting the glyph matrix of any
++     window in this frame.  The simpler approach is justified by the
++     fact that the race condition is sufficiently rare, but when it
++     happens it leads to an unrecoverable crash of the Emacs process
++     (see bug #xyz-to-be-filled).  */
++  it.f->dont_adjust_matrices++;
++
+   /* Temporarily make frame's keyboard the current kboard so that
+      kboard-local variables in the mode_line_format will get the right
+      values.  */
+@@ -29126,19 +29173,29 @@ DEFUN ("format-mode-line", Fformat_mode_line, Sformat_mode_line,
+ 
+   old_buffer = current_buffer;
+ 
++  struct frame *target_frame = XFRAME (WINDOW_FRAME (w));
++
+   /* Save things including mode_line_proptrans_alist,
+      and set that to nil so that we don't alter the outer value.  */
+   record_unwind_protect (unwind_format_mode_line,
+-			 format_mode_line_unwind_data
+-			   (XFRAME (WINDOW_FRAME (w)),
+-			    old_buffer, selected_window, true));
++			 format_mode_line_unwind_data (target_frame, old_buffer,
++						       selected_window,
++						       true, true, true));
++
++  /* DTRT: These counters must be directly incremented after registering
++     unwind_format_mode_line, avoiding any function in between that can
++     signal.  Otherwise, if something signals, the registered unwinding
++     function runs without the counter ever being incremented,
++     potentially leading to negative values.  */
++  dont_resize_frames++;
++  XFRAME (WINDOW_FRAME (w))->dont_adjust_matrices++;
++
+   mode_line_proptrans_alist = Qnil;
+ 
+   Fselect_window (window, Qt);
+   set_buffer_internal_1 (XBUFFER (buffer));
+ 
+   init_iterator (&it, w, -1, -1, NULL, face_id);
+-  dont_resize_frames++;
+ 
+   /* Make sure `base_line_number` is fresh in case we encounter a `%l`.  */
+   if (current_buffer == XBUFFER ((w)->contents)
+-- 
+2.55.0
+

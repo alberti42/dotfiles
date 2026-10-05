@@ -35,8 +35,8 @@ NOISE = ("<system-reminder>", "<local-command-", "<command-", "Caveat:")
 
 
 def project_dir(cwd: Path) -> Path:
-    """Transcript folder for a working directory ('/' and '.' become '-')."""
-    return PROJECTS / re.sub(r"[/.]", "-", str(cwd.resolve()))
+    """Transcript folder for a working directory (every non-alphanumeric character becomes '-')."""
+    return PROJECTS / re.sub(r"[^A-Za-z0-9]", "-", str(cwd.resolve()))
 
 
 def read_session(path: Path) -> dict:

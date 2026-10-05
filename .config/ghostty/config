@@ -5,7 +5,7 @@
 # WezTerm: JetBrainsMonoNL Nerd Font Mono, Regular, size 17 (mac)
 font-family = "JetBrainsMonoNL Nerd Font Mono"
 font-style  = Regular
-font-size   = 17
+font-size   = 15
 
 # --- Colors / theme ---
 # WezTerm switched Catppuccin Frappe (dark) / Latte (light) with the OS appearance.
@@ -77,14 +77,13 @@ clipboard-write = allow
 # `$(defaults read -g AppleInterfaceStyle …)` prints "Dark" (exit 0) in dark mode
 # and errors (exit 1) in light mode -> the flag becomes 1 (dark) or 0 (light).
 #
-# Runs for the first surface only (matches the single-window tmux workflow).
-initial-command = /usr/bin/env PATH=$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin tmux new-session -A -D -s main \; set-option -g @dark_appearance $(defaults read -g AppleInterfaceStyle >/dev/null 2>&1 && echo 1 || echo 0)
+# `command`, not `initial-command`: the latter only ever applies to Ghostty's
+# very first surface, so other windows fell back to a plain login shell.
+command = /usr/bin/env PATH=$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin tmux new-session -A -D -s main \; set-option -g @dark_appearance $(defaults read -g AppleInterfaceStyle >/dev/null 2>&1 && echo 1 || echo 0)
 
-# NOTE / limitation: this only seeds @dark_appearance ONCE, at launch. WezTerm's
-# zsh-appearance-control dispatcher also re-pushed it on every live light<->dark
-# switch; Ghostty has no "on appearance change" hook, so keeping @dark_appearance
-# in sync after launch is still the job of the standalone dispatcher (TODO).
-# Ghostty's own colors do follow the OS live via the theme = line above.
+# NOTE: @dark_appearance is only seeded at surface creation; Ghostty has no
+# "appearance changed" hook, so live light<->dark switches are still the job of
+# the standalone dispatcher (TODO). Ghostty's own colors follow the OS via theme=.
 
 # --- Keybindings ---
 # WezTerm had disable_default_key_bindings = true; `keybind = clear` is the equivalent
@@ -94,15 +93,6 @@ keybind = clear
 # tmux prev/next pane: Ctrl-b p / Ctrl-b n  (WezTerm sent \x02p / \x02n)
 keybind = ctrl+alt+left_bracket=text:\x02p
 keybind = ctrl+alt+right_bracket=text:\x02n
-
-# Send arrow keys with modifiers (WezTerm SendKey -> xterm CSI 1;<mod><dir>).
-# mod = 1 + shift(1) + alt(2) + ctrl(4).  D=Left C=Right A=Up B=Down.
-keybind = ctrl+shift+left_bracket=text:\x1b[1;6D
-keybind = ctrl+shift+right_bracket=text:\x1b[1;6C
-keybind = alt+shift+left_bracket=text:\x1b[1;4D
-keybind = alt+shift+right_bracket=text:\x1b[1;4C
-keybind = alt+shift+equal=text:\x1b[1;4A
-keybind = alt+shift+quote=text:\x1b[1;4B
 
 # Disable Alt+Enter (WezTerm disabled its fullscreen toggle here)
 keybind = alt+enter=ignore

@@ -1,0 +1,143 @@
+From c7a015775a0e1cd12f1b3dd807ac68a7ad275e98 Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Sun, 13 Sep 2026 01:19:06 +0200
+Subject: [PATCH] org-id: Make uuid lowercase and use built-in uuid.el module
+
+This patch introduces two related fixes:
+
+1. Uses built-in module (candidate for Emacs 32) to generate uuid
+   when `uuid-v4' is bound.
+2. Make the `uuid' that is produced by the CLI utility `uuidgen'
+   lowercase. In Unix systems, uuidgen produces by default lowercase
+   uuid; the `uuidgen' utility shipped with macOS produces uppercase
+   uuid. For users switching between Emacs sessions on Linux and macOS,
+   this difference is source of inconsistencies in org notes.
+
+* lisp/org/org-id.el (org-id-new): Use uuid-v4 when available and make
+the generated uuid lowercase to be consistent with Unix systems.
+---
+ lisp/org/org-id.el   | 26 ++++++++++++++++--------
+ lisp/org/org-macs.el | 47 ++++++++++++++++++++++++--------------------
+ 2 files changed, 44 insertions(+), 29 deletions(-)
+
+diff --git a/lisp/org/org-id.el b/lisp/org/org-id.el
+index c33ea7fbbe9..802736090d1 100644
+--- a/lisp/org/org-id.el
++++ b/lisp/org/org-id.el
+@@ -167,10 +167,16 @@ org-id-link-use-context
+   :package-version '(Org . "9.7")
+   :type 'boolean)
+ 
+-(defcustom org-id-uuid-program "uuidgen"
+-  "The uuidgen program."
++(defcustom org-id-uuid-program nil
++  "Program used to generate the UUID, or nil to use Emacs's own generator.
++
++On Unix-like systems, uuidgen is usually available as an external program
++for generating UUIDs.  Using the internal function avoids spawning a process
++to run the external program."
+   :group 'org-id
+-  :type 'string)
++  :type '(choice (const :tag "Use built-in generator" nil)
++                 (string :tag "Program"))
++  :package-version '(Org . "9.9"))
+ 
+ (defcustom org-id-ts-format "%Y%m%dT%H%M%S.%6N"
+   "Timestamp format for IDs generated using `ts' `org-id-method'.
+@@ -193,9 +199,10 @@ org-id-method
+            microsecond accuracy, and optionally the current domain of the
+            computer.  See the variable `org-id-include-domain'.
+ 
+-uuid       Create random (version 4) UUIDs.  If the program defined in
+-           `org-id-uuid-program' is available it is used to create the ID.
+-           Otherwise an internal functions is used.
++uuid       Create random (version 4) UUIDs.  If `org-id-uuid-program' is set to
++           a program generating a valid UUID, the generated UUID is used to
++           create the new ID; the string is forced to lower case.  Otherwise an
++           internal function is used.
+ 
+ ts         Create ID's based on timestamps as specified in `org-id-ts-format'."
+   :group 'org-id
+@@ -439,9 +446,12 @@ org-id-new
+     (if (equal prefix ":") (setq prefix ""))
+     (cond
+      ((memq org-id-method '(uuidgen uuid))
+-      (setq unique (org-trim (shell-command-to-string org-id-uuid-program)))
++      (if (null org-id-uuid-program)
++          (setq unique (org-id-uuid))
++        (setq unique (downcase (org-trim
++                              (shell-command-to-string org-id-uuid-program)))))
+       (unless (org-uuidgen-p unique)
+-	(setq unique (org-id-uuid))))
++        (setq unique (org-id-uuid))))
+      ((eq org-id-method 'org)
+       (let* ((etime (org-reverse-string (org-id-time-to-b36)))
+ 	     (postfix (when org-id-include-domain
+diff --git a/lisp/org/org-macs.el b/lisp/org/org-macs.el
+index 44e73ca9875..2c9036fa054 100644
+--- a/lisp/org/org-macs.el
++++ b/lisp/org/org-macs.el
+@@ -36,6 +36,9 @@
+ (require 'format-spec)
+ (eval-when-compile (require 'subr-x))  ; For `when-let*', Emacs < 29
+ 
++(declare-function uuid-v4 "uuid" (&rest args))
++(declare-function uuid-to-string "uuid" (uuid))
++
+ ;;; Org version verification.
+ 
+ (defvar org--inhibit-version-check nil
+@@ -867,27 +870,29 @@ org-next-line-empty-p
+ 
+ (defun org-id-uuid ()
+   "Return string with random (version 4) UUID."
+-  (let ((rnd (md5 (format "%s%s%s%s%s%s%s"
+-			  (random)
+-			  (org-time-convert-to-list nil)
+-			  (user-uid)
+-			  (emacs-pid)
+-			  (user-full-name)
+-			  user-mail-address
+-			  (recent-keys)))))
+-    (format "%s-%s-4%s-%s%s-%s"
+-	    (substring rnd 0 8)
+-	    (substring rnd 8 12)
+-	    (substring rnd 13 16)
+-	    (format "%x"
+-		    (logior
+-		     #b10000000
+-		     (logand
+-		      #b10111111
+-		      (string-to-number
+-		       (substring rnd 16 18) 16))))
+-	    (substring rnd 18 20)
+-	    (substring rnd 20 32))))
++  (if (or (fboundp 'uuid-v4) (and (require 'uuid nil t) (fboundp 'uuid-v4)))
++      (uuid-to-string (uuid-v4))
++    (let ((rnd (md5 (format "%s%s%s%s%s%s%s"
++			    (random)
++			    (org-time-convert-to-list nil)
++			    (user-uid)
++			    (emacs-pid)
++			    (user-full-name)
++			    user-mail-address
++			    (recent-keys)))))
++      (format "%s-%s-4%s-%s%s-%s"
++	      (substring rnd 0 8)
++	      (substring rnd 8 12)
++	      (substring rnd 13 16)
++	      (format "%x"
++		      (logior
++		       #b10000000
++		       (logand
++		        #b10111111
++		        (string-to-number
++		         (substring rnd 16 18) 16))))
++	      (substring rnd 18 20)
++	      (substring rnd 20 32)))))
+ 
+ 
+ ;;; Motion
+-- 
+2.55.0
+

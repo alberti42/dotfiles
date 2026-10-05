@@ -65,7 +65,6 @@ function __fzf_tab_init_hook() {
 zinit ice wait'0b' light-mode lucid \
   atclone"source '${${(%):-%x}:a:h}/__fzf_tab_atclone_hook.zsh'" \
   atinit'_safe_one_off_load __fzf_tab_init_hook' \
-  ver'integrated' \
   depth 1 \
   id-as'Aloxaf/fzf-tab'
 zinit light Aloxaf/fzf-tab

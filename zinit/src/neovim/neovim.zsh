@@ -6,7 +6,7 @@ zinit ice \
   depth=1 \
   lucid \
   from'gh-r' \
-  lbin'tree-sitter-* -> tree-sitter' \
+  lbin'tree-sitter' \
   nocompletions \
   nocompile
 zinit light @tree-sitter/tree-sitter

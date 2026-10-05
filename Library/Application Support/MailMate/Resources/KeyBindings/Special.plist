@@ -1,0 +1,172 @@
+{
+	// Based on: https://mail.google.com/support/bin/answer.py?answer=6594
+
+	// ⇧⌘ sends from either newline key:
+	"$@\U000D" = "send:"; // ⇧⌘+return  — \U000D = CR
+	"$@\U0003" = "send:"; // ⇧⌘+enter   — \U0003 = ETX (keypad enter, or fn+return)
+
+	// References:
+	// http://manual.mailmate-app.com/custom_key_bindings
+	// http://manual.mailmate-app.com/key_binding_selectors
+
+	// My custom keybindings
+
+	"\U007f" = "archive:"; // ⌫ — archive
+	"$\U007f" = "deleteMessage:"; // ⇧⌫ — move to Trash
+	"~$@\U007f" = "expungeMessage:"; // ⌥⇧⌘⌫ — erase now, no Trash
+
+	"]" = "expandThread:"; // expands the selected thread
+	"[" = "collapseThread:"; // collapses the selected thread
+
+	"}" = "expandAll:"; // expands all threads in current view
+	"{" = "collapseAll:"; // collapses all threads in current view
+
+	"c"	= "newMessage:";
+	"R"	= "reply:";
+	"^r" = ( "reply:", "insertFormatString:", "Dear ${to.name.first},\n\n"); /* Smart reply */
+	"F"	= "forwardMessage:";
+	"m" = "moveToMailbox:";
+
+    "^." = "increaseQuoteLevel:";
+    "^," = "decreaseQuoteLevel:";
+	
+	"T" = "showThread:"; // lower-case t doesn't work because it's bound to tags (?)
+	// "l" = "copyAsLink:"; // copies message:// link for selected message
+	"a" = ( "selectWithFilter:", "#thread-id = ${#thread-id}", "archive:"); // http://protips.maxmasnick.com/mailmate-keyboard-shortcut-to-archive-all-messages-in-a-thread
+	"\UF702" = "backInHistory:"; // ← left arrow (\UF702) — back in history, e.g. back to mailbox after a search. ESC also works.
+	"\UF703" = "forwardInHistory:"; // → right arrow (\UF703) — forward in history
+	"~@f" 	= "searchAllMessages:";
+    "/"     = "searchAllMessages:";
+    "^/"    = "mailboxSearch:";
+	"D" = "saveAttachmentsInDownloads:";
+	// "^j" = ("makeFirstResponder:", "messageEditor"); // ⌃j
+	"L" = "loadImagesOnce:"; // load remote images once
+	// "h" = "nextAlternative:"; // shows HTML view of message (I have MM set to default to plain text when viewing messages)
+	"G" = "goToMailbox:";
+	"C" = "showCorrespondence:"; // show all messages to/from the sender of the selected message
+
+	// Switch j/k and h/l
+	"j" = "nextMessage:";
+	"k" = "previousMessage:";
+	"h" = "nextThread:";
+	"l" = "previousThread:";
+
+	"u" = ( "toggleTag:", "\\Seen");
+	"!" = ( "toggleFilterKey:", "unread");
+	"f"	= "toggleFlag:";
+	
+
+	/*
+	"\UF703"  = "nextMessage:";              // →
+	"\UF702"  = "previousMessage:";          // ←
+	"\UF700"  = "previousThread:";           // ↑
+	"\UF701"  = "nextThread:";               // ↓
+	"^\UF703" = "nextUnreadMessage:";        // ⌃→
+	"^\UF702" = "previousUnreadMessage:";    // ⌃←
+	"^\UF700" = "previousUnreadThread:";     // ⌃↑
+	"^\UF701" = "nextUnreadThread:";         // ⌃↓
+	*/
+
+	"s" = {
+		"t" = ( "selectThread:" );
+		"a" = "selectAll:";
+		"n" = "deselectAll:";
+		"u" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Seen'"); // Selects all unread mail.
+		"U" = ( "selectWithFilter:", "#flags.flag = '\\Seen'"); // Selects all mail you've read.
+		"s" = ( "selectWithFilter:", "#flags.flag = '\\Flagged'"); // Selects all starred mail.
+		"S" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Flagged'"); // Selects all unstarred mail.
+	};
+
+	// Thanks, Brett: https://gist.github.com/ttscoff/4703aaf195a1d7381b3a
+	// g,g jumps to first message in message list
+	// g,G jumps to last message in list
+	"g" = {
+		"g" = ( "makeFirstResponder:", "mainOutline", "selectFirstMessageRow:");
+		"G" = ( "makeFirstResponder:", "mainOutline", "selectLastMessageRow:");
+
+		"m" = ("makeFirstResponder:", "messageView"); // move focus to message view (for scrolling with arrows)
+		"b" = ("makeFirstResponder:", "mailboxesOutline");
+		"c" = ("makeFirstResponder:", "correspondenceOutline"); // move focus to correspondence list
+
+		"i" = ( "goToMailbox:", "INBOX", "makeFirstResponder:", "mainOutline" );
+		"a" = ( "goToMailbox:", "ALL_MESSAGES", "makeFirstResponder:", "mainOutline" );
+        "A" = ( "goToMailbox:", "ARCHIVE",      "makeFirstResponder:", "mainOutline" );
+        "f" = ( "goToMailbox:", "FLAGGED",      "makeFirstResponder:", "mainOutline" );
+	};
+
+}
+
+/* Disabled 
+
+"c"	= "newMessage:";
+	"/"	= "searchAllMessages:";
+	"n"	= "nextMessage:";
+	"p"	= "previousMessage:";
+	"j"   = "nextThread:";
+	"k"   = "previousThread:";
+	"o"	= "openMessages:"; // Gmail: Also expands or collapses a message if you are in 'Conversation View.'
+	"e"	= "archive:";
+	"m"	= ( "toggleMuteState:", "archive:" ); // FIXME: Should be 'markAsMuted:'
+	"s"	= "toggleFlag:";
+	"!"	= "moveToJunk:";
+	"r"	= "reply:";
+	"a"	= "replyAll:";
+	"f"	= "forwardMessage:";
+	"^s"	= "saveDocument:";
+	// l Label	
+	"v"	= "moveToMailbox:";
+	"#"   = "deleteMessage:";
+
+	"I"	= ( "setTag:", "\\Seen", "nextMessage:");
+	"U"	= ( "removeTag:", "\\Seen");
+
+	// Only in MailMate
+ 	"N"	= "moveDownAndModifySelection:";
+	"P"	= "moveUpAndModifySelection:";
+	"J"	= "moveDownAndModifySelection:";
+	"K"	= "moveUpAndModifySelection:";
+	"Z"	= "redo:";
+
+	// Combo keys
+	"g" = {
+		"a" = ( "goToMailbox:", "ALL_MESSAGES" );
+		"s" = ( "goToMailbox:", "FLAGGED" );
+		// g then c	Go to 'Contacts'	Takes you to your Contacts list.
+		"d" = ( "goToMailbox:", "DRAFTS" );
+		"l" = "goToMailbox:";
+		"i" = ( "goToMailbox:", "INBOX" );
+		"t" = ( "goToMailbox:", "SENT" );
+	};
+
+	"*" = {
+		"a" = "selectAll:";
+		"n" = "deselectAll:";
+		"r" = ( "selectWithFilter:", "#flags.flag = '\\Seen'"); // Selects all mail you've read.
+		"u" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Seen'"); // Selects all unread mail.
+		"s" = ( "selectWithFilter:", "#flags.flag = '\\Flagged'"); // Selects all starred mail.
+		"t" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Flagged'"); // Selects all unstarred mail.
+	};
+
+*/
+
+/*
+Not included above:
+
+u	Return to conversation list	Refreshes your page and returns you to the inbox, or list of conversations.
+x	Select conversation	Automatically checks and selects a conversation so that you can archive, apply a label, or choose an action from the drop-down menu to apply to that conversation.
++	Mark as important	Helps Gmail learn what's important to you by marking misclassified messages. (Specific to Priority Inbox)
+-	Mark as unimportant	Helps Gmail learn what's not important to you by marking misclassified messages. (Specific to Priority Inbox)
+
+[	Archive and previous	Removes the current view's label from your conversation and moves to the previous one.
+]	Archive and next	Removes the current view's label from your conversation and moves to the next one.
+y	Remove from Current View* Automatically removes the message or conversation from your current view.
+ From 'Inbox,' 'y' means Archive
+ From 'Starred,' 'y' means Unstar
+ From 'Trash,' 'y' means Move to inbox
+ From any label, 'y' means Remove the label
+ * 'y' has no effect if you're in 'Spam,' 'Sent,' or 'All Mail.'
+.	Show more actions	Displays the 'More Actions' drop-down menu.
+
+y then o	Archive and next	Archives your conversation and moves to the next one.
+	
+*/

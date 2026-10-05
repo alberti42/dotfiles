@@ -1,0 +1,16 @@
+/*
+Read the first few entries below to learn the format.
+
+Current limitation: One can only specify subranges of the original strings.
+
+WARNING: Be very careful with changing anything below. Internally, MailMate uses and thus depends on numerous specifiers.
+*/
+
+{
+	shorthands =
+	{
+		"#smart-list-id" = {
+			"formatString" = "${list-id.description:?${list-id.description/^[a-z]*\d.*/${subject.blob:?${subject.blob:/capitalize}:${from.name:${list-id.identifier.final-level:?${list-id.identifier.final-level:/capitalize}:${from.address}}}}/}:${subject.blob:?${subject.blob:/capitalize}:${from.name:${list-id.identifier.final-level:?${list-id.identifier.final-level:/capitalize}:${from.address}}}}}";
+		};
+	};
+}

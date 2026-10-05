@@ -15,6 +15,14 @@
         "-c",
         "test -f \"$HOME/.config/envs/mqva-dokuwiki.sh\" && source \"$HOME/.config/envs/mqva-dokuwiki.sh\" && exec npx -y mcp-remote https://w-mqv-atoms.qm.physik.uni-muenchen.de/lib/plugins/mcp/mcp.php --header \"Authorization: Bearer $DOKUWIKI_MCP_TOKEN\""
       ]
+    },
+    "knuspr": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "test -f \"$HOME/.config/envs/knuspr.sh\" && source \"$HOME/.config/envs/knuspr.sh\" && RHL_EMAIL=$(op read \"$RHL_EMAIL\") && RHL_PASS=$(op read \"$RHL_PASS\") && exec npx -y mcp-remote https://mcp.knuspr.de/mcp --header \"rhl-email: $RHL_EMAIL\" --header \"rhl-pass: $RHL_PASS\""
+      ]
     }
   }
 }

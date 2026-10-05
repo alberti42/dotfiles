@@ -1,13 +1,13 @@
 #!/usr/bin/env zsh
-# Deploy private dotfiles to the public repo as ONE commit, with secrets sanitized.
-# Works on macOS (BSD sed) and Linux (GNU sed).
+# Deploy private dotfiles to the public repo as ONE commit. Secrets are already
+# redacted by the git clean filters (.gitattributes) when committing to the private repo.
 
 # Branch strategy
 # - The script never commits on the private branch (e.g. main).
 # - It creates/resets a disposable work branch ($WORK_BRANCH, default: public-sync)
 #   at the current public tip ($PUBLIC_REMOTE/$PUBLIC_BRANCH).
-# - It then "transplants" the private tree onto that work branch, runs strict
-#   sanitization, and creates exactly one commit.
+# - It then "transplants" the private tree onto that work branch, drops the
+#   private-only files, and creates exactly one commit.
 # - Finally, it pushes that commit to the public remote branch (unless PUSH=0)
 #   and checks out the private branch again.
 #
@@ -23,7 +23,7 @@ set -euo pipefail
 #          Config             #
 #=============================#
 PRIVATE_REMOTE="origin"          # dotfiles-private.git
-PUBLIC_REMOTE="pubic-origin"     # dotfiles.git (your remote name)
+PUBLIC_REMOTE="public-origin"     # dotfiles.git (your remote name)
 PRIVATE_BRANCH="main"
 PUBLIC_BRANCH="public"
 WORK_BRANCH="public-sync"
@@ -55,6 +55,13 @@ require_repo_root() {
 
   DOTFILES="$repo_root"
   builtin cd "$DOTFILES" || die "Failed to cd to repo root: $DOTFILES"
+}
+
+require_git_config() {
+  # .git-dotfiles.conf defines the clean filters and enables git-hooks/pre-commit;
+  # .git/config is not versioned, so each clone must include it once.
+  [[ "$(git config --get dotfiles.included)" == "true" ]] \
+    || die ".git-dotfiles.conf is not included. Run: git config include.path ../.git-dotfiles.conf"
 }
 
 require_clean_tree() {
@@ -133,143 +140,9 @@ transplant_private_tree() {
   run "git restore --source '$PRIVATE_REF' --worktree --staged :/"
 }
 
-# Cross-platform sed -i -E (requires GNU sed)
-gnu_sed_cmd() {
-  # Prefer GNU sed explicitly if available.
-  if command -v gsed >/dev/null 2>&1; then
-    print -r -- "gsed"
-    return 0
-  fi
-
-  if command -v sed >/dev/null 2>&1 && sed --version >/dev/null 2>&1; then
-    print -r -- "sed"
-    return 0
-  fi
-
-  die "GNU sed (gsed) not found. Install it (e.g. 'brew install gnu-sed'). BSD sed is unsafe for secret redaction."
-}
-
-sedi() {
-  local expr="$1"; shift
-  local sedcmd
-  sedcmd="$(gnu_sed_cmd)"
-  "$sedcmd" -i -E "$expr" "$@"
-}
-
 assert_file_exists() {
   local f="$1"
   [[ -f "$f" ]] || die "Missing required file: $f"
-}
-
-sed_has_match() {
-  local re="$1" file="$2"
-  local sedcmd
-  sedcmd="$(gnu_sed_cmd)"
-
-  # Escape / for the address regex.
-  local addr_re="${re//\//\\/}"
-  "$sedcmd" -nE "/$addr_re/{q 0}; \$q 1" "$file"
-}
-
-sed_render() {
-  local expr="$1" file="$2"
-  local sedcmd
-  sedcmd="$(gnu_sed_cmd)"
-  "$sedcmd" -E "$expr" "$file"
-}
-
-strict_redact_and_stage() {
-  local f="$1"; shift
-  local pre_re="$1"; shift
-  local sed_expr="$1"; shift
-  local post_re="$1"; shift
-
-  assert_file_exists "$f"
-
-  if ! sed_has_match "$pre_re" "$f"; then
-    die "Expected secret pattern not found in $f (pattern drift or file changed)."
-  fi
-
-  log "Sanitizing (strict): $f"
-  if [[ "$DRY_RUN" == "1" ]]; then
-    print -r -- "+ sed -E '$sed_expr' -- $f"
-  fi
-
-  local tmp
-  tmp="$(mktemp "${TMPDIR:-/tmp}/deploy_public.XXXXXX")"
-
-  if [[ "$DRY_RUN" == "1" ]]; then
-    sed_render "$sed_expr" "$f" >"$tmp"
-
-    if command cmp -s -- "$f" "$tmp"; then
-      command rm -f -- "$tmp"
-      die "Sanitization made no changes in $f (already sanitized or pattern drift). Aborting."
-    fi
-
-    if ! sed_has_match "$post_re" "$tmp"; then
-      command rm -f -- "$tmp"
-      die "Sanitization did not produce expected redacted output in $f. Aborting."
-    fi
-
-    command rm -f -- "$tmp"
-    return 0
-  fi
-
-  # Non-dry-run: edit in-place to preserve file mode bits.
-  command cp -f -- "$f" "$tmp"
-  sedi "$sed_expr" "$f"
-
-  if command cmp -s -- "$f" "$tmp"; then
-    command rm -f -- "$tmp"
-    die "Sanitization made no changes in $f (already sanitized or pattern drift). Aborting."
-  fi
-  command rm -f -- "$tmp"
-
-  if ! sed_has_match "$post_re" "$f"; then
-    die "Sanitization did not produce expected redacted output in $f. Aborting."
-  fi
-
-  git add -- "$f"
-}
-
-#=============================#
-#       Sanitization          #
-#=============================#
-sanitize_sublime_sftp() {
-  # 1) Sublime Text/Packages/User/SFTP.sublime-settings
-  strict_redact_and_stage \
-    "Sublime Text/Packages/User/SFTP.sublime-settings" \
-    '("product_key"\s*:\s*")[^"]*(")' \
-    's/("product_key"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("product_key"\s*:\s*")\.\.\.(")'
-}
-
-sanitize_vscode_settings() {
-  # 2) Library/Application Support/Code/settings.json
-  strict_redact_and_stage \
-    "Library/Application Support/Code/settings.json" \
-    '("ltex\.languageToolOrg\.username"\s*:\s*")[^"]*(")' \
-    's/("ltex\.languageToolOrg\.username"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("ltex\.languageToolOrg\.username"\s*:\s*")\.\.\.(")'
-  strict_redact_and_stage \
-    "Library/Application Support/Code/settings.json" \
-    '("ltex\.languageToolOrg\.apiKey"\s*:\s*")[^"]*(")' \
-    's/("ltex\.languageToolOrg\.apiKey"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("ltex\.languageToolOrg\.apiKey"\s*:\s*")\.\.\.(")'
-}
-
-sanitize_sublime_ltex() {
-  # 3) Sublime Text/Packages/User/LSP-ltex-ls.sublime-settings
-  strict_redact_and_stage \
-    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
-    '("ltex\.languageToolOrg\.username"\s*:\s*")[^"]*(")' \
-    's/("ltex\.languageToolOrg\.username"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("ltex\.languageToolOrg\.username"\s*:\s*")\.\.\.(")'
-  strict_redact_and_stage \
-    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
-    '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")[^"]*(")' \
-    's/("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")[^"]*(")/\1...\2/g' \
-    '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")\.\.\.(")'
 }
 
 drop_from_public() {
@@ -292,63 +165,13 @@ drop_from_public() {
   done
 }
 
-verify_sanitization() {
-  log "Verifying sanitization…"
-
-  # In dry-run we already validated each redaction via a temp render.
-  if [[ "$DRY_RUN" == "1" ]]; then
-    return 0
-  fi
-
-  # Verify redactions are present (fail if missing).
-  assert_file_exists "Sublime Text/Packages/User/SFTP.sublime-settings"
-  sed_has_match '("product_key"\s*:\s*")\.\.\.(")' \
-    "Sublime Text/Packages/User/SFTP.sublime-settings" \
-    || die "Redacted product_key not found in Sublime Text/Packages/User/SFTP.sublime-settings"
-
-  assert_file_exists "Library/Application Support/Code/settings.json"
-  sed_has_match '("ltex\.languageToolOrg\.username"\s*:\s*")\.\.\.(")' \
-    "Library/Application Support/Code/settings.json" \
-    || die "Redacted ltex.languageToolOrg.username not found in Library/Application Support/Code/settings.json"
-  sed_has_match '("ltex\.languageToolOrg\.apiKey"\s*:\s*")\.\.\.(")' \
-    "Library/Application Support/Code/settings.json" \
-    || die "Redacted ltex.languageToolOrg.apiKey not found in Library/Application Support/Code/settings.json"
-
-  assert_file_exists "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings"
-  sed_has_match '("ltex\.languageToolOrg\.username"\s*:\s*")\.\.\.(")' \
-    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
-    || die "Redacted ltex.languageToolOrg.username not found in Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings"
-  sed_has_match '("ltex\.ltex-ls\.languageToolOrgApiKey"\s*:\s*")\.\.\.(")' \
-    "Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings" \
-    || die "Redacted ltex.ltex-ls.languageToolOrgApiKey not found in Sublime Text/Packages/User/LSP-ltex-ls-plus.sublime-settings"
-
-  # Verify private-only paths are no longer tracked.
-  if git ls-files --error-unmatch -- "Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json" >/dev/null 2>&1; then
-    die "Private-only file is still tracked: Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
-  fi
-}
-
-sanitize_all() {
-  log "Starting sanitization…"
-  sanitize_sublime_sftp
-  sanitize_vscode_settings
-  sanitize_sublime_ltex
-    
+drop_private_files() {
   # Files that must NEVER be published
   local -a PRIVATE_ONLY_FILES=(
     "Sublime Text/Packages/User/sftp_servers/mqva-exp-control-dev.json"
   )
 
-  # Drop the private files 
   drop_from_public "${PRIVATE_ONLY_FILES[@]}"
-
-  verify_sanitization
-
-  # Optional: best-effort scan for other obvious secrets (does not block).
-  # if command -v rg >/dev/null 2>&1; then
-  #  log "Scanning for likely secrets (best-effort)…"
-  #  run "rg -n --hidden --iglob '!*\.git/*' '(password|passwd|api[_-]?key|secret|token|ssh-)' || true"
-  # fi
 }
 
 commit_and_push() {
@@ -359,7 +182,7 @@ commit_and_push() {
   run "git add -A"
 
   if git diff --cached --quiet; then
-    log "No changes to commit (public branch already matches sanitized $PRIVATE_REF)."
+    log "No changes to commit (public branch already matches $PRIVATE_REF)."
     log "Checking out local $PRIVATE_BRANCH"
     run "git checkout '$PRIVATE_BRANCH'"
     return 0
@@ -374,7 +197,7 @@ commit_and_push() {
   if [[ "$PUSH" == "1" ]]; then
     log "Pushing to $PUBLIC_REMOTE/$PUBLIC_BRANCH…"
     run "git push -u '$PUBLIC_REMOTE' 'HEAD:$PUBLIC_BRANCH'"
-    log "✅ Deployed to $PUBLIC_REMOTE/$PUBLIC_BRANCH as a single sanitized commit."
+    log "✅ Deployed to $PUBLIC_REMOTE/$PUBLIC_BRANCH as a single commit."
   else
     log "Skipping push (PUSH=$PUSH). Review locally, then push when ready."
   fi
@@ -388,13 +211,14 @@ commit_and_push() {
 #=============================#
 main() {
   require_repo_root
+  require_git_config
   require_clean_tree
   fetch_remotes
   require_private_ref_in_sync
   switch_to_public_tip
   transplant_private_tree
   clean_submodules_hard
-  sanitize_all
+  drop_private_files
   commit_and_push
 }
 

@@ -1,0 +1,715 @@
+diff --git a/lisp/pixel-scroll.el b/lisp/pixel-scroll.el
+index 23e63add994..e88892ada0a 100644
+--- a/lisp/pixel-scroll.el
++++ b/lisp/pixel-scroll.el
+@@ -213,6 +213,52 @@ pixel-scroll-precision-interpolate-mice
+   :type 'boolean
+   :version "29.1")
+ 
++(defcustom pixel-scroll-precision-reposition-point t
++  "Whether to reposition point to honor `scroll-margin' after scrolling.
++While a scroll gesture is in progress, `pixel-scroll-precision-mode' lets the
++window move freely under point and ignores `scroll-margin', so the view is not
++recentered mid-scroll.  When this option is non-nil, point is moved back inside
++the margin once scrolling stops; only point moves -- the window is left where
++scrolling left it -- so the margin is restored without the view jumping.  When
++nil, point is left wherever scrolling placed it."
++  :type 'boolean
++  :version "32.1")
++
++(defcustom pixel-scroll-precision-hide-cursor-while-scrolling nil
++  "Whether to hide the cursor while it rests against the window edge when scrolling.
++While scrolling, point is held at the top or bottom edge of the window rather
++than at its usual `scroll-margin' distance from it.  When this option is
++non-nil, the cursor is hidden as soon as point reaches the edge and is shown
++again, at its repositioned location, once scrolling stops."
++  :type 'boolean
++  :version "32.1")
++
++(defcustom pixel-scroll-precision-settle-delay 0.18
++  "Seconds of scroll inactivity after which a scroll gesture is treated as finished.
++When this much time passes with no further scrolling, `scroll-margin' is
++restored and, if `pixel-scroll-precision-reposition-point' is non-nil, point is
++moved back inside the margin.  It must be longer than the gap between events of
++a slow continuous scroll, or the margin would be restored in the middle of one;
++but a larger value also delays how soon point settles after scrolling stops."
++  :type 'number
++  :version "32.1")
++
++(defvar pixel-scroll-precision--settle-timer nil
++  "Timer that runs `pixel-scroll-precision--settle' once scrolling stops.")
++
++(defvar pixel-scroll-precision--gesture-windows nil
++  "Windows whose `scroll-margin' is suppressed for the current scroll gesture.")
++
++(defvar-local pixel-scroll-precision--saved-margin 'unset
++  "Saved `scroll-margin' state while a scroll gesture suppresses it.
++The symbol `unset' means no gesture is active in this buffer.  Otherwise a
++cons (WAS-LOCAL . VALUE) recording how to restore `scroll-margin'.")
++
++(defvar-local pixel-scroll-precision--saved-cursor-type 'unset
++  "Saved `cursor-type' state while the cursor is hidden during scrolling.
++The symbol `unset' means the cursor is not hidden.  Otherwise a
++cons (WAS-LOCAL . VALUE) recording how to restore `cursor-type'.")
++
+ (defun pixel-scroll-in-rush-p ()
+   "Return non-nil if next scroll should be non-smooth.
+ When scrolling request is delivered soon after the previous one,
+@@ -497,6 +543,129 @@ pixel-scroll-down-and-set-window-vscroll
+   (set-window-start nil (pixel-point-at-unseen-line) t)
+   (set-window-vscroll nil vscroll t))
+ 
++(defun pixel-scroll-precision--point-pinned-p (window margin)
++  "Return non-nil if point in WINDOW sits within MARGIN rows of a window edge."
++  (and (> margin 0)
++       (with-selected-window window
++         (let ((row (cdr (posn-col-row (posn-at-point)))))
++           (and row
++                (let ((bottom (1- (window-text-height))))
++                  (or (< row margin)
++                      (> row (- bottom margin)))))))))
++
++(defun pixel-scroll-precision--begin-gesture (&optional window)
++  "Begin or continue a scroll gesture in WINDOW (default the selected window).
++Suppress `scroll-margin' in the window's buffer so redisplay does not recenter
++the window while scrolling, optionally hide the cursor once point reaches a
++window edge, and (re)arm the timer that settles the gesture.  All paths that
++scroll funnel through here, so the settle timer is pushed forward on every
++step and only fires once scrolling -- including any momentum tail -- stops."
++  (when pixel-scroll-precision-mode
++    (let* ((window (or window (selected-window)))
++           (buffer (window-buffer window)))
++      (with-current-buffer buffer
++        (let ((orig-margin (if (consp pixel-scroll-precision--saved-margin)
++                               (cdr pixel-scroll-precision--saved-margin)
++                             scroll-margin)))
++          (when (eq pixel-scroll-precision--saved-margin 'unset)
++            (setq pixel-scroll-precision--saved-margin
++                  (cons (local-variable-p 'scroll-margin) scroll-margin))
++            (setq-local scroll-margin 0))
++          (when (and pixel-scroll-precision-hide-cursor-while-scrolling
++                     (eq pixel-scroll-precision--saved-cursor-type 'unset)
++                     (pixel-scroll-precision--point-pinned-p window orig-margin))
++            (setq pixel-scroll-precision--saved-cursor-type
++                  (cons (local-variable-p 'cursor-type) cursor-type))
++            (setq-local cursor-type nil))))
++      (unless (memq window pixel-scroll-precision--gesture-windows)
++        (push window pixel-scroll-precision--gesture-windows))
++      (when (timerp pixel-scroll-precision--settle-timer)
++        (cancel-timer pixel-scroll-precision--settle-timer))
++      (setq pixel-scroll-precision--settle-timer
++            (run-with-timer pixel-scroll-precision-settle-delay nil
++                            #'pixel-scroll-precision--settle)))))
++
++(defun pixel-scroll-precision--reposition-point (margin)
++  "Move point inward to keep at least MARGIN whole rows from the window edge.
++Measured in pixels (via `posn-at-x-y'), not screen rows, so tall display lines
++such as images are handled correctly: a row-based count treats a tall image as
++a single row and wrongly concludes point is clear of the edge while in pixels
++it is pinned against it.  Target one row beyond MARGIN: a non-zero `vscroll'
++clips the boundary line, so the extra line absorbs that fractional row.  Only
++point moves, never the window; does nothing when point is already between the
++margins, or cannot be made compliant (for example next to an image taller than
++the window, where both margin lines resolve to the same position)."
++  (let* ((win (selected-window))
++         (lh (default-line-height))
++         (h (window-body-height win t))
++         ;; One line beyond MARGIN, clamped so the two margins never cross.
++         (pad (min (* (1+ margin) lh) (max 0 (- (/ h 2) lh))))
++         (top (posn-at-x-y 0 pad win))
++         (bot (posn-at-x-y 0 (max 0 (- h pad 1)) win))
++         (top-pos (and top (posn-point top)))
++         (bot-pos (and bot (posn-point bot))))
++    (cond ((and top-pos (< (point) top-pos)) (goto-char top-pos))
++          ((and bot-pos (> (point) bot-pos)) (goto-char bot-pos)))))
++
++(defun pixel-scroll-precision--reposition-point-in-margin ()
++  "Ride point at the gesture's original `scroll-margin' in the selected window.
++`pixel-scroll-precision--begin-gesture' suppresses `scroll-margin' so redisplay
++does not recenter the window mid-gesture; this keeps point the same number of
++rows from the edge by hand, so it never scrolls off-screen -- an off-screen
++point is what makes redisplay recenter, jumping the window.  Called on every
++scroll step and again at settle, so both place point identically.  A no-op when
++`pixel-scroll-precision-reposition-point' is nil or no margin is in effect."
++  (let ((saved pixel-scroll-precision--saved-margin))
++    (when (and pixel-scroll-precision-reposition-point (consp saved))
++      (let ((margin (max 0 (min (cdr saved)
++                                (truncate (* (window-text-height)
++                                             maximum-scroll-margin))))))
++        (when (> margin 0)
++          (pixel-scroll-precision--reposition-point margin))))))
++
++(defun pixel-scroll-precision--settle ()
++  "Finish the current scroll gesture.
++For each window scrolled since the last settle: reposition point to honor
++`scroll-margin' (when `pixel-scroll-precision-reposition-point' is non-nil),
++restore `scroll-margin', and reveal the cursor if it was hidden."
++  (when (timerp pixel-scroll-precision--settle-timer)
++    (cancel-timer pixel-scroll-precision--settle-timer))
++  (setq pixel-scroll-precision--settle-timer nil)
++  (dolist (window pixel-scroll-precision--gesture-windows)
++    (when (window-live-p window)
++      (with-selected-window window
++        (let ((saved pixel-scroll-precision--saved-margin))
++          (when (consp saved)
++            (pixel-scroll-precision--reposition-point-in-margin)
++            (if (car saved)
++                (setq-local scroll-margin (cdr saved))
++              (kill-local-variable 'scroll-margin))
++            (setq pixel-scroll-precision--saved-margin 'unset)))
++        (let ((cur pixel-scroll-precision--saved-cursor-type))
++          (when (consp cur)
++            (if (car cur)
++                (setq-local cursor-type (cdr cur))
++              (kill-local-variable 'cursor-type))
++            (setq pixel-scroll-precision--saved-cursor-type 'unset))))))
++  (setq pixel-scroll-precision--gesture-windows nil))
++
++(defun pixel-scroll-precision--overlay-string-at-p (pos)
++  "Return non-nil if an overlay before/after-string is anchored at POS.
++A before-string is drawn at its overlay's start and an after-string at
++its overlay's end, so when either anchor is POS the string is drawn just
++before POS's own character.  Such a POS is not a clean window start: the
++display there begins inside the string, above POS's character, so
++`posn-at-point' is an unreliable vertical reference for it.  This mirrors
++the C-level check in `window-text-pixel-size' (bug#64252)."
++  (catch 'found
++    (dolist (ov (overlays-in (max (point-min) (1- pos))
++                             (min (point-max) (1+ pos))))
++      (when (or (and (= (overlay-start ov) pos)
++                     (overlay-get ov 'before-string))
++                (and (= (overlay-end ov) pos)
++                     (overlay-get ov 'after-string)))
++        (throw 'found t)))))
++
+ ;;;###autoload
+ (defun pixel-scroll-precision-scroll-down-page (delta)
+   "Scroll the current window down by DELTA pixels.
+@@ -520,11 +689,29 @@ pixel-scroll-precision-scroll-down-page
+                                  (goto-char desired-start)
+                                  (beginning-of-visual-line)
+                                  (point)))))
+-    (set-window-start nil new-start-position
+-                      (not (zerop desired-vscroll)))
++    ;; If DESIRED-START is not a real line start -- an overlay
++    ;; before/after-string is anchored there, so the display begins inside
++    ;; the string, above DESIRED-START's character -- then `posn-at-point'
++    ;; (and thus DESIRED-VSCROLL) is an unreliable reference, and committing
++    ;; it would move the window start into the middle of that line and
++    ;; expose the string's leading newline as a blank row.  Keep the
++    ;; current line start and let vscroll do the within-line correction
++    ;; instead, preserving the window-start-by-lines design.
++    (when (and desired-start
++               (not (eq desired-start (window-start)))
++               (pixel-scroll-precision--overlay-string-at-p desired-start))
++      (setq new-start-position (window-start)
++            desired-vscroll (+ current-vs delta)))
++    ;; Force the window start so redisplay honors it instead of disregarding
++    ;; it and jumping the window when point would be off-screen across a
++    ;; display line taller than DELTA -- see
++    ;; `pixel-scroll-precision-scroll-up-page' (bug#64252).
++    (set-window-start nil new-start-position nil)
+     (set-window-vscroll nil desired-vscroll t t)
+-    ;; Constrain point to a location that will not result in
+-    ;; recentering, if it is no longer completely visible.
++    ;; The forced start keeps the *window* in place, but redisplay would
++    ;; still recenter an off-screen *point* to mid-window.  Constrain point
++    ;; to a location that will not result in recentering, if it is no longer
++    ;; completely visible, so it rides the window edge instead.
+     (unless (pos-visible-in-window-p (point))
+       ;; If desired-vscroll is 0, target the window start itself.  But
+       ;; in any other case, target the line immediately below the
+@@ -550,11 +737,35 @@ pixel-scroll-precision-scroll-down-page
+ 
+ (defun pixel-scroll-precision-scroll-down (delta)
+   "Scroll the current window down by DELTA pixels."
++  (pixel-scroll-precision--begin-gesture)
+   (let ((max-height (1- (window-text-height nil t))))
+     (while (> delta max-height)
+       (pixel-scroll-precision-scroll-down-page max-height)
+       (setq delta (- delta max-height)))
+-    (pixel-scroll-precision-scroll-down-page delta)))
++    (pixel-scroll-precision-scroll-down-page delta))
++  ;; Keep point riding the margin on every step, not just at settle, so it
++  ;; never scrolls off-screen mid-gesture and provokes a redisplay recenter.
++  (pixel-scroll-precision--reposition-point-in-margin))
++
++(defun pixel-scroll-precision--after-string-at-p (pos)
++  "Return non-nil if an overlay after-string is anchored at POS."
++  (seq-some (lambda (ov) (and (= (overlay-end ov) pos)
++                              (overlay-get ov 'after-string)))
++            (overlays-in (max (point-min) (1- pos))
++                         (min (point-max) (1+ pos)))))
++
++(defun pixel-scroll-precision--screen-line-start (position)
++  "Start of the screen line on which the text at POSITION is drawn.
++An after-string anchored at POSITION is drawn after the character
++before it, and its rows all carry POSITION, so that character's
++screen line is the one a window may begin at."
++  (save-excursion
++    (goto-char position)
++    (when (and (> position (point-min))
++               (pixel-scroll-precision--after-string-at-p position))
++      (backward-char))
++    (vertical-motion 0)
++    (point)))
+ 
+ ;;;###autoload
+ (defun pixel-scroll-precision-scroll-up-page (delta)
+@@ -579,16 +790,33 @@ pixel-scroll-precision-scroll-up-page
+                (height (nth 1 dims))
+                (position (nth 2 dims)))
+           (setq wanted-pos position)
++          ;; POSITION may lie inside a screen line rather than at its
++          ;; start (e.g. a newline hidden by a `display' overlay, or an
++          ;; overlay-string anchor).  Commit the start of the screen
++          ;; line that contains it, as the display engine itself defines
++          ;; it, so redisplay's continuation-line normalization finds it
++          ;; at distance 0 and keeps it.
++          (when position
++            (setq wanted-pos (pixel-scroll-precision--screen-line-start position)))
+           (when (or (not position) (eq position start))
++            ;; At the top of the buffer: force the window start so redisplay
++            ;; honors it instead of recomputing it to keep point visible --
++            ;; which, when point sits on a display line too tall to fit at
++            ;; the buffer's start, yanks the view back down and prevents
++            ;; reaching the top (bug#64252).
++            (set-window-start nil start nil)
+             (signal 'beginning-of-buffer nil))
+           (setq delta (- delta height))))
+-      (set-window-start nil wanted-pos
+-                        (not (zerop delta)))
++      ;; Force the window start so redisplay honors it instead of
++      ;; disregarding it and jumping the window across a display line taller
++      ;; than DELTA (bug#64252).  The vscroll is preserved by PRESERVE-VSCROLL.
++      (set-window-start nil wanted-pos nil)
+       (when (< delta 0)
+         (set-window-vscroll nil (- delta) t t))
+-      ;; vscroll and the window start are now set.  Move point to a
+-      ;; position where redisplay will not recenter, if it is now
+-      ;; outside the window.
++      ;; The forced start keeps the *window* in place, but redisplay would
++      ;; still recenter an off-screen *point* to mid-window.  Move point to a
++      ;; position where redisplay will not recenter, if it is now outside the
++      ;; window, so it rides the bottom edge instead.
+       (unless (pos-visible-in-window-p (point))
+         (let ((up-pos (save-excursion
+                         (goto-char point)
+@@ -664,12 +892,16 @@ pixel-scroll-precision-interpolate
+ 
+ (defun pixel-scroll-precision-scroll-up (delta)
+   "Scroll the current window up by DELTA pixels."
++  (pixel-scroll-precision--begin-gesture)
+   (let ((max-height (window-text-height nil t)))
+     (when (> max-height 0)
+       (while (> delta max-height)
+         (pixel-scroll-precision-scroll-up-page max-height)
+         (setq delta (- delta max-height)))
+-      (pixel-scroll-precision-scroll-up-page delta))))
++      (pixel-scroll-precision-scroll-up-page delta)))
++  ;; Keep point riding the margin on every step, not just at settle, so it
++  ;; never scrolls off-screen mid-gesture and provokes a redisplay recenter.
++  (pixel-scroll-precision--reposition-point-in-margin))
+ 
+ ;; FIXME: This doesn't _always_ work when there's an image above the
+ ;; current line that is taller than the window, and scrolling can
+diff --git a/src/xdisp.c b/src/xdisp.c
+index 6d3fa2fbe4f..61023a5a828 100644
+--- a/src/xdisp.c
++++ b/src/xdisp.c
+@@ -11748,7 +11748,7 @@ window_text_pixel_size (Lisp_Object window, Lisp_Object from, Lisp_Object to,
+   ptrdiff_t start, end, bpos;
+   struct text_pos startp;
+   void *itdata = NULL;
+-  int c, max_x = 0, max_y = 0, x = 0, y = 0, vertical_offset = 0, doff = 0;
++  int c, max_x = 0, max_y = 0, x = 0, y = 0, vertical_offset = 0;
+ 
+   if (NILP (from))
+     {
+@@ -11951,58 +11951,201 @@ window_text_pixel_size (Lisp_Object window, Lisp_Object from, Lisp_Object to,
+       to_x = INT_MAX;
+     }
+ 
+-  void *it2data = NULL;
+-  struct it it2;
+-  SAVE_IT (it2, it, it2data);
++  int top_of_end_line_y = 0;
++  if (!NILP (ignore_line_at_end))
++    {
++      /* IGNORE_LINE_AT_END asks for the pixel height of the screen
++	 lines strictly above the screen line containing END.  This
++	 also excludes any display or overlay strings anchored at END.
++
++	 The typical caller passes FROM as a cons,
++
++	 (cons START (- DELTA))
++
++	 where `(- DELTA)' represents a negative pixel offset with
++	 respect to the top of the screen line containing START.  In
++	 particular, it is used by pixel-scroll-precision-mode, which
++	 sets START=TO=`window-start', in order to obtain the number
++	 of pixels above `window-start' in a scroll operation moving
++	 toward BEG.
++
++	 To measure the pixel height between FROM and END (with END
++	 excluded), IT walks down from FROM one screen line at a time
++	 and stops once END has been reached.  This lands on a screen
++	 line that either contains END or is just one screen line past
++	 it.  If it moved past the line containing END, it moves back
++	 by one screen line.
++
++	 Note that `it.current_y' always reports the positive distance
++	 from the window top, including the tab and header lines. The
++	 offset caused by the tab and header lines is compensated by
++	 the rebase done above, which redefined the y-coordinate of
++	 FROM by setting
++
++	 it.current_y = start_y = WINDOW_TAB_LINE_HEIGHT +
++	 WINDOW_HEADER_LINE_HEIGHT
++
++	 This virtually mimics the situation where FROM sits just
++	 below the window top, i.e., just after the header line.
++	 During the walk-down, `it.current_y' grows; at the screen
++	 line containing END, `it.current_y' minus `start_y' is
++	 exactly the height of the screen lines between FROM and END,
++	 with the end line being excluded.
++
++	 Also note we walk downward (forward direction), with the
++	 coordinate rebased at start_y, rather than stepping once
++	 backward from the top of END: `move_it_vertically' with a
++	 negative offset calls `move_it_vertically_backward', and as
++	 it is explained in its comment, this function is not accurate
++	 since it can move more or less than the desired number of
++	 pixels, thus cannot be trusted where pixel-precision is
++	 relevant like in this case.  Conversely, forward steps from
++	 FROM produce exact pixel coordinates measured with respect to
++	 `start_y'.  */
++      int max_current_x = 0;
++      while (IT_CHARPOS (it) < end && it.current_y < max_y)
++	{
++	  ptrdiff_t prev_pos = IT_CHARPOS (it);
++	  int prev_vpos = it.vpos;
++	  int prev_top = it.current_y;
++
++	  /* Forward move to the next screen line (i.e., move downward).  */
++	  x = move_it_to (&it, -1, -1, -1, it.vpos + 1, MOVE_TO_VPOS);
++
++	  if (IT_CHARPOS (it) == prev_pos && it.vpos == prev_vpos)
++	    /* Defensive guard: should a step fail to advance, break
++	       instead of looping forever.  */
++	    break;
++
++	  if (IT_CHARPOS (it) == end)
++	    {
++	      /* The screen line starts at END, where the entity
++		 displayed at END can be either: (1) a string anchored
++		 at END or (2) just a buffer character.  */
++	      if (STRINGP (it.string))
++		{
++		  if (IT_STRING_CHARPOS (it) == 0)
++		    {
++		      /* The screen line begins with a string anchored
++			 at END.  */
++		      if (it.current.overlay_string_index > 0)
++			{
++			  /* The screen line begins with a string with an
++			     index > 0, meaning that a previous string was
++			     already displayed on the previous screen
++			     line: take one step back.  */
++			  it.current_y = prev_top;
++			  break;
++			}
++		      else
++			{
++			  /* The screen line begins with the first
++			     string with anchor at END: stop the
++			     walk-down and keep it.current_y.  Update
++			     maximum width since x carries the maximum
++			     width in pixel of the previous screen
++			     line.  */
++			  max_current_x = max (max_current_x, x);
++			  break;
++			}
++		    }
++		  else
++		    {
++		      /* This is the continuation line of either an
++			 overlay string or a display string, since END
++			 position coincides with the beginning of the
++			 screen line, but the string position does
++			 not. It means that the walk-down overshot.
++			 Then, take a step back and use the previous
++			 line position.  Note that here the
++			 overlay_string_index is irrelevant, since
++			 both overlay strings
++			 (it.current.overlay_string_index >= 0) and display
++			 strings (it.current.overlay_string_index == -1)
++			 are treated equally.  */
++		      it.current_y = prev_top;
++		      break;
++		    }
++		}
++	      else
++		{
++		  /* END is a buffer character: stop walking down and
++		     keep its top position `it.current_y', so that this
++		     screen line is not counted in the pixel count.
++		     Like before, update maximum width.  */
++		  max_current_x = max (max_current_x, x);
++		  break;
++		}
++	    }
++	  else if (IT_CHARPOS (it) > end)
++	    {
++	      /* END is interior to the previous line, meaning that the
++		 walk-down overshot.  Take a step back and return the top
++		 position of the previous line, which is that containing
++		 END.  */
++	      it.current_y = prev_top;
++	      break;
++	    }
++
++	  /* This is a screen line occurring before END: update the
++	     maximum pixel width.  */
++	  max_current_x = max (max_current_x, x);
++	}
+ 
+-  x = move_it_to (&it, end, to_x, max_y, -1, move_op);
++      x = max_current_x;
++      top_of_end_line_y = it.current_y;
+ 
+-  /* We could have a display property at END, in which case asking
+-     move_it_to to stop at END will overshoot and stop at position
+-     after END.  So we try again, stopping before END, and account for
+-     the width of the last buffer position manually.  */
+-  if (IT_CHARPOS (it) > end)
++      /* Set start_x to zero for the case when the loop is skipped
++	 (e.g., when FROM is specified above BEGV and TO is set above or
++	 equal to BEGV, both are then clamped to BEGV and the loop is
++	 skipped) or when it runs and produces a zero-pixel height
++	 (e.g., when FROM and TO are specified at the same screen line,
++	 the loop runs but produces a height of 0 pixels).  For such an
++	 empty selection, a width of zero pixels is what is expected.
++	 For this we need to zero start_x to avoid subtracting it from x
++	 in the code below shared between the two branches.  */
++      start_x = 0;
++    }
++  else
+     {
+-      int end_y = it.current_y;
++      void *it2data = NULL;
++      struct it it2;
++      SAVE_IT (it2, it, it2data);
+ 
+-      end--;
+-      RESTORE_IT (&it, &it2, it2data);
+       x = move_it_to (&it, end, to_x, max_y, -1, move_op);
+-      /* Add the width of the thing at TO, but only if we didn't
+-	 overshoot it; if we did, it is already accounted for.  Also,
+-	 account for the height of the thing at TO.  */
+-      if (IT_CHARPOS (it) == end)
+-	{
+-	  x += it.pixel_width;
+ 
+-	  /* DTRT if ignore_line_at_end is t.  */
+-	  if (!NILP (ignore_line_at_end))
+-	    {
+-	      /* If END-1 is on the previous screen line, we need to
+-                 account for the vertical dimensions of previous line.  */
+-	      if (it.current_y < end_y)
+-		doff = (max (it.max_ascent, it.ascent)
+-			+ max (it.max_descent, it.descent));
+-	    }
+-	  else
++      /* We could have a display property at END, in which case asking
++	 move_it_to to stop at END will overshoot and stop at position
++	 after END.  So we try again, stopping before END, and account for
++	 the width of the last buffer position manually.  */
++      if (IT_CHARPOS (it) > end)
++	{
++	  end--;
++	  RESTORE_IT (&it, &it2, it2data);
++	  x = move_it_to (&it, end, to_x, max_y, -1, move_op);
++	  /* Add the width of the thing at TO, but only if we didn't
++	     overshoot it; if we did, it is already accounted for.  Also,
++	     account for the height of the thing at TO.  */
++	  if (IT_CHARPOS (it) == end)
+ 	    {
++	      x += it.pixel_width;
+ 	      it.max_ascent = max (it.max_ascent, it.ascent);
+ 	      it.max_descent = max (it.max_descent, it.descent);
+ 	    }
++	  else if (IT_CHARPOS (it) > end
++		   && it.line_wrap == TRUNCATE
++		   && it.current_x - it.first_visible_x >= it.last_visible_x)
++	    {
++	      /* If the display property at END is at the beginning of the
++		 line, and the previous line was truncated, we are at END,
++		 but it.current_y is not yet updated to reflect that.  */
++	      it.current_y += max (it.max_ascent, it.ascent)
++			      + max (it.max_descent, it.descent);
++	    }
+ 	}
+-      else if (IT_CHARPOS (it) > end
+-	       && it.line_wrap == TRUNCATE
+-	       && it.current_x - it.first_visible_x >= it.last_visible_x)
+-	{
+-          /* If the display property at END is at the beginning of the
+-             line, and the previous line was truncated, we are at END,
+-             but it.current_y is not yet updated to reflect that.  */
+-          it.current_y += max (it.max_ascent, it.ascent)
+-                          + max (it.max_descent, it.descent);
+-	}
++      else
++	bidi_unshelve_cache (it2data, true);
+     }
+-  else
+-    bidi_unshelve_cache (it2data, true);
+ 
+   if (!NILP (x_limit))
+     {
+@@ -12020,12 +12163,10 @@ window_text_pixel_size (Lisp_Object window, Lisp_Object from, Lisp_Object to,
+   /* Subtract height of header-line and tab-line which was counted
+      automatically by start_display.  */
+   if (!NILP (ignore_line_at_end))
+-    y = (it.current_y + doff
+-	 - WINDOW_TAB_LINE_HEIGHT (w)
+-	 - WINDOW_HEADER_LINE_HEIGHT (w));
++    y = (top_of_end_line_y - start_y);
+   else
+-    y = (it.current_y + it.max_ascent + it.max_descent + doff
+-	 - WINDOW_TAB_LINE_HEIGHT (w) - WINDOW_HEADER_LINE_HEIGHT (w));
++    y = (it.current_y + it.max_ascent + it.max_descent
++	 - start_y);
+ 
+   /* Don't return more than Y-LIMIT.  */
+   if (y > max_y)
+@@ -12130,8 +12271,9 @@ DEFUN ("window-text-pixel-size", Fwindow_text_pixel_size, Swindow_text_pixel_siz
+ only the height of that line, if present, in the return value.  If t,
+ include the height of any of these, if present, in the return value.
+ 
+-IGNORE-LINE-AT-END, if non-nil, means to not add the height of the
+-screen line that includes TO to the returned height of the text.  */)
++IGNORE-LINE-AT-END, if non-nil, means to not add to the returned height
++of the text the height of the screen line that includes TO, or of any
++overlay or display strings shown on that line.  */)
+   (Lisp_Object window, Lisp_Object from, Lisp_Object to, Lisp_Object x_limit,
+    Lisp_Object y_limit, Lisp_Object mode_lines, Lisp_Object ignore_line_at_end)
+ {
+diff --git a/test/src/xdisp-tests.el b/test/src/xdisp-tests.el
+index 8eb57253972..df8a63aba27 100644
+--- a/test/src/xdisp-tests.el
++++ b/test/src/xdisp-tests.el
+@@ -99,6 +99,112 @@ xdisp-tests--window-text-pixel-size-trailing-space
+            (width-in-chars (/ (car size) char-width)))
+       (should (equal width-in-chars 3)))))
+ 
++(ert-deftest xdisp-tests--window-text-pixel-size-backward-boundary-string ()
++  ;; bug#64252
++  "IGNORE-LINE-AT-END leaves END's whole screen line out of the height.
++A before-string, after-string, or `display' string or image anchored on
++that line is drawn as part of it, so however tall it is, it must not
++change the measured height of the lines above.  The measurement stops at
++the top of END's buffer line (reached by walking down to the line's
++beginning), so a string drawn at or below that top is never counted.
++
++Needs a graphical frame: a multi-line string collapses to zero rows on a
++text terminal, which would make the check vacuous."
++  (skip-unless (display-graphic-p))
++  (with-temp-buffer
++    (dotimes (i 8) (insert (format "line %d\n" i)))
++    (switch-to-buffer (current-buffer))
++    (redisplay t)
++    (let* ((to (save-excursion (goto-char (point-min)) (forward-line 4) (point)))
++           (nl (save-excursion (goto-char to) (line-end-position)))
++           (tall "boundary\nstring\nfour\nlines\n")
++           ;; Height of everything above END's screen line: a large pixel
++           ;; offset clamps FROM to point-min.
++           (above (lambda (end)
++                    (nth 1 (window-text-pixel-size nil (cons end -1000000)
++                                                   end nil nil nil t))))
++           ;; Whole-buffer height, with END's line included: it grows when
++           ;; the string is genuinely tall (guards against a vacuous test).
++           ;; A plain (non-cons) FROM returns a (width . height) pair.
++           (full (lambda ()
++                   (cdr (window-text-pixel-size nil (point-min) (point-max)))))
++           (h-above (funcall above to))
++           (h-full  (funcall full)))
++      (should (> h-above 0))
++      ;; Overlay before-/after-strings anchored on line 4: at its start,
++      ;; and at its terminating newline (where the string stacks below).
++      (dolist (spec (list (list 'before-string to to to)
++                          (list 'after-string  to to to)
++                          (list 'after-string  nl (1+ nl) nl)))
++        (pcase-let ((`(,prop ,beg ,end ,to*) spec))
++          (let ((ov (make-overlay beg end)))
++            (overlay-put ov prop tall)
++            (redisplay t)
++            (should (> (funcall full) h-full))
++            (should (equal (funcall above to*) h-above))
++            (delete-overlay ov))))
++      ;; A `display' string on a character of line 4.  This path already
++      ;; worked before the fix; keep it as a guard that the generalization
++      ;; did not regress it.
++      (put-text-property to (1+ to) 'display tall)
++      (redisplay t)
++      (should (> (funcall full) h-full))
++      (should (equal (funcall above to) h-above))
++      (remove-text-properties to (1+ to) '(display nil))
++      ;; Same for a `display' image (an automated mirror of the
++      ;; interactive reproducer's test-003).  A tall image on line 4 is
++      ;; part of that line and excluded.
++      (when (image-type-available-p 'svg)
++        (put-text-property
++         to (1+ to) 'display
++         (create-image (concat "<svg xmlns='http://www.w3.org/2000/svg'"
++                               " width='40' height='200'>"
++                               "<rect width='100%' height='100%'"
++                               " fill='#5b9bd5'/></svg>")
++                       'svg t))
++        (redisplay t)
++        (should (> (funcall full) h-full))
++        (should (equal (funcall above to) h-above))
++        (remove-text-properties to (1+ to) '(display nil))))))
++
++(ert-deftest xdisp-tests--window-text-pixel-size-backward-boundary-wrapped ()
++  ;; bug#64252
++  "IGNORE-LINE-AT-END counts a wrapped line's rows in full when it lies
++above END, and excludes a tall string on END's own line.  pixel-scroll's
++sole caller passes `window-start' -- a buffer-line start -- so END tops
++its line; this checks a wrapped line neither loses rows above END nor
++leaks when it is END's own line."
++  (skip-unless (display-graphic-p))
++  (with-temp-buffer
++    (setq truncate-lines nil)
++    (insert "first\n")
++    (insert (make-string 2000 ?x) "\n")   ; a long line that wraps
++    (insert "third\n")
++    (switch-to-buffer (current-buffer))
++    (redisplay t)
++    (let* ((p-long (save-excursion (goto-char (point-min)) (forward-line 1) (point)))
++           (p3 (save-excursion (goto-char (point-min)) (forward-line 2) (point)))
++           (tall "boundary\nstring\nfour\nlines\n")
++           (above (lambda (end)
++                    (nth 1 (window-text-pixel-size nil (cons end -1000000)
++                                                   end nil nil nil t))))
++           (h-above-p3 (funcall above p3)))
++      ;; The wrapped line above line 3 contributes many screen rows.
++      (should (> h-above-p3 (* 3 (frame-char-height))))
++      ;; A tall before-string ON the wrapped line (above line 3) is part
++      ;; of the counted region, so the height above line 3 grows.
++      (let ((ov (make-overlay p-long p-long)))
++        (overlay-put ov 'before-string tall)
++        (redisplay t)
++        (should (> (funcall above p3) h-above-p3))
++        (delete-overlay ov))
++      ;; A tall after-string on line 3 itself (END's line) is excluded.
++      (let ((ov (make-overlay p3 p3)))
++        (overlay-put ov 'after-string tall)
++        (redisplay t)
++        (should (equal (funcall above p3) h-above-p3))
++        (delete-overlay ov)))))
++
+ (ert-deftest xdisp-tests--find-directional-overrides-case-1 ()
+   (with-temp-buffer
+     (insert "\

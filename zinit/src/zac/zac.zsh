@@ -70,6 +70,6 @@ function __my_appearance_immediate() {
   zinit lucid wait light-mode for \
       wait'0' \
       atinit"export ZAC_IMMEDIATE_CALLBACK_FNC=__my_appearance_immediate" \
-      atload'zac sync && __my_appearance_immediate "$REPLY"' \
+      atload'_zac.sync; __my_appearance_immediate "${_zac[state.is_dark]}"' \
       $__local_plugin_path/zsh-appearance-control
 }

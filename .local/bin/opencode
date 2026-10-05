@@ -6,4 +6,5 @@ declare -a oc_paths=("${(@f)$(whence -a opencode)}")
 export EDITOR="$HOME/.local/bin/emacsclient -nw -c"
 # exec $opencode[1] — executes the first entry (the real opencode binary, not this wrapper)
 
-exec $oc_paths[1] attach http://localhost:4096 --dir . "$@"
+# exec $oc_paths[1] attach http://localhost:4096 --dir . "$@"
+exec $oc_paths[1] "$@"

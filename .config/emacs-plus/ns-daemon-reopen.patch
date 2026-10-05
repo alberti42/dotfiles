@@ -1,8 +1,8 @@
 diff --git a/lisp/files.el b/lisp/files.el
-index 5aaa0d44a04..6f05bfdfa82 100644
+index e0d510df51b..19f6263cb4f 100644
 --- a/lisp/files.el
 +++ b/lisp/files.el
-@@ -8649,11 +8649,22 @@ save-buffers-kill-terminal
+@@ -8674,11 +8674,22 @@ save-buffers-kill-terminal
  With prefix ARG, silently save all file-visiting buffers, then kill.
  
  If emacsclient was started with a list of file names to edit, then
@@ -90,7 +90,7 @@ index b912b185275..22d10402805 100644
    "Handle deletion of FRAME when `server-stop-automatically' is `delete-frame'."
    (when (null (cddr (frame-list)))
 diff --git a/lisp/term/ns-win.el b/lisp/term/ns-win.el
-index f78e75b743e..09c25e91c7e 100644
+index f78e75b743e..82f066d133f 100644
 --- a/lisp/term/ns-win.el
 +++ b/lisp/term/ns-win.el
 @@ -171,22 +171,34 @@ global-map
@@ -142,7 +142,7 @@ index f78e75b743e..09c25e91c7e 100644
  (ns-setup-special-keys)
  
  ;; Special Nextstep-generated events are converted to function keys.  Here
-@@ -197,10 +209,70 @@ global-map
+@@ -197,10 +209,75 @@ global-map
  (define-key global-map [ns-open-temp-file] [ns-open-file])
  (define-key global-map [ns-open-file-line] 'ns-open-file-select-line)
  (define-key global-map [ns-spi-service-call] 'ns-spi-service-call)
@@ -169,14 +169,19 @@ index f78e75b743e..09c25e91c7e 100644
 +last GUI frame keeps running with its selected frame on the initial
 +terminal, where `make-frame' cannot create a GUI frame (\"Unknown
 +terminal type\").  In that case create the frame on an existing NS
-+display instead, so the reopen gesture brings back a usable frame."
++display instead, so the reopen gesture brings back a usable frame.
++
++The new frame is given input focus in either case.  Creating a window
++does not bring a background application forward, so a frame made from
++the reopen gesture stays invisible until it is focused."
 +  (interactive)
-+  (if (eq (framep (selected-frame)) 'ns)
-+      (make-frame)
-+    (let ((display (car (x-display-list))))
-+      (if display
-+          (select-frame-set-input-focus (make-frame-on-display display))
-+        (make-frame)))))
++  (select-frame-set-input-focus
++   (if (eq (framep (selected-frame)) 'ns)
++       (make-frame)
++     (let ((display (car (x-display-list))))
++       (if display
++           (make-frame-on-display display)
++         (make-frame))))))
 +
 +(defun ns-show-daemon-in-dock ()
 +  "Give a headless Emacs daemon a macOS Dock presence without showing a window.
@@ -214,7 +219,7 @@ index f78e75b743e..09c25e91c7e 100644
  
  ;; Set up a number of aliases and other layers to pretend we're using
  ;; the Choi/Mitsuharu Carbon port.
-@@ -493,6 +565,35 @@ ns-pop-up-frames
+@@ -493,6 +570,35 @@ ns-pop-up-frames
    :version "23.1"
    :group 'ns)
  
@@ -250,11 +255,168 @@ index f78e75b743e..09c25e91c7e 100644
  (declare-function ns-hide-emacs "nsfns.m" (on))
  
  (defun ns-find-file ()
+diff --git a/src/frame.c b/src/frame.c
+index a9ab769ead1..29a950a4ea7 100644
+--- a/src/frame.c
++++ b/src/frame.c
+@@ -2994,6 +2994,14 @@ delete_frame (Lisp_Object frame, Lisp_Object force)
+ 	   is unsafe!  */
+ 	if (!EQ (force, Qnoelisp))
+ 	  Fdelete_terminal (tmp, NILP (force) ? Qt : force);
++
++	/* A terminal's delete hook may leave the terminal alive, waiting
++	   for new frames: `ns_delete_terminal' does, and so the keyboard
++	   below outlives its last frame.  `delete_terminal' clears the
++	   name, so a name still here means the terminal stayed, and its
++	   keyboard still has to be accounted for.  */
++	if (terminal->name)
++	  kb = terminal->kboard;
+       }
+     else
+       kb = terminal->kboard;
+@@ -3029,7 +3037,10 @@ delete_frame (Lisp_Object frame, Lisp_Object force)
+ 	  frame_on_same_kboard = frame1;
+ 
+       if (NILP (frame_on_same_kboard))
+-	not_single_kboard_state (kb);
++	{
++	  not_single_kboard_state (kb);
++	  kboard_lost_last_frame (kb);
++	}
+     }
+ 
+ 
+diff --git a/src/keyboard.c b/src/keyboard.c
+index 1129fd3b58c..fe8890bd136 100644
+--- a/src/keyboard.c
++++ b/src/keyboard.c
+@@ -867,6 +867,20 @@ not_single_kboard_state (KBOARD *kboard)
+ 
+ static struct kboard_stack *kboard_stack;
+ 
++/* True if any live frame uses KB, i.e. somebody can still type on it.  */
++
++static bool
++kboard_has_frame (KBOARD *kb)
++{
++  Lisp_Object tail, frame;
++
++  FOR_EACH_FRAME (tail, frame)
++    if (FRAME_LIVE_P (XFRAME (frame)) && FRAME_KBOARD (XFRAME (frame)) == kb)
++      return true;
++
++  return false;
++}
++
+ void
+ push_kboard (struct kboard *k)
+ {
+@@ -887,7 +901,7 @@ pop_kboard (void)
+   bool found = false;
+   for (t = terminal_list; t; t = t->next_terminal)
+     {
+-      if (t->kboard == p->kboard)
++      if (t->kboard == p->kboard && kboard_has_frame (p->kboard))
+         {
+           current_kboard = p->kboard;
+           found = true;
+@@ -896,7 +910,10 @@ pop_kboard (void)
+     }
+   if (!found)
+     {
+-      /* The terminal we remembered has been deleted.  */
++      /* The terminal we remembered has been deleted, or its keyboard
++         has no frames left, which leaves nobody able to type on it.
++         Either way it cannot be restored: binding input to it would
++         stall every later read.  */
+       current_kboard = FRAME_KBOARD (SELECTED_FRAME ());
+       single_kboard = false;
+     }
+@@ -904,6 +921,50 @@ pop_kboard (void)
+   xfree (p);
+ }
+ 
++/* KBOARD has just lost its last frame, so no input can reach it any
++   more.  Drop the single-kboard lock, so that input arriving from any
++   other keyboard is read instead of being queued for this one.
++
++   If some other keyboard has a frame a user can actually type on, bind
++   input to it and rewrite any keyboards saved on the stack, so that
++   `pop_kboard' does not restore this one.  A daemon's initial frame is
++   not such a frame: it has a keyboard but no way to type on it, so
++   binding input there stalls just as badly.  With no usable frame
++   anywhere, leave the binding alone and let `read_char' follow whatever
++   keyboard produces input next.  */
++
++void
++kboard_lost_last_frame (KBOARD *kboard)
++{
++  Lisp_Object tail, frame;
++  KBOARD *to = NULL;
++
++  if (current_kboard == kboard)
++    single_kboard = false;
++
++  FOR_EACH_FRAME (tail, frame)
++    {
++      struct frame *f = XFRAME (frame);
++
++      if (FRAME_LIVE_P (f) && !FRAME_INITIAL_P (f)
++	  && FRAME_KBOARD (f) != kboard)
++	{
++	  to = FRAME_KBOARD (f);
++	  break;
++	}
++    }
++
++  if (to == NULL)
++    return;
++
++  for (struct kboard_stack *p = kboard_stack; p; p = p->next)
++    if (p->kboard == kboard)
++      p->kboard = to;
++
++  if (current_kboard == kboard)
++    current_kboard = to;
++}
++
+ /* Switch to single_kboard mode, making current_kboard the only KBOARD
+   from which further input is accepted.  If F is non-nil, set its
+   KBOARD as the current keyboard.
+diff --git a/src/keyboard.h b/src/keyboard.h
+index b88752dcb86..328d138b6f7 100644
+--- a/src/keyboard.h
++++ b/src/keyboard.h
+@@ -477,6 +477,7 @@ #define EVENT_HEAD_KIND(event_head) \
+ extern KBOARD *allocate_kboard (Lisp_Object);
+ extern void delete_kboard (KBOARD *);
+ extern void not_single_kboard_state (KBOARD *);
++extern void kboard_lost_last_frame (KBOARD *);
+ extern void push_kboard (struct kboard *);
+ extern void push_frame_kboard (struct frame *);
+ extern void pop_kboard (void);
 diff --git a/src/nsterm.m b/src/nsterm.m
-index ab656e5942e..fa0f666b79a 100644
+index 77ce7d94fc0..0293c04767c 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
-@@ -5866,8 +5866,22 @@ static Lisp_Object ns_string_to_lispmod (const char *s)
+@@ -1518,7 +1518,15 @@ -(void)remove
+     {
+       EmacsView *view = FRAME_NS_VIEW (f);
+       block_input ();
+-      [NSApp activateIgnoringOtherApps: YES];
++#if defined (NS_IMPL_COCOA) && MAC_OS_X_VERSION_MAX_ALLOWED >= 140000
++      /* activateIgnoringOtherApps: is deprecated as of macOS 14, which
++         may refuse it for an application that is not already frontmost;
++         `activate' is the cooperative replacement.  */
++      if ([NSApp respondsToSelector: @selector (activate)])
++        [NSApp activate];
++      else
++#endif
++        [NSApp activateIgnoringOtherApps: YES];
+       [[view window] makeKeyAndOrderFront: view];
+       unblock_input ();
+     }
+@@ -5885,8 +5893,22 @@ static Lisp_Object ns_string_to_lispmod (const char *s)
  
  #ifdef NS_IMPL_COCOA
    /* Rather than try to clean up the NS environment we can just
@@ -279,7 +441,7 @@ index ab656e5942e..fa0f666b79a 100644
  #endif
  
    image_destroy_all_bitmaps (dpyinfo);
-@@ -6729,6 +6743,25 @@ - (void)applicationDidResignActive: (NSNotification *)notification
+@@ -6750,6 +6772,25 @@ - (void)applicationDidResignActive: (NSNotification *)notification
    ns_send_appdefined (-1);
  }
  
@@ -305,7 +467,7 @@ index ab656e5942e..fa0f666b79a 100644
  
  
  /* ==========================================================================
-@@ -11661,6 +11694,32 @@ Convert an X font name (XLFD) to an NS font name.
+@@ -11677,6 +11718,32 @@ Convert an X font name (XLFD) to an NS font name.
      doc: /* Whether to confirm application quit using dialog.  */);
    ns_confirm_quit = Qnil;
  
@@ -338,7 +500,7 @@ index ab656e5942e..fa0f666b79a 100644
    DEFVAR_LISP ("ns-auto-hide-menu-bar", ns_auto_hide_menu_bar,
                 doc: /* Non-nil means that the menu bar is hidden, but appears when the mouse is near.
  Only works on Mac OS X.  */);
-@@ -11764,6 +11823,8 @@ Nil means use fullscreen the old (< 10.7) way.  The old way works better with
+@@ -11780,6 +11847,8 @@ Nil means use fullscreen the old (< 10.7) way.  The old way works better with
    DEFSYM (Qreverse_italic, "reverse-italic");
    DEFSYM (Qexpanded, "expanded");
    DEFSYM (Qns_in_echo_area, "ns-in-echo-area");

@@ -1,0 +1,34 @@
+From defd502784f195729f7fd0708ba8d0abb5a7faa3 Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Mon, 14 Sep 2026 11:41:20 +0200
+Subject: [PATCH] project.el:
+
+Pi session
+
+project.el bug: root dropped from file-name history
+
+under /Users/andrea/google-drive/dotfiles/.config/emacs/
+
+* lisp/progmodes/project.el (project--completing-read-strict): Use
+`file-relative-name'
+---
+ lisp/progmodes/project.el | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lisp/progmodes/project.el b/lisp/progmodes/project.el
+index 4ddfe7a48c4..a8b4f5cd14e 100644
+--- a/lisp/progmodes/project.el
++++ b/lisp/progmodes/project.el
+@@ -1556,8 +1556,7 @@ project--completing-read-strict
+                    (lambda (s)
+                      (setq s (expand-file-name s))
+                      (and (string-prefix-p abs-cpd s)
+-                          (not (eq abs-cpd-length (length s)))
+-                          (list (substring s abs-cpd-length))))
++                          (list (file-relative-name s abs-cpd))))
+                    (symbol-value hist))
+                 (symbol-value hist))))
+     (minibuffer-with-setup-hook
+-- 
+2.55.0
+

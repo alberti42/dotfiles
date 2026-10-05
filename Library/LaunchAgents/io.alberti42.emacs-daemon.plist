@@ -4,6 +4,9 @@
 <dict>
 	<key>Disabled</key>
 	<false/>
+	<key>EnvironmentVariables</key>
+	<dict>		
+	</dict>
 	<key>KeepAlive</key>
 	<true/>
 	<key>Label</key>
@@ -15,9 +18,13 @@
 		<string>/Users/andrea/google-drive/dotfiles/.local/bin/zsh_macos_arm_launcher</string>
 		<string>-l</string>
 		<string>-c</string>
-		<string>exec emacs --fg-daemon</string>
+		<string>exec emacs --fg-daemon --debug-init</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
+	<key>StandardErrorPath</key>
+	<string>/Users/andrea/Library/Logs/emacs-daemon.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/andrea/Library/Logs/emacs-daemon.log</string>
 </dict>
 </plist>

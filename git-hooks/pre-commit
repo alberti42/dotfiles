@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+
+# Redundancy check for commits to the public branch: scan the staged changes for
+# secrets the git clean filters (.gitattributes) missed. The staged changes are the
+# filtered content. Other branches are not checked.
+# Enabled by `core.hooksPath = git-hooks` in .git-dotfiles.conf.
+
+[[ $(git symbolic-ref --short -q HEAD) == public-sync ]] || exit 0  # WORK_BRANCH in bin/deploy_public.zsh
+
+command -v betterleaks >/dev/null || { print -r -u2 "pre-commit: betterleaks not found (brew install betterleaks)"; exit 1 }
+exec betterleaks git --pre-commit --staged --redact --no-banner .

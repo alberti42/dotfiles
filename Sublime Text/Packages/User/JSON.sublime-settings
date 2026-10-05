@@ -6,12 +6,12 @@
 	"extensions":
 	[
 		".jshintrc",
-		".eslintrc",
-		".bowerrc",
-		".babelrc",
-		".stylelintrc",
-		".csslintrc",
 		"geojson",
-		".jscsrc"
+		".stylelintrc",
+		".babelrc",
+		".eslintrc",
+		".csslintrc",
+		".bowerrc",
+		".jscsrc",
 	],
 }

@@ -110,6 +110,9 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/zsh-completions.zsh"
 # Install jq: a lightweight command-line JSON processor akin to sed,awk,grep for JSON data (https://github.com/jqlang/jq)
 zinit from"gh-r" lbin'jq-* -> jq' null lucid wait light-mode for @jqlang/jq
 
+# Install ratex compiler
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/ratex/ratex.zsh"
+
 # Previous powerlevel10k prompt (kept commented for easy rollback).
 # () {
 #   local XDG_CACHE_HOME=${XDG_CACHE_HOME:-~/.cache}/p10k # Shadow XDG_CACHE_HOME to change the cache folder to ~/.cache/p10k
@@ -377,8 +380,6 @@ export PAGER="less"
 #####################
 
 # alias l="exa -abghHlS --git --group-directories-first"
-alias ipInternal=ip-internal
-alias ipExternal=ip-external
 # alias ls='ls -G'
 # alias ll='ls -l'
 # alias lsd='ls -haltr'

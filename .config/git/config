@@ -97,3 +97,5 @@
   path = ~/.config/git/theme.gitconfig
 [github]
 	user = alberti42
+[tag]
+	gpgsign = true
