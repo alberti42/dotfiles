@@ -10,10 +10,10 @@ zinit ice light-mode \
     https://raw.githubusercontent.com/alberti42/zsh-misc-completions/refs/heads/main/src/_rmate;
   ' \
   atpull'%atclone' \
-  from'gh-r' \
+  from'gh' \
   depth'1' \
   lucid \
   nocompile \
   blockf \
   lbin'rmate -> rmate; rsubl -> rsubl; remacs -> remacs'
-zinit light @spamwax/rmate-rs
+zinit light @alberti42/fork-rmate-rs

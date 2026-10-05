@@ -1,6 +1,8 @@
 #!/hint/zsh
 
 function __rmate_rs_atclone_hook() {
+  cargo build --release
+
   # Deply subl shim to zinit directory
   cp -fv "${${(%):-%x}:h}/subl" .
   cp -fv "${${(%):-%x}:h}/rsubl" .
