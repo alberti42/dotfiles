@@ -403,7 +403,16 @@ alias 7='cd -7 >/dev/null'
 alias 8='cd -8 >/dev/null'
 alias 9='cd -9 >/dev/null'
 
-alias e='emacsclient -t -r'         # opens terminal frame, blocking
+# Opens a terminal frame, blocking.  Inside an Emacs terminal (ghostel sets
+# INSIDE_EMACS) a terminal frame would be drawn into a buffer of the same
+# Emacs, which redraws itself without end, so `e' refuses to run there.
+function e () {
+  if [[ -n $INSIDE_EMACS ]]; then
+    print -u2 "e: cannot open a terminal frame from inside Emacs; use eb to edit a file"
+    return 1
+  fi
+  emacsclient -t -r "$@"
+}
 alias emacs='emacs -nw'
 function eg () {
   "$HOME/Applications/Emacs Launcher.app/Contents/MacOS/EmacsLauncher" "$@" 2>/dev/null

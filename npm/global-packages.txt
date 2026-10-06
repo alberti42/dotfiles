@@ -1,0 +1,21 @@
+# Global npm packages (installed into ~/.npm-global).
+#
+# Generated with the command below; its output was pasted under the comments:
+#   npm ls -g --depth=0 --json | jq -r '.dependencies | keys[]'
+#
+# Install on a new machine (sed removes comments, including those after a name, and blank lines):
+#   sed -e 's/[[:space:]]*#.*//' -e '/^[[:space:]]*$/d' $DOTFILES_DIR/npm/global-packages.txt | xargs npm install -g
+#
+# Append @<version> to a name to pin it.
+
+@earendil-works/pi-coding-agent          # pi coding agent CLI
+@google/gemini-cli                       # Gemini CLI coding agent
+@marp-team/marp-cli                      # Marp: Markdown slide decks to HTML/PDF/PPTX
+@modelcontextprotocol/server-filesystem  # MCP server for local file access
+@openai/codex                            # OpenAI Codex CLI coding agent
+@slidev/cli                              # Slidev: Markdown slide decks for developers
+@slidev/theme-default                    # default theme for Slidev
+@zed-industries/codex-acp                # ACP adapter for Codex (used by agent-shell)
+opencode-ai                              # opencode coding agent CLI
+pi-acp                                   # ACP adapter for pi (used by agent-shell)
+vscode-langservers-extracted             # HTML/CSS/JSON/ESLint language servers from VS Code
