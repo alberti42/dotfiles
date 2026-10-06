@@ -265,8 +265,8 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/neovim/neovim.zsh"
 # Import superfile
 zinit binary lucid light-mode wait depth=1 from'gh-r' lbin'dist/superfile*/spf -> spf' for @yorukot/superfile
 
-# Wrapper snippet for Sublime Text
-__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/sublime/sublime.zsh"
+# Rmate support for editors
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/editors/editors.zsh"
 
 # Load syntax highlighting
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/fast-syntax-highlighting/fast-syntax-highlighting.zsh"

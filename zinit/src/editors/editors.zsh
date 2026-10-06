@@ -1,4 +1,4 @@
-# https://github.com/junegunn/fzf
+# https://github.com/alberti42/fork-rmate-rs
 
 # For keybinding, add the ICE: src'key-bindings.zsh'
 zinit ice light-mode \
@@ -15,5 +15,6 @@ zinit ice light-mode \
   lucid \
   nocompile \
   blockf \
+  ver"merged" \
   lbin'rmate -> rmate; rsubl -> rsubl; remacs -> remacs'
 zinit light @alberti42/fork-rmate-rs
