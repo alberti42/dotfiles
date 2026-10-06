@@ -11,7 +11,6 @@ zinit ice light-mode \
   ' \
   atpull'%atclone' \
   from'gh' \
-  depth'1' \
   lucid \
   nocompile \
   blockf \
