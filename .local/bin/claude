@@ -14,5 +14,8 @@ else
   export EDITOR="$HOME/.local/bin/emacsclient -t -c"
 fi
 
+# source CLAUDE_CODE_OAUTH_TOKEN
+. $XDG_CONFIG_HOME/envs/claude.sh
+
 # exec $claude_paths[1] — executes the first entry (the real claude binary, not this wrapper)
 exec $claude_paths[1] "$@"
