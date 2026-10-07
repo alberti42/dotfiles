@@ -18,16 +18,16 @@ function __eza_init_hook() {
   alias lx="eza -lbhHigUmuSa@"
   alias tree="eza --tree ${_eza_params[*]}"
 
-  # We use atinit'!...' whihc runs in the loading stage after zinit
-  # redirected compdef to just do book-keeping and delay execution of
-  # compdef to the end when compinit finally runs just one time only.
-  compdef l=eza
-  compdef ll=eza
-  compdef llm=eza
-  compdef lls=eza
-  compdef la=eza
-  compdef lx=eza
-  compdef tree=eza
+  # We use zicompdef because this function is executed at the
+  # initialization stage, where compdef is not redirected yet by
+  # zinit.
+  zicompdef l=eza
+  zicompdef ll=eza
+  zicompdef llm=eza
+  zicompdef lls=eza
+  zicompdef la=eza
+  zicompdef lx=eza
+  zicompdef tree=eza
 
   # Needed under macOS because otherwise the
   # standard directory is under `~/Library/Application Support/eza`
@@ -39,7 +39,7 @@ zinit ice \
     depth=1 \
     wait'0b' \
     lucid \
-    atinit'!_safe_one_off_load __eza_init_hook' \
+    atinit'_safe_one_off_load __eza_init_hook' \
     nocompile \
     latest-release \
     completions \
