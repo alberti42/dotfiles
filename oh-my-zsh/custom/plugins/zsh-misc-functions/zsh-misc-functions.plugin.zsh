@@ -260,3 +260,43 @@ function b64peek() {
     rm -f -- $tmp
   }
 }
+
+# ssh through a shared master connection, with an rmate socket forward that
+# survives a leftover socket file on the remote. The first call to a host
+# starts the master (asking for the password once), which then stays in the
+# background for 12 h after the last session closes. Before forwarding, it
+# deletes ~/.rmate.socket on the remote: sshd does not remove that file when
+# a connection ends, and refuses to create it again while it exists.
+# The host must be the first argument; the rest is passed to ssh.
+#
+# Examples:
+#
+# mcssh raven
+# mcssh raven 'squeue -u $USER'
+function mcssh() {
+  emulate -LR zsh
+
+  if (( $# == 0 )) || [[ $1 == -* ]]; then
+    print -u2 -- 'usage: mcssh <host> [ssh arguments…]'
+    return 1
+  fi
+
+  local h=$1 home
+  local -a mux=(-o ControlMaster=auto -o ControlPersist=12h -o "ControlPath=~/.ssh/master-%C")
+
+  if ! command ssh $mux -O check $h 2>/dev/null; then
+    # Start the master without the forwards from ~/.ssh/config and read the
+    # remote home, as the remote shell sees it
+    home=$(command ssh $mux -o ClearAllForwardings=yes -T $h 'printf %s "$HOME"') || return
+    # Delete a leftover socket file, then have the master create it again
+    command ssh $mux -T $h 'rm -f ~/.rmate.socket'
+    command ssh $mux -O forward -R "$home/.rmate.socket:localhost:52698" $h
+  fi
+
+  command ssh $mux "$@"
+}
+
+# Complete mcssh like ssh (host names from ~/.ssh/config and known_hosts).
+# When zinit loads this plugin it records the compdef instead of running it;
+# the zinit/compinit job at the end of .zshrc applies it with `zicdreplay`.
+(( $+functions[compdef] )) && compdef mcssh=ssh

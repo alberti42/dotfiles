@@ -283,19 +283,6 @@ zinit binary lucid light-mode wait from'gh-r' extract'!' \
       lbin'zsh-patina -> patina' \
       for @michel-kraemer/zsh-patina
 
-# Finalize Zsh initialization after all plugins and completions are loaded
-zinit ice id-as'zinit/compinit' lucid as'null' wait atload'
-  # Set compinit options to avoid re-generating .zcompdump if it exists and is up-to-date
-  ZINIT[COMPINIT_OPTS]=-C
-  
-  # Initialize the Zsh completion system
-  zicompinit
-
-  # Replay any `compdef` calls that plugins made before `compinit` was ready
-  zicdreplay
-'
-zinit light zdharma-continuum/null
-
 #####################
 # Keybindings       #
 #####################
@@ -508,5 +495,26 @@ fi
 # Local customizations   #
 ##########################
 # __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/rc_local.zsh"
+
+##########################
+# Register compinit      #
+##########################
+
+# Finalize Zsh initialization after all plugins and completions are loaded
+zinit ice id-as'zinit/compinit' lucid as'null' wait'0c' atload'
+  # Use the existing .zcompdump without checking for new completion functions.
+  # If some completions are installed outside zinit (like Homebrew), delete
+  # ${ZDOTDIR:-$HOME}/.zcompdump to force its regeneration. When zinit itself
+  # installs a new completion (e.g., with a new plugin), it regenerates
+  # .zcompdump automatically.
+  ZINIT[COMPINIT_OPTS]=-C
+
+  # Initialize the Zsh completion system
+  zicompinit
+
+  # Replay any `compdef` calls that plugins made before `compinit` was ready
+  zicdreplay
+'
+zinit light zdharma-continuum/null
 
 # vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :
