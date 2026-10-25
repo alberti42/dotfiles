@@ -7,8 +7,11 @@ A session's title is just a record appended to its transcript
     {"type": "custom-title", "customTitle": "...", "sessionId": "..."}
 
 The last such record wins, so renaming is an append — nothing is rewritten and
-no session has to be running.  `/rename` in the TUI does exactly this, but only
-for the session you are sitting in; this script reaches any of them.
+no session has to be running.  `/rename` also writes the title to
+`<session-id>/custom-title.json` next to the transcript, which /resume reads
+when the transcript's tail holds no custom-title record; this script writes
+both.  `/rename` works only for the session you are sitting in; this script
+reaches any of them.
 
 Usage:
     session_namer.py list [-n N] [--project DIR] [--all]
@@ -126,9 +129,29 @@ def cmd_rename(args: argparse.Namespace) -> None:
     directory = project_dir(Path(args.project))
     path = resolve(directory, args.session_id)
     record = {"type": "custom-title", "customTitle": title, "sessionId": path.stem}
+    # Compact: the harness finds the record by the substring
+    # '"type":"custom-title"', so a space after the colon hides it.
     with path.open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(record) + "\n")
+        fh.write(json.dumps(record, separators=(",", ":"), ensure_ascii=False) + "\n")
+    write_sidecar(path, title)
     print(f"{path.stem[:8]}  ->  {title}")
+
+
+def write_sidecar(path: Path, title: str) -> None:
+    """Write <session-id>/custom-title.json, as /rename does.
+
+    /resume takes the title from the last custom-title record in the
+    transcript's tail, and from this file when the tail has none.  A live
+    session appends large records every turn, so the appended record soon
+    leaves the tail, and the harness re-appends only the title it holds in
+    memory: without this file the auto-title comes back.
+    """
+    sidecar = path.parent / path.stem / "custom-title.json"
+    sidecar.parent.mkdir(mode=0o700, exist_ok=True)
+    tmp = sidecar.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps({"customTitle": title}, separators=(",", ":")), encoding="utf-8")
+    tmp.chmod(0o600)
+    tmp.replace(sidecar)
 
 
 def main() -> None:

@@ -83,6 +83,9 @@
     ]
   },
   "model": "opus[1m]",
+  "disabledMcpjsonServers": [
+    "keynote"
+  ],
   "hooks": {
     "Notification": [
       {

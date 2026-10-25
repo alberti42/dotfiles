@@ -1,0 +1,9 @@
+#!/bin/zsh -fd
+
+# EDITOR export
+export EDITOR="$HOME/.local/bin/emacsclient -nw -c"
+
+# source CLAUDE_CODE_OAUTH_TOKEN
+. $XDG_CONFIG_HOME/envs/claude.sh
+
+exec "${HOME}/.pi/agent/bin/pi" "$@"

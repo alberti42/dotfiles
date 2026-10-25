@@ -450,6 +450,15 @@ alias gitP='git -P'
 # EDITORS           #
 #####################
 
+# xterm-emacs gives `emacsclient -t' 24-bit color (see the .terminfo source).
+# Compile it once per machine; tic picks the directory layout (macOS 78/, Linux x/).
+() {
+  local src=$DOTFILES_DIR/.config/emacs/etc/goodies/xterm-emacs.terminfo
+  local db=${TERMINFO:-$HOME/.terminfo}
+  [[ -e $db/78/xterm-emacs || -e $db/x/xterm-emacs ]] && return
+  [[ -r $src ]] && (( $+commands[tic] )) && tic -x "$src"
+}
+
 # Preferred editor for local and remote sessions
 local -a editor_cmd
 

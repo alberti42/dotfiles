@@ -40,6 +40,17 @@ A title is one appended record: `{"type":"custom-title","customTitle":…}`, las
 one wins. So renaming appends, never rewrites; the session may be running, and
 `/resume` picks the new title up when reopened.
 
+`/resume` reads that record only from the transcript's tail. A running session
+appends large records every turn, so the record soon leaves the tail, and the
+harness appends again only the title it holds in memory. `/rename` therefore also
+writes `<session-id>/custom-title.json` next to the transcript, which `/resume`
+reads when the tail has no custom-title record; the script writes it too.
+
+The record must be compact JSON (`"type":"custom-title"`, no space after the
+colon): the harness finds it by that substring, both when it reloads the title
+into memory and in `/resume`. Up to 2026-10-23 the script wrote `json.dumps`'s
+default `"type": "custom-title"`, which the harness never saw.
+
 ## Notes
 
 - **This session's id** is in the scratchpad path from the system prompt

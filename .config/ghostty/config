@@ -49,6 +49,7 @@ confirm-close-surface = false
 # --- Mouse ---
 # WezTerm hide_mouse_cursor_when_typing = false
 mouse-hide-while-typing = false
+# Links open with Cmd+click; inside tmux (mouse on) they need Cmd+Shift+click.
 
 # --- macOS Option/Alt behavior ---
 # WezTerm: LEFT alt = Alt modifier (send_composed = false),

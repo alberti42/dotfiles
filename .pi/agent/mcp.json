@@ -1,5 +1,14 @@
 {
   "mcpServers": {
+    "firefox-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mozilla/firefox-devtools-mcp@latest"
+      ],
+      "lifecycle": "lazy"
+    },
     "context7": {
       "command": "bash",
       "args": [
@@ -29,6 +38,18 @@
         "core_deleteMedia",
         "wiki_deleteAttachment"
       ]
+    },
+    "rea": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "rea-agents@6.4.0",
+        "mcp"
+      ],
+      "env": {
+        "HOPPER_LAUNCHER_PATH": "/Applications/Hopper Disassembler.app/Contents/MacOS/hopper"
+      }
     }
   }
 }

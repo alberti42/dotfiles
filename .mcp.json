@@ -16,6 +16,19 @@
         "test -f \"$HOME/.config/envs/mqva-dokuwiki.sh\" && source \"$HOME/.config/envs/mqva-dokuwiki.sh\" && exec npx -y mcp-remote https://w-mqv-atoms.qm.physik.uni-muenchen.de/lib/plugins/mcp/mcp.php --header \"Authorization: Bearer $DOKUWIKI_MCP_TOKEN\""
       ]
     },
+    "firefox-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@mozilla/firefox-devtools-mcp@latest"]
+    },
+    "keynote": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "d=\"${XDG_DATA_HOME:-$HOME/.local/share}/keynote-mcp\"; test -d \"$d\" || { git clone -q https://github.com/easychen/keynote-mcp \"$d\" && git -C \"$d\" checkout -q 73780c4e80e9d1d465a9d4535b483704dd7ca39d; } || exit 1; cd \"$d\" && exec uv run --no-project --python \"$HOME/.local/share/virtualenvs/py313/bin/python\" --with-requirements requirements.txt --with 'mcp<2' python -c 'import asyncio, sys; out = sys.stdout; sys.stdout = sys.stderr; from src.server import KeynoteMCPServer; s = KeynoteMCPServer(); sys.stdout = out; asyncio.run(s.run())'"
+      ]
+    },
     "knuspr": {
       "type": "stdio",
       "command": "bash",

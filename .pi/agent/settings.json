@@ -3,8 +3,11 @@
   "theme": "light",
   "quietStartup": true,
   "packages": [
-    "git:github.com/pankajudhas81/pi-claude-auth@30d7a44ab2ba7538fc610f437867318a73d05e40",
+    "git:github.com/alberti42/fork-pi-claude-auth",
     "npm:pi-mcp-adapter",
     "npm:@juicesharp/rpiv-todo@2.12.0"
+  ],
+  "extensions": [
+    "-builtin:mcp"
   ]
 }

@@ -6,7 +6,7 @@ function __eza_init_hook() {
     '--group'
     '--group-directories-first'
     '--time-style=long-iso'
-    '--icons'
+    '--icons=always'
   )
 
   alias ls="eza ${_eza_params[*]}"
