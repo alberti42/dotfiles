@@ -526,4 +526,13 @@ zinit ice id-as'zinit/compinit' lucid as'null' wait'0c' atload'
 '
 zinit light zdharma-continuum/null
 
-# vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 :
+if [[ $OSTYPE =~ 'darwin*' ]]; then
+
+  # eMudhra/emSign CA incident (2026-10) — point OpenSSL-based CLI tools at the
+  # Homebrew ca-certificates bundle, which has had the compromised emSign ECC
+  # Root CA - G3 and the Sectigo AAA cross-sign anchor removed. The stock macOS
+  # /etc/ssl/cert.pem still carries both until a future macOS update.
+  # Remove this block once that update lands and /etc/ssl/cert.pem is clean.
+  export SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem
+  export CURL_CA_BUNDLE=/opt/homebrew/etc/ca-certificates/cert.pem
+fi

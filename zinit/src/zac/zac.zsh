@@ -42,6 +42,19 @@ function __my_appearance_immediate() {
     typeset -ga zle_highlight=('paste:fg=#00B3FF,bg=#DDECF9')
   fi
 
+  # Inside Emacs (ghostel), the background is the Emacs theme's, not
+  # Catppuccin's: doom-challenger-deep (dark) and doom-opera-light (light), see
+  # .config/emacs/themes-config.el. fzf takes the last --color it is given.
+  if [[ $INSIDE_EMACS == ghostel ]]; then
+    if (( is_dark )); then
+      BACKGROUND_COLOR="#1E1C31"
+      FZF_DEFAULT_OPTS+=" --color=gutter:#1E1C31,preview-bg:#12111E"
+    else
+      BACKGROUND_COLOR="#fafafa"
+      FZF_DEFAULT_OPTS+=" --color=gutter:#fafafa,preview-bg:#fafafa"
+    fi
+  fi
+
   # zsh-opencode-tab plugin
   if (( ${+_zsh_opencode_tab} )); then
     _zsh_opencode_tab[spinner.bg_hex]=$BACKGROUND_COLOR
@@ -70,6 +83,5 @@ function __my_appearance_immediate() {
   zinit lucid wait light-mode for \
       wait'0' \
       atinit"export ZAC_IMMEDIATE_CALLBACK_FNC=__my_appearance_immediate" \
-      atload'_zac.sync; __my_appearance_immediate "${_zac[state.is_dark]}"' \
       $__local_plugin_path/zsh-appearance-control
 }
