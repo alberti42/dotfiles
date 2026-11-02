@@ -108,6 +108,7 @@ function _relink() {
 
 local yazi_theme gemini_theme claude_theme opencode_mode opencode_theme \
       ipython_colors patina_theme ls_colors_file btop_theme git_theme
+local -a dripfetch_sed
 
 if (( is_dark )); then
   yazi_theme=catppuccin-frappe
@@ -120,6 +121,8 @@ if (( is_dark )); then
   ls_colors_file=ls_colors_dark
   btop_theme=catppuccin_frappe
   git_theme=theme-dark.gitconfig
+  # Latte -> original dark colors
+  dripfetch_sed=(-e 's/"#4C4F69"/"#FFFFFF"/g' -e 's/"#8839EF"/"#8747FF"/g' -e 's/"#7287FD"/"#687FE5"/g')
 else
   yazi_theme=catppuccin-latte
   gemini_theme="Default Light"
@@ -131,6 +134,8 @@ else
   ls_colors_file=ls_colors_light
   btop_theme=catppuccin_latte
   git_theme=theme-light.gitconfig
+  # original dark colors -> Latte
+  dripfetch_sed=(-e 's/"#FFFFFF"/"#4C4F69"/g' -e 's/"#8747FF"/"#8839EF"/g' -e 's/"#687FE5"/"#7287FD"/g')
 fi
 
 # --- apply -------------------------------------------------------------------
@@ -180,6 +185,10 @@ _relink "$ls_colors_file" "${XDG_CACHE_HOME:-$HOME/.cache}/vivid/ls_colors" || (
 # btop
 _rewrite "$DOTFILES_DIR/.config/btop/btop.conf" \
   -e 's/^(color_theme[[:space:]]*=[[:space:]]*").*"$/\1'"$btop_theme"'"/' || (( $? == 2 )) || exit 1
+
+# dripfetch — swaps each color for its counterpart; a color not listed in
+# dripfetch_sed stays the same in both appearances.
+_rewrite "$DOTFILES_DIR/.config/dripfetch/config.yaml" "${dripfetch_sed[@]}" || (( $? == 2 )) || exit 1
 
 # git CLI
 _relink "$DOTFILES_DIR/.config/git/$git_theme" "$XDG_CONFIG_HOME/git/theme.gitconfig" \

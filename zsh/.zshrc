@@ -250,6 +250,9 @@ zinit binary lucid light-mode wait from'gh-r' lbin'**/rg(.exe|) -> rg' cp"ripgre
 # Import btop
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/btop/btop.zsh"
 
+# Import dripfetch
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/dripfetch/dripfetch.zsh"
+
 # Import LSP Ltex Plus
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/lsp-ltex-plus/lsp-ltex-plus.zsh"
 
