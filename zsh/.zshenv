@@ -101,6 +101,13 @@ if [ -d "$HOME/.juliaup/bin" ]; then
 fi
 
 ###########################
+# GO SETUP                #
+###########################
+
+export GOPATH="$XDG_DATA_HOME/go"
+export GOMODCACHE="$XDG_CACHE_HOME/go/mod"
+
+###########################
 # RUST SETUP              #
 ###########################
 

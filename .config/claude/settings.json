@@ -5,6 +5,7 @@
     "commit": "",
     "pr": ""
   },
+  "disableDeepLinkRegistration": "disable",
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -83,9 +84,7 @@
     ]
   },
   "model": "opus[1m]",
-  "disabledMcpjsonServers": [
-    "keynote"
-  ],
+  "disabledMcpjsonServers": ["keynote"],
   "hooks": {
     "Notification": [
       {

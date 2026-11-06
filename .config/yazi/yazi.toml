@@ -107,7 +107,7 @@ run = 'faster-piper --rely-on-preloader'
 
 [[plugin.prepend_preloaders]]
 url = "*.md"
-run = 'faster-piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dracula -- "$1"'
+run = 'faster-piper -- CLICOLOR_FORCE=1 glow -w=$w -s="$t" -- "$1"'
 
 [[plugin.prepend_previewers]]
 url = "*.tar*"
