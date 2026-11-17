@@ -47,8 +47,9 @@
 	ff = only
 [merge]
 	# 3-way conflict markers: show the common ancestor (base) between the
-	# two sides, with lines both sides share hoisted out of the conflict
-	conflictStyle = zdiff3
+	# two sides; version.gitconfig switches to zdiff3 on git >= 2.35, which
+	# also hoists the lines both sides share out of the conflict
+	conflictStyle = diff3
 [alias]
   # Print the full SHA of HEAD
   lastcommit = rev-parse HEAD
@@ -101,3 +102,7 @@
 	gpgsign = true
 [url "git@github.com:"]
 	pushInsteadOf = https://github.com/
+# Settings that depend on the git version, written by zinit/src/git/git.zsh;
+# skipped when the file does not exist
+[include]
+	path = ~/.config/git/version.gitconfig

@@ -8,7 +8,8 @@
 # files outside $HOME, as listed in links.conf.
 # Usage:
 #   links.zsh install [-n]   create the links, and with sudo the copies that are missing
-#                            or differ, for this OS (-n: print the actions only)
+#                            or differ, for this OS; each copy is made only after you
+#                            answer y (-n: print the actions only)
 #   links.zsh check          report links in $HOME that point into the repo but are not
 #                            in links.conf, entries whose link is missing or wrong, and
 #                            copies that are missing or differ from the repo file
@@ -164,9 +165,10 @@ install_links() {
   done
   log "created $made, already correct $kept, skipped $skipped"
 
-  # Copies outside $HOME, installed with sudo when missing or different
-  local dest
-  integer copied=0 current=0 failed=0
+  # Copies outside $HOME, installed with sudo when missing or different, and only
+  # after the user answers y: the machine may be shared or owned by someone else.
+  local dest state answer
+  integer copied=0 current=0 declined=0 failed=0
   for dest in "${COPIES[@]}"; do
     src=$REPO/${SOURCES[$dest]}
     if [[ ! -f $src ]]; then
@@ -174,6 +176,16 @@ install_links() {
       (( ++failed )); continue
     fi
     if [[ -r $dest ]] && cmp -s "$src" "$dest"; then (( ++current )); continue; fi
+    if (( ! dry )); then
+      [[ -e $dest ]] && state=differs || state=missing
+      answer=
+      if { : </dev/tty } 2>/dev/null; then
+        read -r "answer?copy ${SOURCES[$dest]} -> $dest ($state) with sudo? [y/N] " </dev/tty
+      else
+        warn "skipped $dest: no terminal to ask"
+      fi
+      if [[ $answer != [yY]([eE][sS]|) ]]; then (( ++declined )); continue; fi
+    fi
     log "copying: ${SOURCES[$dest]} -> $dest"
     if act sudo install -D -m 644 "$src" "$dest"; then
       (( ++copied ))
@@ -182,7 +194,7 @@ install_links() {
       (( ++failed ))
     fi
   done
-  (( $#COPIES )) && log "copied $copied, already current $current, failed $failed"
+  (( $#COPIES )) && log "copied $copied, already current $current, declined $declined, failed $failed"
 
   (( skipped == 0 && failed == 0 ))
 }

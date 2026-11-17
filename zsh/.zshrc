@@ -6,6 +6,13 @@
 # interactive shell (e.g., $LS_COLORS).
 
 ###########################
+# git settings by version #
+###########################
+
+# Before zinit: its clones and checkouts read the git config
+__zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/git/git.zsh"
+
+###########################
 # zinit installation      #
 ###########################
 

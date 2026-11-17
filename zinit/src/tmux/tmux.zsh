@@ -37,7 +37,14 @@ zinit ice from"gh-r" \
       _cfg_opts+=(--enable-jemalloc)
     fi
 
-    ./configure -quiet --prefix="$ZPFX" --enable-utf8proc $_cfg_opts && \
+    if ! ./configure -quiet --prefix="$ZPFX" --enable-utf8proc $_cfg_opts; then
+      # configure has printed the missing library; name the packages that provide them
+      [[ "$OSTYPE" == darwin* ]] ||
+        print -u2 "tmux: not built; the system tmux, if any, stays in use. Build dependencies" \
+          "on Debian/Ubuntu: sudo apt install build-essential pkg-config libevent-dev" \
+          "libncurses-dev libutf8proc-dev; then run: zinit delete --yes tmux/tmux"
+      exit 1
+    fi
     {
       make -s 2>&1 | tee build.log | grep -E --line-buffered -i "error:|ld:|fatal" || true
       rc=$pipestatus[1]   # exit status of the *first* command in the pipeline (make)
