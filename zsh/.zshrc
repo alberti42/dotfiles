@@ -148,17 +148,17 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/ratex/ratex.zsh"
     blockf completions $__local_plugin_path/zsh-misc-completions
 
     # Import zsh-opencode-tab (make sure to import it after fzf-tab)
-    wait'0c' atinit'
-      export Z_OC_TAB_OPENCODE_MODEL="openai/gpt-5.4-mini-fast" \
-      Z_OC_TAB_OPENCODE_BACKEND_URL="http://localhost:4096" \
-      Z_OC_TAB_OPENCODE_VARIANT_GENERATOR="low" \
-      Z_OC_TAB_OPENCODE_VARIANT_EXPLAINER="" \
-      Z_OC_TAB_OPENCODE_RUN_MODE="attach" \
-      Z_OC_TAB_EXPLAIN_PRINT_CMD="bat --plain --color=always --decorations=always --language markdown --paging=never {}"' \
-      $__local_plugin_path/zsh-opencode-tab
+    # wait'0c' atinit'
+    #   export Z_OC_TAB_OPENCODE_MODEL="openai/gpt-5.4-mini-fast" \
+    #   Z_OC_TAB_OPENCODE_BACKEND_URL="http://localhost:4096" \
+    #   Z_OC_TAB_OPENCODE_VARIANT_GENERATOR="low" \
+    #   Z_OC_TAB_OPENCODE_VARIANT_EXPLAINER="" \
+    #   Z_OC_TAB_OPENCODE_RUN_MODE="attach" \
+    #   Z_OC_TAB_EXPLAIN_PRINT_CMD="bat --plain --color=always --decorations=always --language markdown --paging=never {}"' \
+    #   $__local_plugin_path/zsh-opencode-tab
 
     # Import useful misc zsh functions (make sure to execute this wrapper after the other plugins have been loaded)
-    wait'0c' atload:"wrap_restore_tty nvim yazi tmux ssh-tmux ipython opencode claude; restore_tty" $__local_plugin_path/zsh-misc-functions
+    wait'0c' atload:"wrap_restore_tty nvim yazi tmux ssh-tmux ipython claude; restore_tty" $__local_plugin_path/zsh-misc-functions
   )
   zinit lucid wait light-mode for "${__local_plugins[@]}"
 }
@@ -184,15 +184,6 @@ __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/yazi/yazi.zsh"
 
 # Wrapper snippet for Tmux
 __zcompile_if_needed_and_source "$DOTFILES_DIR/zinit/src/tmux/tmux.zsh"
-
-# Import zsh-opencode-tab
-# zinit lucid wait depth=1 from'gh' compile for \
-#   wait'0c' atinit'export Z_OC_TAB_OPENCODE_MODEL="anthropic/claude-3-5-haiku-latest" \
-#     Z_OC_TAB_SPINNER_BG_HEX="#24273A" \
-#     Z_OC_TAB_OPENCODE_BACKEND_URL="http://localhost:4096" \
-#     Z_OC_TAB_OPENCODE_RUN_MODE="cold" \
-#     Z_OC_TAB_EXPLAIN_PRINT_CMD="bat --plain --color=always --decorations=always --language markdown --paging=never {}"' \
-#   @alberti42/zsh-opencode-tab
 
 # Import zsh-indent-control
 zinit lucid wait'0c' from'gh-r' extract'!' light-mode \
@@ -536,6 +527,11 @@ if [[ $OSTYPE =~ 'darwin*' ]]; then
   # Root CA - G3 and the Sectigo AAA cross-sign anchor removed. The stock macOS
   # /etc/ssl/cert.pem still carries both until a future macOS update.
   # Remove this block once that update lands and /etc/ssl/cert.pem is clean.
-  export SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem
-  export CURL_CA_BUNDLE=/opt/homebrew/etc/ca-certificates/cert.pem
+  # Use $HOMEBREW_PREFIX (/opt/homebrew on Apple Silicon, /usr/local on Intel)
+  # and only export if the bundle exists: a dangling path breaks curl (error
+  # 77), which silently breaks zinit's GitHub downloads.
+  if [[ -r ${HOMEBREW_PREFIX:-/opt/homebrew}/etc/ca-certificates/cert.pem ]]; then
+    export SSL_CERT_FILE=${HOMEBREW_PREFIX:-/opt/homebrew}/etc/ca-certificates/cert.pem
+    export CURL_CA_BUNDLE=$SSL_CERT_FILE
+  fi
 fi

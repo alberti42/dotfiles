@@ -1,0 +1,48 @@
+# ~/.config/ghostty/platform on macOS (see links.conf), loaded by config.
+
+font-size = 15
+
+# Initial window size in grid cells. Commented out: Ghostty's default is used.
+# window-width  = 120
+# window-height = 50
+
+# --- Default program (tmux) ---
+# Run tmux under `env` with an explicit, minimal PATH, then seed tmux's @dark_appearance from the current macOS appearance.
+#
+# The PATH is REQUIRED, not cosmetic: Ghostty is a GUI app (minimal launchd PATH)
+# and runs a command-with-args via `/bin/sh -c` (non-login, does NOT source your
+# zsh rc), so a bare `tmux` would not be found — tmux lives only in polaris/bin.
+# `$HOME` is expanded by that `/bin/sh -c`. TERM is already exported by the
+# `term =` line in config and inherited here, so it's not set in env.
+# The zsh started inside tmux rebuilds the full interactive PATH.
+#
+# `\;` is passed literally to tmux as its command separator (`/bin/sh -c` turns
+# `\;` into a `;` argument), so tmux runs new-session AND set-option in one go.
+# `$(defaults read -g AppleInterfaceStyle …)` prints "Dark" (exit 0) in dark mode
+# and errors (exit 1) in light mode -> the flag becomes 1 (dark) or 0 (light).
+#
+# `command`, not `initial-command`: the latter only ever applies to Ghostty's
+# very first surface, so other windows fell back to a plain login shell.
+command = /usr/bin/env PATH=$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin tmux new-session -A -D -s main \; set-option -g @dark_appearance $(defaults read -g AppleInterfaceStyle >/dev/null 2>&1 && echo 1 || echo 0)
+
+# NOTE: @dark_appearance is only seeded at surface creation; Ghostty has no
+# "appearance changed" hook, so live light<->dark switches are still the job of
+# the standalone dispatcher (TODO). Ghostty's own colors follow the OS via theme=.
+
+# --- Keybindings ---
+# Copy / paste
+keybind = cmd+c=copy_to_clipboard
+keybind = cmd+v=paste_from_clipboard
+
+# Quit / close window
+keybind = cmd+q=quit
+keybind = cmd+w=close_surface
+
+# Disable Cmd+n (new window)
+keybind = cmd+n=ignore
+
+# Terminal inspector
+keybind = cmd+shift+l=inspector:toggle
+
+# Fullscreen
+keybind = cmd+shift+f=toggle_fullscreen

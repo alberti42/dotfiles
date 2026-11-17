@@ -7,7 +7,7 @@
 # Git clean filter: applies sed -E expressions to stdin and fails if any expression
 # makes no substitution (e.g. the key it should redact was renamed).
 # Usage, in a git config filter (git passes the path as %f):
-#   clean = bin/sed_require.zsh %f '<expr1>' ['<expr2>' ...]
+#   clean = $HOME/.config/dotfiles/bin/sed_require.zsh %f '<expr1>' ['<expr2>' ...]
 #   required = true
 
 file=$1; shift

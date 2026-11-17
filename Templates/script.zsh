@@ -1,2 +1,2 @@
-#!/usr/bin/env zsh -fd
+#!/usr/bin/env -S zsh -fd
 

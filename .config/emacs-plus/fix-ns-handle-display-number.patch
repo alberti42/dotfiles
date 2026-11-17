@@ -1,0 +1,107 @@
+From 1ac598cfd6acb988c592ed18c5534e94292a10d3 Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Sun, 15 Nov 2026 14:52:09 +0100
+Subject: [PATCH] Fix font height queries with numeric NS displays
+
+The NS frame display parameter can be a number, which is not a valid
+device argument for display-multi-font-p.  Use the frame itself so
+fitting a window to its buffer does not signal an error.
+
+* lisp/window.el (window-default-font-height): Pass the frame directly
+to display-multi-font-p.
+* test/lisp/window-tests.el: New file.  Test numeric displays, different
+default fonts, and TTY frames.
+---
+ lisp/window.el            |  2 +-
+ test/lisp/window-tests.el | 66 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+), 1 deletion(-)
+ create mode 100644 test/lisp/window-tests.el
+
+diff --git a/lisp/window.el b/lisp/window.el
+index 957ed552d8d..725c6e963e9 100644
+--- a/lisp/window.el
++++ b/lisp/window.el
+@@ -9937,7 +9937,7 @@ window-default-font-height
+     ;; frames, even though they are TTY frames, so make sure we won't
+     ;; be duped by that up front with 'framep'.
+     (if (and (not (eq (framep frame) t))
+-             (display-multi-font-p (frame-parameter frame 'display))
++             (display-multi-font-p frame)
+ 	     (not (string-equal (frame-parameter frame 'font) default-font)))
+         (aref (font-info default-font frame) 3)
+       (frame-char-height frame))))
+diff --git a/test/lisp/window-tests.el b/test/lisp/window-tests.el
+new file mode 100644
+index 00000000000..83cbee7c3da
+--- /dev/null
++++ b/test/lisp/window-tests.el
+@@ -0,0 +1,66 @@
++;;; window-tests.el --- Tests for window.el  -*- lexical-binding: t; -*-
++
++;; Copyright (C) 2026 Andrea Alberti
++;; SPDX-License-Identifier: GPL-3.0-or-later
++
++;;; Code:
++
++(require 'ert)
++(require 'cl-lib)
++(require 'window)
++
++(ert-deftest window-default-font-height-numeric-display ()
++  "A numeric NS display parameter must not be used as a terminal."
++  (let* ((window (selected-window))
++         (frame (window-frame window))
++         (original-framep (symbol-function 'framep))
++         (original-parameter (symbol-function 'frame-parameter)))
++    ;; Exercise the graphical path even when running in batch mode.
++    (dolist (display '(0 1 42))
++      (cl-letf (((symbol-function 'framep)
++                 (lambda (object)
++                   (if (eq object frame) 'ns
++                     (funcall original-framep object))))
++                ((symbol-function 'frame-parameter)
++                 (lambda (object parameter)
++                   (if (and (eq object frame) (eq parameter 'display))
++                       display
++                     (funcall original-parameter object parameter)))))
++        (should (> (window-default-font-height window) 0))))))
++
++(ert-deftest window-default-font-height-different-font ()
++  "Use the requested frame when querying a different default font."
++  (let* ((window (selected-window))
++         (frame (window-frame window)))
++    (cl-letf (((symbol-function 'framep) (lambda (_) 'ns))
++              ((symbol-function 'frame-parameter)
++               (lambda (_ parameter)
++                 (pcase parameter
++                   ('display 0)
++                   ('font "frame-font"))))
++              ((symbol-function 'display-multi-font-p)
++               (lambda (device)
++                 (should (eq device frame))
++                 t))
++              ((symbol-function 'face-font)
++               (lambda (_face requested-frame &optional _character)
++                 (should (eq requested-frame frame))
++                 "default-font"))
++              ((symbol-function 'font-info)
++               (lambda (font requested-frame)
++                 (should (equal font "default-font"))
++                 (should (eq requested-frame frame))
++                 [nil nil nil 37])))
++      (should (= (window-default-font-height window) 37)))))
++
++(ert-deftest window-default-font-height-tty ()
++  "TTY frames must not query graphical font capabilities."
++  (let* ((window (selected-window))
++         (frame (window-frame window)))
++    (cl-letf (((symbol-function 'framep) (lambda (_) t))
++              ((symbol-function 'display-multi-font-p)
++               (lambda (&rest _) (ert-fail "Graphical query on a TTY"))))
++      (should (= (window-default-font-height window)
++                 (frame-char-height frame))))))
++
++;;; window-tests.el ends here
+-- 
+2.56.0
+

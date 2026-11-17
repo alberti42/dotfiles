@@ -1,0 +1,127 @@
+From 0cd1457238ded93811ddb918c09d5d05be3e79ae Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Mon, 16 Nov 2026 23:02:06 +0100
+Subject: [PATCH] drm/amdgpu: post the ASIC after the reset on resume from
+ s2idle
+
+A soc15 dGPU keeps its power through suspend-to-idle. On resume,
+soc15_need_reset_on_resume() finds in_s3 set without a firmware resume,
+and soc15_common_resume() resets the ASIC ("S3 suspend abort case").
+
+amdgpu_device_resume() decides whether to post the ASIC before the IP
+blocks resume, so before this reset. On a Radeon Pro Vega 56 (Vega 10,
+iMacPro1,1) the PSP bootloader stays down after the mode1 reset
+(C2PMSG_35 reads 0) and psp_resume() fails:
+
+  amdgpu 0000:f3:00.0: S3 suspend abort case, let's reset ASIC.
+  amdgpu 0000:f3:00.0: GPU mode1 reset
+  amdgpu 0000:f3:00.0: [drm] psp mode1 reset succeed
+  amdgpu 0000:f3:00.0: PSP is resuming...
+  amdgpu 0000:f3:00.0: psp reg (0x16063) wait timed out, mask: 80000000, read: 0 exp: 80000000
+  amdgpu 0000:f3:00.0: PSP load sys drv failed!
+
+Posting the ASIC after the reset sets C2PMSG_35 bit 31, and the PSP
+loads the sys driver and the sOS as after power-on.
+
+The reset also clears the config space of the display audio function
+(function 1), which the PCI core had restored in resume_noirq.
+snd_hda_intel then gets Unsupported Request on its BAR, and AER recovery,
+which snd_hda_intel does not support, fails the whole slot:
+
+  snd_hda_intel 0000:f3:00.1: CORB reset timeout#2, CORBRP = 65535
+  amdgpu 0000:f3:00.0: pci_channel_io_perm_failure: state(3)!!
+
+Save the audio function's config before the reset and restore it after
+the post. Both changes apply to dGPUs only; the APU path is unchanged.
+---
+ drivers/gpu/drm/amd/amdgpu/amdgpu.h        |  1 +
+ drivers/gpu/drm/amd/amdgpu/amdgpu_device.c |  2 +-
+ drivers/gpu/drm/amd/amdgpu/soc15.c         | 44 +++++++++++++++++++++-
+ 3 files changed, 45 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu.h b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+index a9c6f5d4a..19dfdf80b 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu.h
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+@@ -1192,6 +1192,7 @@ void amdgpu_device_program_register_sequence(struct amdgpu_device *adev,
+ 
+ int amdgpu_device_mode1_reset(struct amdgpu_device *adev);
+ int amdgpu_device_link_reset(struct amdgpu_device *adev);
++int amdgpu_device_asic_init(struct amdgpu_device *adev);
+ bool amdgpu_device_supports_atpx(struct amdgpu_device *adev);
+ bool amdgpu_device_supports_px(struct amdgpu_device *adev);
+ bool amdgpu_device_supports_boco(struct amdgpu_device *adev);
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
+index 9269e780f..9624476aa 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
+@@ -955,7 +955,7 @@ static uint32_t amdgpu_device_get_vbios_flags(struct amdgpu_device *adev)
+  *
+  * Does any asic specific work and then calls atom asic init.
+  */
+-static int amdgpu_device_asic_init(struct amdgpu_device *adev)
++int amdgpu_device_asic_init(struct amdgpu_device *adev)
+ {
+ 	uint32_t flags;
+ 	bool optional;
+diff --git a/drivers/gpu/drm/amd/amdgpu/soc15.c b/drivers/gpu/drm/amd/amdgpu/soc15.c
+index 3d4573d93..7140b88ae 100644
+--- a/drivers/gpu/drm/amd/amdgpu/soc15.c
++++ b/drivers/gpu/drm/amd/amdgpu/soc15.c
+@@ -1313,13 +1313,55 @@ static int soc15_common_suspend(struct amdgpu_ip_block *ip_block)
+ 	return soc15_common_hw_fini(ip_block);
+ }
+ 
++/*
++ * Reset a dGPU that kept its power through the suspend (s2idle, or an
++ * aborted S3 suspend) and bring it back to the state it has after power-on.
++ *
++ * amdgpu_device_resume() decides whether to post the ASIC before the IP
++ * blocks resume, so before this reset. After a mode1 reset the PSP
++ * bootloader stays down (C2PMSG_35 bit 31 clear) until the VBIOS posts the
++ * ASIC again, and psp_resume() then fails with "PSP load sys drv failed!".
++ *
++ * The reset also clears the config space of the display audio function,
++ * which the PCI core restored in resume_noirq. snd_hda_intel then gets
++ * Unsupported Request on its BAR, and AER recovery, which snd_hda_intel does
++ * not support, marks the slot (and with it the GPU) as permanently failed.
++ */
++static void soc15_reset_on_resume(struct amdgpu_device *adev)
++{
++	struct pci_dev *audio = NULL;
++	int r;
++
++	if (!(adev->flags & AMD_IS_APU)) {
++		audio = pci_get_domain_bus_and_slot(pci_domain_nr(adev->pdev->bus),
++						    adev->pdev->bus->number,
++						    PCI_DEVFN(PCI_SLOT(adev->pdev->devfn), 1));
++		if (audio)
++			pci_save_state(audio);
++	}
++
++	r = soc15_asic_reset(adev);
++	if (r)
++		dev_err(adev->dev, "ASIC reset on resume failed (%d)\n", r);
++
++	if (!(adev->flags & AMD_IS_APU)) {
++		r = amdgpu_device_asic_init(adev);
++		if (r)
++			dev_err(adev->dev, "asic init after reset failed (%d)\n", r);
++		if (audio) {
++			pci_restore_state(audio);
++			pci_dev_put(audio);
++		}
++	}
++}
++
+ static int soc15_common_resume(struct amdgpu_ip_block *ip_block)
+ {
+ 	struct amdgpu_device *adev = ip_block->adev;
+ 
+ 	if (soc15_need_reset_on_resume(adev)) {
+ 		dev_info(adev->dev, "S3 suspend abort case, let's reset ASIC.\n");
+-		soc15_asic_reset(adev);
++		soc15_reset_on_resume(adev);
+ 	}
+ 	return soc15_common_hw_init(ip_block);
+ }

@@ -1,0 +1,368 @@
+From 96412bb62cbc1b6ea17ea538cc5945133b0916b3 Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Tue, 17 Nov 2026 10:29:45 +0100
+Subject: [PATCH] HID: magicmouse: optionally keep scrolling after the finger
+ lifts
+
+The driver stops scrolling the moment the finger leaves the surface. With
+scroll_momentum_ms set, a finger that leaves while scrolling fast keeps the
+page scrolling from a timer, slowing down exponentially with that time
+constant. A new touch or a click stops it, as on macOS.
+---
+ drivers/hid/hid-magicmouse.c | 224 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 223 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/hid/hid-magicmouse.c b/drivers/hid/hid-magicmouse.c
+index ffeff89..9e6c3ea 100644
+--- a/drivers/hid/hid-magicmouse.c
++++ b/drivers/hid/hid-magicmouse.c
+@@ -13,6 +13,7 @@
+ 
+ #include <linux/device.h>
+ #include <linux/hid.h>
++#include <linux/hrtimer.h>
+ #include <linux/input/mt.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+@@ -55,6 +56,10 @@ static unsigned int scroll_motion_threshold = 2;
+ module_param(scroll_motion_threshold, uint, 0644);
+ MODULE_PARM_DESC(scroll_motion_threshold, "Movement per report (|dx|+|dy|) above which the Magic Mouse counts as moving");
+ 
++static unsigned int scroll_momentum_ms;
++module_param(scroll_momentum_ms, uint, 0644);
++MODULE_PARM_DESC(scroll_momentum_ms, "Keep scrolling after the finger leaves the Magic Mouse, slowing down with this time constant in ms (0 = off)");
++
+ static unsigned int click_priority_side;
+ static int param_set_click_priority_side(const char *val,
+ 					 const struct kernel_param *kp) {
+@@ -105,6 +110,17 @@ MODULE_PARM_DESC(report_undeciphered, "Report undeciphered multi-touch state fie
+ #define SCROLL_HR_THRESHOLD 90 /* units */
+ #define SCROLL_ACCEL_DEFAULT 7
+ 
++/*
++ * Scroll momentum (scroll_momentum_ms). Speeds are in touch units per second.
++ * The finger must leave the surface faster than MOMENTUM_START_SPEED, and
++ * must have moved within the last MOMENTUM_IDLE_MS; scrolling continues every
++ * MOMENTUM_TICK_MS until the speed drops below MOMENTUM_STOP_SPEED.
++ */
++#define MOMENTUM_TICK_MS 8
++#define MOMENTUM_IDLE_MS 50
++#define MOMENTUM_START_SPEED 700
++#define MOMENTUM_STOP_SPEED 100
++
+ /* Touch surface information. Dimension is in hundredths of a mm, min and max
+  * are in units. */
+ #define MOUSE_DIMENSION_X (float)9056
+@@ -270,6 +286,8 @@ struct magicmouse_input_ops {
+  * @scroll_accel: Number of consecutive scroll motions.
+  * @scroll_jiffies: Time of last scroll motion.
+  * @motion_jiffies: Time the mouse last moved more than scroll_motion_threshold.
++ * @momentum: Scrolling that continues after the finger leaves the mouse;
++ *	@momentum.lock serializes it with the touch reports.
+  * @pos: multi touch position data of the last report.
+  * @touches: Most recent data for a touch, indexed by tracking ID.
+  * @tracking_ids: Mapping of current touch input data to @touches.
+@@ -288,6 +306,18 @@ struct magicmouse_sc {
+ 	unsigned long scroll_jiffies;
+ 	unsigned long motion_jiffies;
+ 
++	struct {
++		spinlock_t lock;
++		struct hrtimer timer;
++		bool active;
++		bool dead;
++		int touch;	/* tracking ID of the scrolling touch, or -1 */
++		bool seen;	/* that touch was in the current report */
++		int vx, vy;	/* scroll speed, units/s, in wheel direction */
++		s64 acc_x, acc_y;	/* distance not yet scrolled, milli-units */
++		int v120_x, v120_y;	/* hi-res scroll not yet sent as REL_*WHEEL */
++	} momentum;
++
+ 	struct input_mt_pos pos[MAX_CONTACTS];
+ 	struct {
+ 		short scroll_x;
+@@ -296,6 +326,9 @@ struct magicmouse_sc {
+ 		short scroll_y_hr;
+ 		u8 size;
+ 		bool down;
++		short last_x;
++		short last_y;
++		ktime_t last_time;
+ 		bool scroll_x_active;
+ 		bool scroll_y_active;
+ 	} touches[MAX_CONTACTS];
+@@ -427,6 +460,148 @@ static int magicmouse_firm_touch(struct magicmouse_sc *msc)
+ 	return touch;
+ }
+ 
++static int magicmouse_scroll_step_hr(struct magicmouse_sc *msc)
++{
++	return max_t(int, ((64 - (int)scroll_speed) * msc->scroll_accel) /
++				  SCROLL_HR_STEPS, 1);
++}
++
++/* Scroll the distance travelled at speed v during one tick. */
++static void magicmouse_momentum_axis(struct magicmouse_sc *msc, int v,
++				     s64 *acc, int *v120, int hr_code,
++				     int code)
++{
++	s64 unit = (s64)magicmouse_scroll_step_hr(msc) * 1000;
++	int steps;
++
++	*acc += (s64)v * MOMENTUM_TICK_MS;
++	steps = div64_s64(*acc, unit);
++	if (!steps)
++		return;
++	*acc -= steps * unit;
++	input_report_rel(msc->input, hr_code, steps * SCROLL_HR_MULT);
++
++	*v120 += steps * SCROLL_HR_MULT;
++	if (abs(*v120) >= 120) {
++		input_report_rel(msc->input, code, *v120 / 120);
++		*v120 %= 120;
++	}
++}
++
++static enum hrtimer_restart magicmouse_momentum_tick(struct hrtimer *timer)
++{
++	struct magicmouse_sc *msc =
++		container_of(timer, struct magicmouse_sc, momentum.timer);
++	unsigned int tau = scroll_momentum_ms;
++	unsigned long flags;
++
++	spin_lock_irqsave(&msc->momentum.lock, flags);
++
++	/* Restarted by a new fling while this callback waited. */
++	if (hrtimer_is_queued(timer)) {
++		spin_unlock_irqrestore(&msc->momentum.lock, flags);
++		return HRTIMER_NORESTART;
++	}
++
++	if (!msc->momentum.active || !msc->input || !tau ||
++	    (abs(msc->momentum.vx) < MOMENTUM_STOP_SPEED &&
++	     abs(msc->momentum.vy) < MOMENTUM_STOP_SPEED)) {
++		msc->momentum.active = false;
++		spin_unlock_irqrestore(&msc->momentum.lock, flags);
++		return HRTIMER_NORESTART;
++	}
++
++	magicmouse_momentum_axis(msc, msc->momentum.vx, &msc->momentum.acc_x,
++				 &msc->momentum.v120_x, REL_HWHEEL_HI_RES,
++				 REL_HWHEEL);
++	magicmouse_momentum_axis(msc, msc->momentum.vy, &msc->momentum.acc_y,
++				 &msc->momentum.v120_y, REL_WHEEL_HI_RES,
++				 REL_WHEEL);
++	input_sync(msc->input);
++
++	/* Exponential decay with time constant tau. */
++	msc->momentum.vx -= div_s64((s64)msc->momentum.vx *
++				    min_t(unsigned int, MOMENTUM_TICK_MS, tau), tau);
++	msc->momentum.vy -= div_s64((s64)msc->momentum.vy *
++				    min_t(unsigned int, MOMENTUM_TICK_MS, tau), tau);
++
++	hrtimer_forward_now(timer, ms_to_ktime(MOMENTUM_TICK_MS));
++	spin_unlock_irqrestore(&msc->momentum.lock, flags);
++	return HRTIMER_RESTART;
++}
++
++/* Called with momentum.lock held. */
++static void magicmouse_momentum_stop(struct magicmouse_sc *msc)
++{
++	msc->momentum.active = false;
++}
++
++/*
++ * Called with momentum.lock held, after the touches of a report: if the
++ * scrolling touch is gone, keep scrolling at the speed the finger left with.
++ */
++static void magicmouse_momentum_check_lift(struct magicmouse_sc *msc)
++{
++	int id = msc->momentum.touch;
++
++	if (id < 0 || msc->momentum.seen)
++		return;
++	msc->momentum.touch = -1;
++
++	if (!scroll_momentum_ms || msc->momentum.dead ||
++	    ktime_ms_delta(ktime_get(), msc->touches[id].last_time) >
++		    MOMENTUM_IDLE_MS ||
++	    (abs(msc->momentum.vx) < MOMENTUM_START_SPEED &&
++	     abs(msc->momentum.vy) < MOMENTUM_START_SPEED))
++		return;
++
++	msc->momentum.acc_x = 0;
++	msc->momentum.acc_y = 0;
++	msc->momentum.v120_x = 0;
++	msc->momentum.v120_y = 0;
++	msc->momentum.active = true;
++	hrtimer_start(&msc->momentum.timer, ms_to_ktime(MOMENTUM_TICK_MS),
++		      HRTIMER_MODE_REL_SOFT);
++}
++
++/*
++ * Called with momentum.lock held, for a touch that scrolls: estimate the
++ * finger's speed, in wheel direction, from the last two moves.
++ */
++static void magicmouse_momentum_track(struct magicmouse_sc *msc, int id,
++				      int x, int y)
++{
++	ktime_t now = ktime_get();
++	s64 dt = ktime_to_ns(ktime_sub(now, msc->touches[id].last_time));
++	int dx = x - msc->touches[id].last_x;
++	int dy = msc->touches[id].last_y - y;
++	int vx, vy;
++
++	/* A finger that scrolls stops the momentum of an earlier one. */
++	magicmouse_momentum_stop(msc);
++
++	if (!dx && !dy)
++		return;
++
++	vx = msc->touches[id].scroll_x_active && dt > 0 ?
++		div64_s64((s64)dx * NSEC_PER_SEC, dt) : 0;
++	vy = msc->touches[id].scroll_y_active && dt > 0 ?
++		div64_s64((s64)dy * NSEC_PER_SEC, dt) : 0;
++
++	if (msc->momentum.touch != id) {
++		msc->momentum.touch = id;
++		msc->momentum.vx = vx;
++		msc->momentum.vy = vy;
++	} else {
++		msc->momentum.vx = (msc->momentum.vx + vx) / 2;
++		msc->momentum.vy = (msc->momentum.vy + vy) / 2;
++	}
++
++	msc->touches[id].last_x = x;
++	msc->touches[id].last_y = y;
++	msc->touches[id].last_time = now;
++}
++
+ /*
+  * Choose the button of a click from all touches on the mouse, as macOS does.
+  * With click_priority_side = 1, a touch on the left half makes a left click,
+@@ -470,6 +645,9 @@ static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state,
+ 		test_bit(BTN_MIDDLE, msc->input->key) << 2;
+ 	int side;
+ 
++	if (state)
++		magicmouse_momentum_stop(msc);
++
+ 	if (emulate_3button || click_priority_side) {
+ 		int id;
+ 
+@@ -602,6 +780,12 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
+ 			msc->touches[id].scroll_y_hr = y;
+ 			msc->touches[id].scroll_x_active = false;
+ 			msc->touches[id].scroll_y_active = false;
++			msc->touches[id].last_x = x;
++			msc->touches[id].last_y = y;
++			msc->touches[id].last_time = ktime_get();
++
++			/* A new touch stops the momentum, as on macOS. */
++			magicmouse_momentum_stop(msc);
+ 
+ 			/* Reset acceleration after half a second. */
+ 			if (scroll_acceleration && time_before(now,
+@@ -625,6 +809,8 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
+ 				msc->touches[id].scroll_y_hr = y;
+ 				msc->touches[id].scroll_x_active = false;
+ 				msc->touches[id].scroll_y_active = false;
++				if (msc->momentum.touch == id)
++					msc->momentum.touch = -1;
+ 				break;
+ 			}
+ 
+@@ -677,6 +863,13 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
+ 						 REL_WHEEL_HI_RES,
+ 						 step_y_hr * SCROLL_HR_MULT);
+ 			}
++
++			if (msc->touches[id].scroll_x_active ||
++			    msc->touches[id].scroll_y_active) {
++				magicmouse_momentum_track(msc, id, x, y);
++				if (msc->momentum.touch == id)
++					msc->momentum.seen = true;
++			}
+ 			break;
+ 		}
+ 	}
+@@ -783,8 +976,10 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 		magicmouse_note_motion(msc, x, y);
+ 
+ 		msc->ntouches = 0;
++		msc->momentum.seen = false;
+ 		for (ii = 0; ii < npoints; ii++)
+ 			magicmouse_emit_touch(msc, ii, data + ii * 8 + 6);
++		magicmouse_momentum_check_lift(msc);
+ 
+ 		/* When emulating three-button mode, it is important
+ 		 * to have the current touch information before
+@@ -816,8 +1011,10 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 		magicmouse_note_motion(msc, x, y);
+ 
+ 		msc->ntouches = 0;
++		msc->momentum.seen = false;
+ 		for (ii = 0; ii < npoints; ii++)
+ 			magicmouse_emit_touch(msc, ii, data + ii * 8 + 14);
++		magicmouse_momentum_check_lift(msc);
+ 
+ 		/* When emulating three-button mode, it is important
+ 		 * to have the current touch information before
+@@ -887,7 +1084,26 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ static int magicmouse_raw_event_usb(struct hid_device *hdev,
+ 		struct hid_report *report, u8 *data, int size)
+ {
+-	return __magicmouse_raw_event_usb(hdev, report, data, size, false);
++	struct magicmouse_sc *msc = hid_get_drvdata(hdev);
++	unsigned long flags;
++	int ret;
++
++	spin_lock_irqsave(&msc->momentum.lock, flags);
++	ret = __magicmouse_raw_event_usb(hdev, report, data, size, false);
++	spin_unlock_irqrestore(&msc->momentum.lock, flags);
++	return ret;
++}
++
++/* Stop the momentum for good, before the input device goes away. */
++static void magicmouse_momentum_shutdown(struct magicmouse_sc *msc)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&msc->momentum.lock, flags);
++	msc->momentum.dead = true;
++	msc->momentum.active = false;
++	spin_unlock_irqrestore(&msc->momentum.lock, flags);
++	hrtimer_cancel(&msc->momentum.timer);
+ }
+ 
+ /**
+@@ -1677,6 +1893,10 @@ static int magicmouse_probe(struct hid_device *hdev,
+ 	msc->scroll_accel = SCROLL_ACCEL_DEFAULT;
+ 	msc->hdev = hdev;
+ 	INIT_DEFERRABLE_WORK(&msc->work, magicmouse_enable_mt_work);
++	spin_lock_init(&msc->momentum.lock);
++	hrtimer_setup(&msc->momentum.timer, magicmouse_momentum_tick,
++		      CLOCK_MONOTONIC, HRTIMER_MODE_REL_SOFT);
++	msc->momentum.touch = -1;
+ 
+ 	msc->quirks = id->driver_data;
+ 	hid_set_drvdata(hdev, msc);
+@@ -1796,6 +2016,7 @@ static int magicmouse_probe(struct hid_device *hdev,
+ 
+ 	return 0;
+ err_stop_hw:
++	magicmouse_momentum_shutdown(msc);
+ 	if (is_usb_magicmouse2(id->vendor, id->product) ||
+ 	    is_usb_magictrackpad2(id->vendor, id->product))
+ 		timer_delete_sync(&msc->battery_timer);
+@@ -1809,6 +2030,7 @@ static void magicmouse_remove(struct hid_device *hdev)
+ 	struct magicmouse_sc *msc = hid_get_drvdata(hdev);
+ 
+ 	if (msc) {
++		magicmouse_momentum_shutdown(msc);
+ 		cancel_delayed_work_sync(&msc->work);
+ 		if (is_usb_magicmouse2(hdev->vendor, hdev->product) ||
+ 		    is_usb_magictrackpad2(hdev->vendor, hdev->product))
+-- 
+2.56.1
+

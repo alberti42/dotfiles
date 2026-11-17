@@ -1,0 +1,152 @@
+From 49481b0bc00624a75b166159a1172de64b75b4cf Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Sun, 15 Nov 2026 19:55:24 +0100
+Subject: [PATCH] HID: magicmouse: optionally ignore scrolling while the mouse
+ moves
+
+---
+ drivers/hid/hid-magicmouse.c | 65 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 61 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/hid/hid-magicmouse.c b/drivers/hid/hid-magicmouse.c
+index 4ee2ce7..6ca5540 100644
+--- a/drivers/hid/hid-magicmouse.c
++++ b/drivers/hid/hid-magicmouse.c
+@@ -47,6 +47,14 @@ static bool scroll_acceleration = false;
+ module_param(scroll_acceleration, bool, 0644);
+ MODULE_PARM_DESC(scroll_acceleration, "Accelerate sequential scroll events");
+ 
++static unsigned int scroll_motion_block_ms;
++module_param(scroll_motion_block_ms, uint, 0644);
++MODULE_PARM_DESC(scroll_motion_block_ms, "Ignore scrolling for this many ms after the Magic Mouse moved (0 = never)");
++
++static unsigned int scroll_motion_threshold = 2;
++module_param(scroll_motion_threshold, uint, 0644);
++MODULE_PARM_DESC(scroll_motion_threshold, "Movement per report (|dx|+|dy|) above which the Magic Mouse counts as moving");
++
+ static bool report_undeciphered;
+ module_param(report_undeciphered, bool, 0644);
+ MODULE_PARM_DESC(report_undeciphered, "Report undeciphered multi-touch state field using a MSC_RAW event");
+@@ -249,6 +257,7 @@ struct magicmouse_input_ops {
+  * @ntouches: Number of touches in most recent touch report.
+  * @scroll_accel: Number of consecutive scroll motions.
+  * @scroll_jiffies: Time of last scroll motion.
++ * @motion_jiffies: Time the mouse last moved more than scroll_motion_threshold.
+  * @pos: multi touch position data of the last report.
+  * @touches: Most recent data for a touch, indexed by tracking ID.
+  * @tracking_ids: Mapping of current touch input data to @touches.
+@@ -265,6 +274,7 @@ struct magicmouse_sc {
+ 	int ntouches;
+ 	int scroll_accel;
+ 	unsigned long scroll_jiffies;
++	unsigned long motion_jiffies;
+ 
+ 	struct input_mt_pos pos[MAX_CONTACTS];
+ 	struct {
+@@ -441,6 +451,25 @@ static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state)
+ 		msc->scroll_accel = SCROLL_ACCEL_DEFAULT;
+ }
+ 
++/*
++ * Moving the mouse also slides the finger a little on the touch surface, which
++ * would otherwise scroll. Record when the mouse last moved, so that
++ * magicmouse_emit_touch() can ignore scrolling while it is moving.
++ */
++static void magicmouse_note_motion(struct magicmouse_sc *msc, int x, int y)
++{
++	if (abs(x) + abs(y) > scroll_motion_threshold)
++		msc->motion_jiffies = jiffies;
++}
++
++static bool magicmouse_scroll_blocked(struct magicmouse_sc *msc,
++				      unsigned long now)
++{
++	return scroll_motion_block_ms &&
++	       time_before(now, msc->motion_jiffies +
++				msecs_to_jiffies(scroll_motion_block_ms));
++}
++
+ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tdata)
+ {
+ 	struct input_dev *input = msc->input;
+@@ -527,6 +556,21 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
+ 
+ 			break;
+ 		case TOUCH_STATE_DRAG:
++			/*
++			 * While the mouse moves, follow the finger without
++			 * scrolling, so that no scroll accumulated during the
++			 * movement is released when it stops.
++			 */
++			if (magicmouse_scroll_blocked(msc, now)) {
++				msc->touches[id].scroll_x = x;
++				msc->touches[id].scroll_y = y;
++				msc->touches[id].scroll_x_hr = x;
++				msc->touches[id].scroll_y_hr = y;
++				msc->touches[id].scroll_x_active = false;
++				msc->touches[id].scroll_y_active = false;
++				break;
++			}
++
+ 			step_x /= (64 - (int)scroll_speed) * msc->scroll_accel;
+ 			if (step_x != 0) {
+ 				msc->touches[id].scroll_x -= step_x *
+@@ -674,6 +718,13 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 					size);
+ 			return 0;
+ 		}
++		/* Read the movement first: it decides whether the
++		 * touches below may scroll.
++		 */
++		x = (int)(((data[3] & 0x0c) << 28) | (data[1] << 22)) >> 22;
++		y = (int)(((data[3] & 0x30) << 26) | (data[2] << 22)) >> 22;
++		magicmouse_note_motion(msc, x, y);
++
+ 		msc->ntouches = 0;
+ 		for (ii = 0; ii < npoints; ii++)
+ 			magicmouse_emit_touch(msc, ii, data + ii * 8 + 6);
+@@ -682,8 +733,6 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 		 * to have the current touch information before
+ 		 * generating a click event.
+ 		 */
+-		x = (int)(((data[3] & 0x0c) << 28) | (data[1] << 22)) >> 22;
+-		y = (int)(((data[3] & 0x30) << 26) | (data[2] << 22)) >> 22;
+ 		clicks = data[3];
+ 
+ 		/* The following bits provide a device specific timestamp. They
+@@ -702,6 +751,13 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 					size);
+ 			return 0;
+ 		}
++		/* Read the movement first: it decides whether the
++		 * touches below may scroll.
++		 */
++		x = (int)((data[3] << 24) | (data[2] << 16)) >> 16;
++		y = (int)((data[5] << 24) | (data[4] << 16)) >> 16;
++		magicmouse_note_motion(msc, x, y);
++
+ 		msc->ntouches = 0;
+ 		for (ii = 0; ii < npoints; ii++)
+ 			magicmouse_emit_touch(msc, ii, data + ii * 8 + 14);
+@@ -710,8 +766,6 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 		 * to have the current touch information before
+ 		 * generating a click event.
+ 		 */
+-		x = (int)((data[3] << 24) | (data[2] << 16)) >> 16;
+-		y = (int)((data[5] << 24) | (data[4] << 16)) >> 16;
+ 		clicks = data[1];
+ 
+ 		/* The following bits provide a device specific timestamp. They
+@@ -1529,6 +1583,9 @@ static int magicmouse_probe(struct hid_device *hdev,
+ 		return -ENOMEM;
+ 	}
+ 
++	/* Not moved yet: jiffies starts negative, so 0 would be "just now". */
++	msc->motion_jiffies = jiffies - MAX_JIFFY_OFFSET / 2;
++
+ 	// internal trackpad use a data format use input ops to avoid
+ 	// conflicts with the report ID.
+ 	switch (id->bus) {
+-- 
+2.56.1
+

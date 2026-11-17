@@ -8,7 +8,6 @@
 #
 # Append @<version> to a name to pin it.
 
-@earendil-works/pi-coding-agent          # pi coding agent CLI
 @google/gemini-cli                       # Gemini CLI coding agent
 @marp-team/marp-cli                      # Marp: Markdown slide decks to HTML/PDF/PPTX
 @modelcontextprotocol/server-filesystem  # MCP server for local file access

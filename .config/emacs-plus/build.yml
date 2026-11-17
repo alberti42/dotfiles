@@ -7,8 +7,8 @@ patches:
   # patch) -- so point at the real emacs-31 files. Pinned to a commit SHA so the
   # content (and thus sha256) is frozen.
   - round-undecorated-frame:
-      url: https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/b7f47101868eeda09ec75251eabb0cce7446abb2/patches/emacs-31/round-undecorated-frame.patch
-      sha256: c9430a1ead81e313b3d2877ff6f8044fb29441eecc7cc42000515d7c8ec6380f
+      url: https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/refs/heads/master/patches/emacs-32/round-undecorated-frame.patch
+      sha256: 6daed6c192f4fe32c104ff754a7fd461a75094ca95fb377e7bd09450af67fc0e
   - system-appearance:
       url: https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/b7f47101868eeda09ec75251eabb0cce7446abb2/patches/emacs-31/system-appearance.patch
       sha256: 53283503db5ed2887e9d733baaaf80f2c810e668e782e988bda5855a0b1ebeb4
@@ -20,6 +20,14 @@ patches:
       # https://github.com/exlee/emacs-patches/blob/master/ns_color_cache_0001.patch
       url: ./ns_color_cache.patch
       sha256: 115bb1022d11779d8fd46e45a252f6ba6fd97092d98ad82f24ab78343a487423
+  # Fix problem in handling display number 0 with NS platform
+  # This is disabled because it turned out that the bug was caused by a break
+  # in round-undecorated-frame patch. What this patch did was a clean-up fix
+  # that solved the problem at the root; however, it is not strictly needed now
+  # that other patch, round-undecorated-frame, is fixed.
+  # - fix/ns-handle-display-number:
+  #     url: ./fix-ns-handle-display-number.patch
+  #     sha256: 3c4a6b576e1f27a477131cfc43dba7061a068e6fcd0ccb84c8fb189f9b4b89e0
   # Fix problem with margin-scroll in scroll-config-smooth-scroll
   - fix/pixel-scroll-precision-margin:
       # Pin the compare BASE to the branch's fork point, NOT `master`:
@@ -45,6 +53,11 @@ patches:
   - fix-protect_adjusting_matrices:
       url: ./fix-protect_adjusting_matrices.patch
       sha256: 28ac4781790bee042c83c241621c6aae4d7defffd2aa23c1bebae19d231ac4e1
+  # Avoid stale bidi state during pixel measurement (Ghostel crashes).
+  # Exported from fork-emacs commit 64f21a97a67; includes regression tests.
+  - fix-bidi-pixel-measurement:
+      url: ./fix-bidi-pixel-measurement.patch
+      sha256: 2b15b092fc4b35e5342d49165c6948158aebe010e953ef7a5f9d0a6c51011eb6
   - ttys-emoji-icons-fix:
       url: https://github.com/emacs-mirror/emacs/commit/85cc02acd97a87324f7fc5e6e5e0e14c29f40469.patch
       sha256: 6a40a240dd8be33418c33baa003b31f7deada265f457b6f1a92a7215a7bf82eb

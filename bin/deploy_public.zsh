@@ -112,8 +112,10 @@ create_worktree() {
 transplant_private_tree() {
   # Index and files become exactly the tree of $PRIVATE_REF; paths it does not
   # contain are removed. Submodules stay as gitlinks and are not checked out.
+  # submodule.recurse=false overrides .git-dotfiles.conf: the worktree has no
+  # submodule repositories to update.
   log "Transplanting tree from $PRIVATE_REF…"
-  git restore --source "$PRIVATE_REF" --worktree --staged :/
+  git -c submodule.recurse=false restore --source "$PRIVATE_REF" --worktree --staged :/
 }
 
 drop_private_files() {

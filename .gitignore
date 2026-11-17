@@ -10,6 +10,8 @@ Sublime Text/Packages/User/sftp/*.sublime-color-scheme
 Sublime Text/Packages/User/Terminus/Terminus.hidden-color-scheme
 **/CLAUDE.md
 **/AGENTS.md
+# global Claude Code instructions, linked to ~/.claude/CLAUDE.md by links.conf
+!/.config/claude/CLAUDE.md
 Sublime Text/Packages/User/GitSavvy/*
 /.agent-shell/
 **/.dir-locals.el

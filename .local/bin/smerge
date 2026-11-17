@@ -1,0 +1,23 @@
+#!/bin/sh
+# Sublime Merge CLI, with a stable path on every OS.
+#
+# macOS: the CLI bundled in the app.
+# Linux: the RPM from Sublime HQ's dnf repo (not the Flatpak, whose sandbox
+#        hides zsh and the host tools the dotfiles hooks and filters need).
+#        On GNOME/Wayland a window opened from a terminal does not get focus
+#        ("Sublime Merge is ready" instead), so first ask the Focus App
+#        extension (.local/share/gnome-shell/extensions/focus-app@...) to
+#        activate the window that asks for attention in the next 5 s. Without
+#        the extension the call just fails and smerge opens as before.
+case $(uname -s) in
+  Darwin)
+    exec "/Applications/Sublime Merge.app/Contents/SharedSupport/bin/smerge" "$@" ;;
+  Linux)
+    gdbus call --session --dest org.gnome.Shell \
+      --object-path /org/gnome/Shell/Extensions/FocusApp \
+      --method org.gnome.Shell.Extensions.FocusApp.Arm \
+      sublime_merge.desktop 5000 >/dev/null 2>&1
+    exec /usr/bin/smerge "$@" ;;
+  *)
+    echo "smerge: unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac

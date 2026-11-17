@@ -5,7 +5,6 @@
     "commit": "",
     "pr": ""
   },
-  "disableDeepLinkRegistration": "disable",
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -84,7 +83,9 @@
     ]
   },
   "model": "opus[1m]",
-  "disabledMcpjsonServers": ["keynote"],
+  "disabledMcpjsonServers": [
+    "keynote"
+  ],
   "hooks": {
     "Notification": [
       {
@@ -192,8 +193,9 @@
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "### User-specific",
       "**Primary use of Claude Code**: software development",
-      "**Trusted repo**: /Users/andrea/Documents/Programming/Emacs/org-semantic (public repo alberti42/org-semantic on github.com) — since this repo is PUBLIC, only this repo's own work is safe to push here; secrets and sensitive personal/entrusted data are never cleared into it regardless of visibility",
+      "**Trusted repo**: /Users/andrea/Programming/Emacs/org-semantic (public repo alberti42/org-semantic on github.com) — since this repo is PUBLIC, only this repo's own work is safe to push here; secrets and sensitive personal/entrusted data are never cleared into it regardless of visibility",
       "**Org-specific CLIs**: None configured"
     ]
-  }
+  },
+  "disableDeepLinkRegistration": "disable"
 }

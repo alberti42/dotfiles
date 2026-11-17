@@ -1,4 +1,6 @@
 {
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-5-5",
   "lastChangelogVersion": "0.85.0",
   "theme": "light",
   "quietStartup": true,
@@ -9,5 +11,9 @@
   ],
   "extensions": [
     "-builtin:mcp"
-  ]
+  ],
+  "extensionChangelogVersions": {
+    "{\"source\":\"git:github.com/alberti42/fork-pi-claude-auth\",\"scope\":\"user\"}": "0.1.0",
+    "{\"source\":\"npm:pi-mcp-adapter\",\"scope\":\"user\"}": "7.0.1"
+  }
 }

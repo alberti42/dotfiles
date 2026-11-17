@@ -8,7 +8,7 @@
 ipython/profile_default/ipython_config.py filter=ipython-theme
 Library/LaunchAgents/com.alberti42.typingmind_mcp.plist filter=typingmind_mcp diff
 Sublime[[:space:]]Merge/Packages/User/Diff.sublime-settings filter=sublime-merge-draw-white-space
-Sublime[[:space:]]Merge/Packages/User/Preferences.sublime-settings filter=sublime-merge-ignore-diff-white-space
+Sublime[[:space:]]Merge/Packages/User/Preferences.sublime-settings filter=sublime-merge-preferences
 Sublime[[:space:]]Text/Packages/User/Preferences.sublime-settings filter=sublime-preferences
 Sublime[[:space:]]Text/Packages/User/LSP-ltex-ls-plus.sublime-settings filter=sublime-ltex
 Sublime[[:space:]]Text/Packages/User/SFTP.sublime-settings filter=sublime-sftp

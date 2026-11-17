@@ -1,1 +1,4 @@
 *.plist diff=plist
+
+# VectorCraft documents: binary whether saved compressed or not
+*.vectorcraft binary

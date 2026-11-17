@@ -1,0 +1,148 @@
+From 81fb11cddf1c3ac8134d316dffd5c41c6c676ade Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Tue, 17 Nov 2026 10:17:14 +0100
+Subject: [PATCH] HID: magicmouse: optionally choose the clicked button from
+ all touches
+
+With the hand resting on the mouse, fingers on the right half can turn a
+left click into a right click. With click_priority_side = 1, any touch on
+the left half makes a left click, as on macOS; 2 mirrors this for the left
+hand.
+---
+ drivers/hid/hid-magicmouse.c | 69 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 63 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/hid/hid-magicmouse.c b/drivers/hid/hid-magicmouse.c
+index 6ca5540..ffeff89 100644
+--- a/drivers/hid/hid-magicmouse.c
++++ b/drivers/hid/hid-magicmouse.c
+@@ -55,6 +55,18 @@ static unsigned int scroll_motion_threshold = 2;
+ module_param(scroll_motion_threshold, uint, 0644);
+ MODULE_PARM_DESC(scroll_motion_threshold, "Movement per report (|dx|+|dy|) above which the Magic Mouse counts as moving");
+ 
++static unsigned int click_priority_side;
++static int param_set_click_priority_side(const char *val,
++					 const struct kernel_param *kp) {
++	unsigned int side;
++	if (!val || kstrtouint(val, 0, &side) || side > 2)
++		return -EINVAL;
++	click_priority_side = side;
++	return 0;
++}
++module_param_call(click_priority_side, param_set_click_priority_side, param_get_uint, &click_priority_side, 0644);
++MODULE_PARM_DESC(click_priority_side, "Choose the button of a Magic Mouse click from all touches: 0 = off, 1 = a touch on the left half makes a left click (right hand), 2 = a touch on the right half makes a right click (left hand)");
++
+ static bool report_undeciphered;
+ module_param(report_undeciphered, bool, 0644);
+ MODULE_PARM_DESC(report_undeciphered, "Report undeciphered multi-touch state field using a MSC_RAW event");
+@@ -283,6 +295,7 @@ struct magicmouse_sc {
+ 		short scroll_x_hr;
+ 		short scroll_y_hr;
+ 		u8 size;
++		bool down;
+ 		bool scroll_x_active;
+ 		bool scroll_y_active;
+ 	} touches[MAX_CONTACTS];
+@@ -414,24 +427,66 @@ static int magicmouse_firm_touch(struct magicmouse_sc *msc)
+ 	return touch;
+ }
+ 
+-static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state)
++/*
++ * Choose the button of a click from all touches on the mouse, as macOS does.
++ * With click_priority_side = 1, a touch on the left half makes a left click,
++ * so a right click needs all fingers on the right half; 2 mirrors this for
++ * the left hand. With emulate_3button, touches only in the middle zone make a
++ * middle click. Returns 0 if no finger touches the mouse.
++ */
++static int magicmouse_click_side(struct magicmouse_sc *msc, int npoints)
++{
++	bool left = false, right = false, middle = true;
++	int ii;
++
++	for (ii = 0; ii < npoints; ii++) {
++		int id = msc->tracking_ids[ii];
++		int x = msc->pos[id].x;
++
++		if (!msc->touches[id].down)
++			continue;
++		if (x < 0)
++			left = true;
++		else
++			right = true;
++		if (x < middle_button_start || x > middle_button_stop)
++			middle = false;
++	}
++
++	if (!left && !right)
++		return 0;
++	if (emulate_3button && middle)
++		return 4;
++	if (click_priority_side == 1)
++		return left ? 1 : 2;
++	return right ? 2 : 1;
++}
++
++static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state,
++				    int npoints)
+ {
+ 	int last_state = test_bit(BTN_LEFT, msc->input->key) << 0 |
+ 		test_bit(BTN_RIGHT, msc->input->key) << 1 |
+ 		test_bit(BTN_MIDDLE, msc->input->key) << 2;
++	int side;
+ 
+-	if (emulate_3button) {
++	if (emulate_3button || click_priority_side) {
+ 		int id;
+ 
+ 		/* If some button was pressed before, keep it held
+-		 * down.  Otherwise, if there's exactly one firm
++		 * down.  Otherwise, choose the button from the touches
++		 * (click_priority_side), or if there's exactly one firm
+ 		 * touch, use that to override the mouse's guess.
+ 		 */
+ 		if (state == 0) {
+ 			/* The button was released. */
+ 		} else if (last_state != 0) {
+ 			state = last_state;
+-		} else if ((id = magicmouse_firm_touch(msc)) >= 0) {
++		} else if (click_priority_side &&
++			   (side = magicmouse_click_side(msc, npoints))) {
++			state = side;
++		} else if (emulate_3button &&
++			   (id = magicmouse_firm_touch(msc)) >= 0) {
+ 			int x = msc->pos[id].x;
+ 			if (x < middle_button_start)
+ 				state = 1;
+@@ -440,9 +495,10 @@ static void magicmouse_emit_buttons(struct magicmouse_sc *msc, int state)
+ 			else
+ 				state = 4;
+ 		} /* else: we keep the mouse's guess */
++	}
+ 
++	if (emulate_3button)
+ 		input_report_key(msc->input, BTN_MIDDLE, state & 4);
+-	}
+ 
+ 	input_report_key(msc->input, BTN_LEFT, state & 1);
+ 	input_report_key(msc->input, BTN_RIGHT, state & 2);
+@@ -518,6 +574,7 @@ static void magicmouse_emit_touch(struct magicmouse_sc *msc, int raw_id, u8 *tda
+ 	msc->pos[id].x = x;
+ 	msc->pos[id].y = y;
+ 	msc->touches[id].size = size;
++	msc->touches[id].down = down;
+ 
+ 	/* If requested, emulate a scroll wheel by detecting small
+ 	 * vertical touch motions.
+@@ -810,7 +867,7 @@ static int __magicmouse_raw_event_usb(struct hid_device *hdev,
+ 	if (input->id.product == USB_DEVICE_ID_APPLE_MAGICMOUSE ||
+ 	    input->id.product == USB_DEVICE_ID_APPLE_MAGICMOUSE2 ||
+ 	    input->id.product == USB_DEVICE_ID_APPLE_MAGICMOUSE2_USBC) {
+-		magicmouse_emit_buttons(msc, clicks & 3);
++		magicmouse_emit_buttons(msc, clicks & 3, npoints);
+ 		input_report_rel(input, REL_X, x);
+ 		input_report_rel(input, REL_Y, y);
+ 	} else if (input->id.product == USB_DEVICE_ID_APPLE_MAGICTRACKPAD2 ||
+-- 
+2.56.1
+

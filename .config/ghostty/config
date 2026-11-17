@@ -1,120 +1,84 @@
 # ~/.config/ghostty/config
-# Migrated from WezTerm (wezterm.lua). macOS-focused.
+#
+# Shared settings. Per-OS settings (font size, default program, platform
+# keybindings) live in config-macos / config-linux; links.conf links the one for
+# this OS to ~/.config/ghostty/platform, which is loaded at the end of this file.
 
 # --- Font ---
-# WezTerm: JetBrainsMonoNL Nerd Font Mono, Regular, size 17 (mac)
 font-family = "JetBrainsMonoNL Nerd Font Mono"
 font-style  = Regular
-font-size   = 15
+# font-size is set per OS: macOS points are 1/72", Linux ones use the real DPI,
+# so the same number renders ~1.33x bigger on Linux.
 
 # --- Colors / theme ---
-# WezTerm switched Catppuccin Frappe (dark) / Latte (light) with the OS appearance.
-# Ghostty does the same automatically via the light:/dark: theme syntax.
+# Catppuccin Latte (light) / Frappe (dark), following the OS appearance.
 theme = light:Catppuccin Latte,dark:Catppuccin Frappe
 
-# WezTerm set cursor_bg/cursor_border to the Catppuccin "text" color (#cad3f5),
-# which is just the foreground. cell-foreground reproduces that and also adapts
-# to the light (Latte) theme instead of being a fixed light-lavender.
+# Cursor in the foreground color, so it adapts to both themes.
 cursor-color = cell-foreground
 
 # --- Cursor ---
-# WezTerm: BlinkingBlock, blink rate 250ms (rate isn't configurable in Ghostty).
+# The blink rate isn't configurable in Ghostty.
 cursor-style       = block
 cursor-style-blink = true
 
 # --- Scrollback ---
-# NOTE: Ghostty's scrollback-limit is in BYTES (not lines like WezTerm's 10000).
-# ~10 MB is roughly comparable and is also Ghostty's default.
+# In BYTES, not lines. ~10 MB is also Ghostty's default.
 scrollback-limit = 10000000
 
 # --- Terminal type ---
-# Match WezTerm's config.term for tmux/SSH compatibility.
+# xterm-256color rather than xterm-ghostty, for tmux/SSH compatibility.
 term = xterm-256color
 
 # --- Window / appearance ---
 background-opacity = 1
-# WezTerm window_padding: left/right 15pt, top/bottom 10pt
 window-padding-x = 15
 window-padding-y = 10
-# WezTerm window_decorations = "RESIZE|MACOS_DISABLE_TITLEBAR_DRAG" -> hide titlebar.
 macos-titlebar-style = hidden
-# WezTerm window_close_confirmation = "NeverPrompt"
 confirm-close-surface = false
 
-# WezTerm centered the window at 70% x 85% of the screen on startup. Ghostty has
-# no percentage sizing or auto-center; it sizes in GRID CELLS. Tune to taste.
-# window-width  = 120
-# window-height = 50
+# window-width / window-height are in GRID CELLS, so they depend on the font
+# size; config-linux sets them. Ghostty cannot center a window: on Linux, GNOME
+# centers new windows (org.gnome.mutter center-new-windows), and
+# window-position-x/y work on macOS only.
 
 # --- Mouse ---
-# WezTerm hide_mouse_cursor_when_typing = false
 mouse-hide-while-typing = false
 # Links open with Cmd+click; inside tmux (mouse on) they need Cmd+Shift+click.
 
 # --- macOS Option/Alt behavior ---
-# WezTerm: LEFT alt = Alt modifier (send_composed = false),
-#          RIGHT alt = compose special chars (send_composed = true).
-# So only the LEFT option should act as Alt.
+# LEFT option acts as Alt; RIGHT option still composes special characters.
 macos-option-as-alt = left
 
 # --- Clipboard ---
-# WezTerm had kitty-keyboard clipboard integration enabled.
 clipboard-read  = allow
 clipboard-write = allow
 
 # --- Default program (tmux) ---
-# Replicates WezTerm's default_prog inline: run tmux under `env` with an explicit,
-# minimal PATH, then seed tmux's @dark_appearance from the current macOS appearance.
-#
-# The PATH is REQUIRED, not cosmetic: Ghostty is a GUI app (minimal launchd PATH)
-# and runs a command-with-args via `/bin/sh -c` (non-login, does NOT source your
-# zsh rc), so a bare `tmux` would not be found — tmux lives only in polaris/bin.
-# `$HOME` is expanded by that `/bin/sh -c`. TERM is already exported by the
-# `term =` line above and inherited here, so (unlike WezTerm) it's not set in env.
-# The zsh started inside tmux rebuilds the full interactive PATH.
-#
-# `\;` is passed literally to tmux as its command separator (`/bin/sh -c` turns
-# `\;` into a `;` argument), so tmux runs new-session AND set-option in one go.
-# `$(defaults read -g AppleInterfaceStyle …)` prints "Dark" (exit 0) in dark mode
-# and errors (exit 1) in light mode -> the flag becomes 1 (dark) or 0 (light).
-#
-# `command`, not `initial-command`: the latter only ever applies to Ghostty's
-# very first surface, so other windows fell back to a plain login shell.
-command = /usr/bin/env PATH=$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin tmux new-session -A -D -s main \; set-option -g @dark_appearance $(defaults read -g AppleInterfaceStyle >/dev/null 2>&1 && echo 1 || echo 0)
-
-# NOTE: @dark_appearance is only seeded at surface creation; Ghostty has no
-# "appearance changed" hook, so live light<->dark switches are still the job of
-# the standalone dispatcher (TODO). Ghostty's own colors follow the OS via theme=.
+# Set per OS in config-macos / config-linux.
 
 # --- Keybindings ---
-# WezTerm had disable_default_key_bindings = true; `keybind = clear` is the equivalent
-# (drops all Ghostty defaults) and we re-add only what WezTerm defined.
+# `keybind = clear` drops all Ghostty defaults; only the bindings below (and the
+# per-OS ones) are active.
 keybind = clear
 
-# tmux prev/next pane: Ctrl-b p / Ctrl-b n  (WezTerm sent \x02p / \x02n)
+# tmux prev/next pane: Ctrl-b p / Ctrl-b n
 keybind = ctrl+alt+left_bracket=text:\x02p
 keybind = ctrl+alt+right_bracket=text:\x02n
 
-# Disable Alt+Enter (WezTerm disabled its fullscreen toggle here)
+# Disable Alt+Enter (no fullscreen toggle here)
 keybind = alt+enter=ignore
 
 # CSI u encodings (enable in tmux with: printf '\e[>4;1m')
 keybind = ctrl+tab=text:\x1b[9;5u
 keybind = shift+enter=text:\x1b[13;2u
 
-# Copy / paste
-keybind = cmd+c=copy_to_clipboard
-keybind = cmd+v=paste_from_clipboard
+# Copy/paste, quit/close, inspector and fullscreen are set per OS.
 
-# Quit / close window
-keybind = cmd+q=quit
-keybind = cmd+w=close_surface
-
-# Disable Cmd+n (new window)
-keybind = cmd+n=ignore
-
-# Debug: WezTerm ShowDebugOverlay (Cmd+Shift+L) -> Ghostty terminal inspector
-keybind = cmd+shift+l=inspector:toggle
-
-# Fullscreen (WezTerm Cmd+Shift+F)
-keybind = cmd+shift+f=toggle_fullscreen
+# --- Per-OS settings ---
+# `platform` is not a Ghostty feature, just a file name: links.conf points
+# ~/.config/ghostty/platform at config-macos or config-linux. Ghostty loads a
+# config-file after this whole file, wherever the line is, so it overrides the
+# settings above. `?` makes it optional: without the link (links.zsh install not
+# run yet), Ghostty starts with the shared settings instead of reporting an error.
+config-file = ?platform

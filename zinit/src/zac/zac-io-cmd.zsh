@@ -107,7 +107,7 @@ function _relink() {
 # --- the two appearances -----------------------------------------------------
 
 local yazi_theme gemini_theme claude_theme opencode_mode opencode_theme \
-      ipython_colors patina_theme ls_colors_file btop_theme git_theme
+      ipython_colors patina_theme ls_colors_file btop_theme git_theme gtk_theme
 local -a dripfetch_sed
 
 if (( is_dark )); then
@@ -121,6 +121,7 @@ if (( is_dark )); then
   ls_colors_file=ls_colors_dark
   btop_theme=catppuccin_frappe
   git_theme=theme-dark.gitconfig
+  gtk_theme=Adwaita-dark
   # Latte -> original dark colors
   dripfetch_sed=(-e 's/"#4C4F69"/"#FFFFFF"/g' -e 's/"#8839EF"/"#8747FF"/g' -e 's/"#7287FD"/"#687FE5"/g')
 else
@@ -134,6 +135,7 @@ else
   ls_colors_file=ls_colors_light
   btop_theme=catppuccin_latte
   git_theme=theme-light.gitconfig
+  gtk_theme=Adwaita
   # original dark colors -> Latte
   dripfetch_sed=(-e 's/"#FFFFFF"/"#4C4F69"/g' -e 's/"#8747FF"/"#8839EF"/g' -e 's/"#687FE5"/"#7287FD"/g')
 fi
@@ -193,6 +195,21 @@ _rewrite "$DOTFILES_DIR/.config/dripfetch/config.yaml" "${dripfetch_sed[@]}" || 
 # git CLI
 _relink "$DOTFILES_DIR/.config/git/$git_theme" "$XDG_CONFIG_HOME/git/theme.gitconfig" \
   || (( $? == 2 )) || exit 1
+
+# GTK3 theme name (GNOME only). Sublime Merge ignores GNOME's color-scheme
+# and picks dark when this name ends in -dark. Fedora ships no GTK3 theme
+# called Adwaita-dark, so GTK3 apps keep drawing light Adwaita; only the name
+# changes.
+# XDG_CURRENT_DESKTOP is a colon-separated list (Ubuntu: ubuntu:GNOME).
+if [[ $OSTYPE == linux* && :${(L)XDG_CURRENT_DESKTOP}: == *:gnome:* ]] \
+   && (( $+commands[gsettings] )); then
+  gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" || {
+    print -r -- "zac-io-cmd: gsettings failed: gtk-theme" >&2
+    exit 1
+  }
+else
+  print -r -- "zac-io-cmd: skipping, not GNOME: gtk-theme"
+fi
 
 # tmux-server-resident settings (@dark_appearance and the @fzf-links-* option),
 # which a fresh tmux server loses on restart. Delegated to a small co-located

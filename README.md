@@ -9,7 +9,7 @@ These are my personal dotfiles, which include configurations for zsh shell, vari
 - **VS Code Settings**: Keybindings and settings for a consistent coding experience.
 - **tmux Integration**: Custom scripts and settings for `tmux` to enhance terminal multiplexing.
 - **Karabiner Customization**: Key remappings for efficiency using `karabiner.json`.
-- **LaunchAgents**: Automations for launching background tasks, such as automatic BibDesk saving and tmux session management.
+- **LaunchAgents**: Automations for launching background tasks.
 - **Custom Scripts**: Various utility scripts for workflow automation.
 
 ## Installation
@@ -52,6 +52,27 @@ If you commit to this repository, include `.git-dotfiles.conf` in the clone's gi
 ```sh
 git config include.path ../.git-dotfiles.conf
 ```
+
+This also enables recursive submodule updates for this clone, so `git pull` and
+`git checkout` keep initialized submodules at the revisions recorded by dotfiles.
+
+### Keeping machines in sync
+
+After pulling dotfiles on an existing machine, align its submodule checkouts with
+the recorded revisions (also useful after enabling the configuration above):
+
+```sh
+git submodule update --init --recursive
+```
+
+Pulling the parent repository without recursive updates can leave submodules at
+their previous revisions. Git then shows them as modified; committing those
+paths records the stale revisions again and can undo another machine's update.
+Run the command above instead of committing those differences.
+
+Use `git submodule update --remote <path>` only when deliberately upgrading a
+submodule, then commit the new revision in dotfiles once and pull it on the other
+machines. Ordinary synchronization uses the pinned revisions, without `--remote`.
 
 ## Submodules
 

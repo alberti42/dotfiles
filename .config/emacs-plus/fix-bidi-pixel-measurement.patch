@@ -1,0 +1,112 @@
+From 64f21a97a67e79593e07c5d0b96d7684fcc109ea Mon Sep 17 00:00:00 2001
+From: Andrea Alberti <a.alberti82@gmail.com>
+Date: Sat, 14 Nov 2026 19:32:44 +0100
+Subject: [PATCH] Avoid stale bidi iterator use during pixel measurements
+
+* src/xdisp.c (handle_single_display_spec, push_prefix_prop): Only
+initialize paragraph direction while bidi iteration is active.
+window_text_pixel_size disables bidi iteration, leaving the bidi
+iterator's position out of sync with the display iterator.
+* test/src/xdisp-tests.el
+(xdisp-tests--window-text-pixel-size-empty-prefix-overlay)
+(xdisp-tests--window-text-pixel-size-display-in-overlay): Check empty
+prefixes and identity display replacements in overlay strings during
+pixel measurement, with different paragraph directions and FROM forms.
+---
+ src/xdisp.c             | 10 +++++---
+ test/src/xdisp-tests.el | 53 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 60 insertions(+), 3 deletions(-)
+
+diff --git a/src/xdisp.c b/src/xdisp.c
+index 17cf56fd1df..cc86970c831 100644
+--- a/src/xdisp.c
++++ b/src/xdisp.c
+@@ -6535,7 +6535,8 @@ handle_single_display_spec (struct it *it, Lisp_Object spec, Lisp_Object object,
+       /* We want the string to inherit the paragraph direction of the
+          parent object, so we need to calculate that if not yet done.  */
+       ptrdiff_t eob = (BUFFERP (object) ? ZV : it->end_charpos);
+-      if (it->bidi_it.first_elt && it->bidi_it.charpos < eob)
++      if (it->bidi_p
++          && it->bidi_it.first_elt && it->bidi_it.charpos < eob)
+ 	bidi_paragraph_init (it->paragraph_embedding, &it->bidi_it, true);
+ 
+       /* Save current settings of IT so that we can restore them
+@@ -25241,9 +25242,12 @@ push_prefix_prop (struct it *it, Lisp_Object prop, int from_buffer)
+ 	   || it->method == GET_FROM_IMAGE);
+ 
+   /* We want the string to inherit the paragraph direction of the parent
+-     object, so we need to calculate that if not yet done.  */
++     object, so we need to calculate that if not yet done.  Only do this
++     while bidi iteration is active: window_text_pixel_size disables it,
++     leaving the bidi iterator's position out of sync with IT.  */
+   ptrdiff_t eob = (STRINGP (it->string) ? SCHARS (it->string) : ZV);
+-  if (it->bidi_it.first_elt && it->bidi_it.charpos < eob)
++  if (it->bidi_p
++      && it->bidi_it.first_elt && it->bidi_it.charpos < eob)
+     bidi_paragraph_init (it->paragraph_embedding, &it->bidi_it, true);
+ 
+   /* We need to save the current buffer/string position, so it will be
+diff --git a/test/src/xdisp-tests.el b/test/src/xdisp-tests.el
+index 8eb57253972..15f82b45805 100644
+--- a/test/src/xdisp-tests.el
++++ b/test/src/xdisp-tests.el
+@@ -99,6 +99,59 @@ xdisp-tests--window-text-pixel-size-trailing-space
+            (width-in-chars (/ (car size) char-width)))
+       (should (equal width-in-chars 3)))))
+ 
++(ert-deftest xdisp-tests--window-text-pixel-size-empty-prefix-overlay ()
++  ;; Pixel measurement disables bidi iteration.  An overlay string must
++  ;; not cause prefix handling to initialize the stale bidi iterator.
++  (skip-unless (display-graphic-p))
++  (save-window-excursion
++    (with-temp-buffer
++      (switch-to-buffer (current-buffer))
++      (insert "x\n")
++      (setq-local bidi-display-reordering t
++                  line-prefix nil)
++      (overlay-put (make-overlay (point-min) (point-min))
++                   'before-string "a\nb\n")
++      (dolist (direction '(nil left-to-right right-to-left))
++        (setq-local bidi-paragraph-direction direction)
++        (dolist (from (list (point-max)
++                           (cons (point-max) 0)
++                           (cons (point-max) -1)
++                           (cons (point-max) (- (window-body-height nil t)))))
++          (setq line-prefix nil)
++          (let ((expected (window-text-pixel-size nil from (point-max))))
++            ;; An empty prefix adds no visible text, so the measurement
++            ;; should be identical to that with no prefix.
++            (setq line-prefix "")
++            (should (equal (window-text-pixel-size nil from (point-max))
++                           expected))))))))
++
++(ert-deftest xdisp-tests--window-text-pixel-size-display-in-overlay ()
++  ;; A display property in an overlay string must not initialize a bidi
++  ;; iterator whose position still refers to the underlying buffer.
++  (skip-unless (display-graphic-p))
++  (save-window-excursion
++    (with-temp-buffer
++      (switch-to-buffer (current-buffer))
++      (insert "x\n")
++      (setq-local bidi-display-reordering t
++                  line-prefix nil)
++      (let ((string (copy-sequence "a\nb\n")))
++        (overlay-put (make-overlay (point-min) (point-min))
++                     'before-string string)
++        (dolist (direction '(nil left-to-right right-to-left))
++          (setq-local bidi-paragraph-direction direction)
++          (dolist (from (list (point-max)
++                             (cons (point-max) 0)
++                             (cons (point-max) -1)
++                             (cons (point-max) (- (window-body-height nil t)))))
++            (remove-text-properties 0 (length string) '(display nil) string)
++            (let ((expected (window-text-pixel-size nil from (point-max))))
++              ;; Replacing a character by the same character should not
++              ;; change the measurement.
++              (put-text-property 2 3 'display "b" string)
++              (should (equal (window-text-pixel-size nil from (point-max))
++                             expected)))))))))
++
+ (ert-deftest xdisp-tests--find-directional-overrides-case-1 ()
+   (with-temp-buffer
+     (insert "\

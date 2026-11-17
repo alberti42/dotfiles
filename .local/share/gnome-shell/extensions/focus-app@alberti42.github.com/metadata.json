@@ -1,0 +1,7 @@
+{
+  "uuid": "focus-app@alberti42.github.com",
+  "name": "Focus App",
+  "description": "D-Bus method that lets a command-line launcher hand focus to the window it opens, which Wayland's focus-stealing prevention otherwise turns into an \"is ready\" notification.",
+  "shell-version": ["45", "46", "47", "48", "49", "50", "51"],
+  "url": "https://github.com/alberti42"
+}

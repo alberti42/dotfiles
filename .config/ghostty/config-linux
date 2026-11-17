@@ -1,0 +1,31 @@
+# ~/.config/ghostty/platform on Linux (see links.conf), loaded by config.
+
+# Linux font sizes use the real DPI (macOS uses 72 dpi points), so 15 on macOS
+# corresponds to about 11.25 here. GNOME's own monospace default is 11.
+font-size = 11.5
+
+# Initial window size in grid cells (measured at font-size 11.5).
+window-width  = 157
+window-height = 49
+
+# --- Default program (tmux) ---
+# Same as macOS, but the light/dark flag comes from GNOME's color-scheme
+# ('prefer-dark' -> 1, 'default'/'prefer-light' -> 0) instead of `defaults read`.
+command = /usr/bin/env PATH=$HOME/.local/share/zinit/polaris/bin:/usr/bin:/bin tmux new-session -A -D -s main \; set-option -g @dark_appearance $(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null | grep -q dark && echo 1 || echo 0)
+
+# --- Keybindings ---
+# Linux terminal conventions: Ctrl+Shift instead of Cmd. Super is taken by
+# GNOME (e.g. Super+V opens the notification list).
+keybind = ctrl+shift+c=copy_to_clipboard
+keybind = ctrl+shift+v=paste_from_clipboard
+
+keybind = ctrl+shift+q=quit
+keybind = ctrl+shift+w=close_surface
+
+# Font size (Ghostty defaults, re-added after `keybind = clear`)
+keybind = ctrl+equal=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+zero=reset_font_size
+
+keybind = ctrl+shift+i=inspector:toggle
+keybind = f11=toggle_fullscreen

@@ -1,0 +1,40 @@
+# Emacs daemon, the Linux counterpart of
+# Library/LaunchAgents/io.alberti42.emacs-daemon.plist.  Linked into
+# ~/.config/systemd/user by bin/links.zsh (see links.conf); enable once with
+#   systemctl --user enable --now emacs
+[Unit]
+Description=Emacs text editor
+Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+ConditionUser=!@system
+# Start with the graphical session, not at login: GNOME puts WAYLAND_DISPLAY
+# and DISPLAY into the systemd user environment only once the compositor is
+# up, and a service keeps the environment it started with, so a daemon
+# started earlier can never open a GUI frame.  PartOf stops it with the
+# session, whose display it would otherwise outlive.
+After=graphical-session.target
+PartOf=graphical-session.target
+# Give up on a crash loop: after 5 starts within 60 s the service stays
+# failed until `systemctl --user start emacs'.  With RestartSec=0 and about
+# 3 s to load the init file, that is about 15 s of retrying.
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+# Needs an Emacs built with libsystemd, which sd_notify()s once it is ready.
+Type=notify
+ExecStart=%h/.local/opt/emacs/bin/emacs --fg-daemon --debug-init
+# systemd hands the daemon a bare PATH.  As the LaunchAgent does, have
+# env-config.el (loaded from early-init.el) import the login shell's
+# environment; an Emacs started from a shell leaves this unset.
+Environment=EMACS_IMPORT_SHELL_ENV=1
+# Emacs exits with status 15 on the SIGTERM systemd sends to stop it.
+SuccessExitStatus=15
+# As the LaunchAgent's KeepAlive: restart after any exit, (kill-emacs)
+# included, at once; launchd too restarts a daemon that has run longer than
+# its 10 s ThrottleInterval at once.  `systemctl --user stop emacs' stops it
+# for good.
+Restart=always
+RestartSec=0
+
+[Install]
+WantedBy=graphical-session.target
