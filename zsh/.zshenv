@@ -156,12 +156,13 @@ fi
 
 () {
   # We load it right away in zshenv because it is often needed by scripts executed without loading zshrc
+  # Added even before the directory exists: on a new machine zinit creates it
+  # during the first shell, and later installs (e.g. dripfetch's atclone) run
+  # the binaries linked there, such as uv
   local ZPFX="$HOME/.local/share/zinit/polaris/bin"
-  if [ -d "$HOME/.local/share/zinit/polaris/bin" ]; then
-    # Ensure ZPFX/bin is first in PATH
-    path=($ZPFX $path)
-    typeset -U path
-  fi
+  # Ensure ZPFX/bin is first in PATH
+  path=($ZPFX $path)
+  typeset -U path
 }
 
 ##############################
